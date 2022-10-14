@@ -89,6 +89,9 @@ export default class Validator {
         this.errors = Errors;
         return Object.keys(Errors).length == 0;
     }
+    async fails(){
+        return !await this.passes()
+    }
     async _getSubmitErrors(): Promise<Record<string, _Error[]>> {
         let Result = {};
         for (let i = 0; i < Validator.Rules.length; i++) {
