@@ -1,5 +1,5 @@
-import Validator, { parseRules } from "../main";
-import { string, int, min, limit } from "../Rules";
+import Validator, { parseRules, Rules } from "../main";
+import { string, int, min, limit, regExp } from "../Rules";
 
 describe("test some validators",  () => {
     const DefaultValidator = new Validator({}, {}, {});
@@ -432,3 +432,14 @@ describe("required without method",  () => {
         ).toBe(false);
     });
 });
+describe("test regEx",()=>{
+    test("simple string",async ()=>{
+        const reg=/(^myWord)$/ig
+        const myExp={val:["regex:/(^myWord)$/"]}
+        expect(await new Validator({val:"myWord"},myExp,{}).passes()).toBe(true)
+        expect(await new Validator({val:"string"},myExp,{}).passes()).toBe(false)
+        expect(await new Validator({val:" myWord"},myExp,{}).passes()).toBe(false)
+        expect(await new Validator({val:"myWord "},myExp,{}).passes()).toBe(false)
+    })
+
+})

@@ -1,4 +1,4 @@
 import { MessagesStore } from "../../Rule";
 
-const ValueNotExist:MessagesStore={ en: "the input value is not equal the another value" }
-export default ValueNotExist
+const ValueNOTtheSame:MessagesStore={ en: "the input value is not equal the another value" }
+export default ValueNOTtheSame

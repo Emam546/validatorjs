@@ -79,4 +79,12 @@ describe("test Regular Expression of Validators", () => {
         );
         expect(r.require_without.isequal("r:myPath,value")).toBe(false);
     });
+    test("regExp",()=>{
+        expect(r.regExp.isequal("regex:/myXp/ig")).toBe(true)
+        expect(r.regExp.isequal("regex:/myReg/")).toBe(true)
+        expect(r.regExp.isequal("regex://ig")).toBe(false)
+        expect(r.regExp.isequal("regex:")).toBe(false)
+        expect(r.regExp.isequal(" regex:/myXp/ig")).toBe(false)
+        expect(r.regExp.isequal("regex:/myXp/ig ")).toBe(false)
+    })
 });

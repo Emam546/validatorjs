@@ -56,7 +56,5 @@ export default class Rule {
         return returnedErrors
     }
 
-    inside(){
-        
-    }
+
 }

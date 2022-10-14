@@ -70,8 +70,8 @@ export const require_if = new Rule(
         _require_if(Validator.inputs, name, Validator, ...a)
 );
 export const require_unless = new Rule(
-    /(^required_if:)\S+,\S+/,
+    /(^required_unless:)\S+,\S+/,
     () => undefined,
     (name, Validator, ...a) =>
-        _require_if(Validator.inputs, name, Validator, ...a)
+    _require_unless(Validator.inputs, name, Validator, ...a)
 );

@@ -18,6 +18,7 @@ import { _in, notIn } from "./in_notIn";
 import required from "./required";
 import { require_if, require_unless } from "./require_if";
 import { require_without, require_withoutAll } from "./require_without";
+import regExp from "./regExp";
 
 export {
     accept,
@@ -45,4 +46,5 @@ export {
     require_without,
     require_withoutAll,
     require_unless,
+    regExp
 };
