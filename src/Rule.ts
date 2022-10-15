@@ -15,7 +15,7 @@ export interface _Error {
 }
 export type GetMessageFun=(value: any,name: string,validator: Validator,path:string,...a:any[])=>string
 export type StoredMessage=string|GetMessageFun
-export type MessagesStore=Partial<Record<LangType,StoredMessage>>
+export type MessagesStore=Record<LangType,StoredMessage>
 export type InitSubmitFun = (name:string,validator:Validator,path:string,lang:LangType)=>ReturnType<RuleFun>
 export default class Rule {
     private readonly name: RegExp | String;
