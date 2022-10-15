@@ -69,11 +69,12 @@ export default class Validator {
     constructor(
         inputs: Record<string, any>,
         rules: Rules,
-        options: ValidatorOptions
+        options?: ValidatorOptions
     ) {
         this.inputs = inputs;
         this.CRules = rules;
-        this.options = options;
+        this.options = options||{};
+        if(options)
         this.lang = options.lang || this.lang;
     }
     async passes(): Promise<boolean> {
