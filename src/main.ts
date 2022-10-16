@@ -209,12 +209,12 @@ export default class Validator {
     inside() {
         return compare(this.validAttr(), this.inputs);
     }
-    async validate(value: any, rule: string, path: string): Promise<_Error[]> {
+    async validate(value: any, rule: string, path: string,expect?:[string]): Promise<_Error[]> {
         let has = false;
         const arrMess: _Error[] = [];
         for (let i = 0; i < Validator.Rules.length; i++) {
             const ele = Validator.Rules[i];
-            if (ele.isequal(rule)) {
+            if (ele.isequal(rule) && !(expect && !expect.some(rul=>ele.isequal(rul)))) {
                 has = true;
                 const message =await ele.validate(
                     value,
