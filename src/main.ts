@@ -73,9 +73,8 @@ export default class Validator {
     ) {
         this.inputs = inputs;
         this.CRules = rules;
-        this.options = options||{};
-        if(options)
-        this.lang = options.lang || this.lang;
+        this.options = options || {};
+        if (options) this.lang = options.lang || this.lang;
     }
     async passes(): Promise<boolean> {
         //Just object of paths and there current objects
@@ -83,15 +82,19 @@ export default class Validator {
         //Just object of paths and Errors description
         let Errors: Record<string, _Error[]> = {};
         for (const path in this.CRules) {
-            const r = await this._get_errors(this.inputs, path, this.CRules[path]);
+            const r = await this._get_errors(
+                this.inputs,
+                path,
+                this.CRules[path]
+            );
             // result = { ...result, ...r[0] };
             Errors = { ...Errors, ...r };
         }
         this.errors = Errors;
         return Object.keys(Errors).length == 0;
     }
-    async fails(){
-        return !await this.passes()
+    async fails() {
+        return !(await this.passes());
     }
     async _getSubmitErrors(): Promise<Record<string, _Error[]>> {
         let Result = {};
@@ -101,6 +104,7 @@ export default class Validator {
         }
         return Result;
     }
+    
     async _get_errors(
         inputs: any,
         path: string,
@@ -116,7 +120,7 @@ export default class Validator {
             if (paths[i].indexOf("*") == 0) {
                 let currPath = addedPath + paths.slice(0, i).join(".");
                 let [, type_, min, max]: Array<any> = paths[i].split(":");
-                const oldPath = paths.slice(0, i).join(".");
+                const oldPath = paths.slice(0, i + 1).join(".");
                 min = parseInt(min) || 0;
                 max = parseInt(max) || Infinity;
                 const newPath = paths.slice(i + 1).join(".");
@@ -143,7 +147,6 @@ export default class Validator {
                             rule,
                             `${addedPath}${oldPath}.${key}.`
                         );
-                        // result = { ...result, ...r[0] };
                         Errors = { ...Errors, ...r };
                     }
                 } else {
@@ -177,24 +180,30 @@ export default class Validator {
                 if (!Object.prototype.hasOwnProperty.call(currentObj, paths[i]))
                     break;
                 currentObj = currentObj[paths[i]];
-                if (i === paths.length - 1) {
-                    if (rule) {
-                        for (let i = 0; i < rule.length; i++) {
-                            const result = await this.validate(
-                                currentObj,
-                                rule[i],
-                                addedPath + path
-                            );
-                            if (result.length)
-                                if (!Errors[path]) Errors[path] = result;
-                                else Errors[path].push(...result);
-                        }
+            } else if (i !== paths.length - 1)
+                Errors[addedPath + paths.slice(0, i).join(".")] = [
+                    {
+                        value: currentObj,
+                        message: "the current value is not a object",
+                    },
+                ];
+            if (i === paths.length - 1) {
+                if (rule) {
+                    for (let i = 0; i < rule.length; i++) {
+                        const result = await this.validate(
+                            currentObj,//value
+                            rule[i],
+                            addedPath+path
+                        );
+                        if (result.length)
+                            if (!Errors[addedPath + path])
+                                Errors[addedPath + path] = result;
+                            else Errors[addedPath + path].push(...result);
                     }
-                    // result[addedPath + path] = currentObj;
                 }
             }
         }
-        return  Errors;
+        return Errors;
     }
     getValue(path: string) {
         return getValue(this.inputs, path);
@@ -209,14 +218,22 @@ export default class Validator {
     inside() {
         return compare(this.validAttr(), this.inputs);
     }
-    async validate(value: any, rule: string, path: string,expect?:[string]): Promise<_Error[]> {
+    async validate(
+        value: any,
+        rule: string,
+        path: string,
+        expect?: [string]
+    ): Promise<_Error[]> {
         let has = false;
         const arrMess: _Error[] = [];
         for (let i = 0; i < Validator.Rules.length; i++) {
             const ele = Validator.Rules[i];
-            if (ele.isequal(rule) && !(expect && !expect.some(rul=>ele.isequal(rul)))) {
+            if (
+                ele.isequal(rule) &&
+                !(expect && !expect.some((rul) => ele.isequal(rul)))
+            ) {
                 has = true;
-                const message =await ele.validate(
+                const message = await ele.validate(
                     value,
                     rule,
                     this,
