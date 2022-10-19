@@ -254,8 +254,10 @@ export default class Validator {
         name: RegExp | string,
         fun: RuleFun,
         initSubmit?: InitSubmitFun
-    ) {
-        return Validator.Rules.push(new Rule(name, fun, initSubmit));
+    ):Rule {
+        const rule=new Rule(name, fun, initSubmit)
+        Validator.Rules.push(rule);
+        return rule
     }
 }
 Validator.Rules = Object.values({ ...r });
