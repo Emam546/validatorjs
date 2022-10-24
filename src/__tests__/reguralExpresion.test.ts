@@ -87,4 +87,28 @@ describe("test Regular Expression of Validators", () => {
         expect(r.regExp.isequal(" regex:/myXp/ig")).toBe(false)
         expect(r.regExp.isequal("regex:/myXp/ig ")).toBe(false)
     })
+    describe("date",()=>{
+        const currDate=new Date()
+        test("after",()=>{
+            expect(r.after.isequal(`after:${currDate}`)).toBe(true)
+            expect(r.after.isequal(`after: ${currDate}`)).toBe(true)
+            expect(r.after.isequal(`after:`)).toBe(true)
+            expect(r.after.isequal(`after:1231234234`)).toBe(true)
+            expect(r.after.isequal(` after:1231234234`)).toBe(false)
+        })
+        test("before",()=>{
+            expect(r.before.isequal(`before:${currDate}`)).toBe(true)
+            expect(r.before.isequal(`before: ${currDate}`)).toBe(true)
+            expect(r.before.isequal(`before:`)).toBe(true)
+            expect(r.before.isequal(`before:1231234234`)).toBe(true)
+            expect(r.before.isequal(` before:1231234234`)).toBe(false)
+        })
+        test("date",()=>{
+            expect(r.date.isequal(`date:${currDate}`)).toBe(true)
+            expect(r.date.isequal(`date: ${currDate}`)).toBe(true)
+            expect(r.date.isequal(`date:`)).toBe(true)
+            expect(r.date.isequal(`date:1231234234`)).toBe(true)
+            expect(r.date.isequal(` date:1231234234`)).toBe(false)
+        })
+    })
 });
