@@ -506,27 +506,28 @@ describe("test dates",()=>{
         })
     })
     describe("date",()=>{
+        const CurrDate=new Date(new Date().toDateString())
         const Rules=parseRules({date:[`date:${CurrDate}`]})
         test("simple date",async()=>{
-            expect(await new Validator({date:new Date()},Rules).passes()).toBe(true)
-            expect(await new Validator({date:new Date(Date.now() +1e10)},Rules).passes()).toBe(false)
-            expect(await new Validator({date:new Date(Date.now() -1e10)},Rules).passes()).toBe(false)
+            expect(await new Validator({date:CurrDate},Rules).passes()).toBe(true)
+            expect(await new Validator({date:new Date(CurrDate.getTime() +1e10)},Rules).passes()).toBe(false)
+            expect(await new Validator({date:new Date(CurrDate.getTime()-1e10)},Rules).passes()).toBe(false)
         })
         test("string data",async()=>{
-            expect(await new Validator({date:new Date(Date.now()).toUTCString()},Rules).passes()).toBe(true)
-            expect(await new Validator({date:new Date(Date.now()).toJSON()},Rules).passes()).toBe(true)
-            expect(await new Validator({date:new Date(Date.now()).toDateString()},Rules).passes()).toBe(false)
-            expect(await new Validator({date:new Date(Date.now()).toISOString()},Rules).passes()).toBe(true)
-            expect(await new Validator({date:new Date(Date.now()).toLocaleDateString()},Rules).passes()).toBe(false)
-            expect(await new Validator({date:new Date(Date.now()).toString()},Rules).passes()).toBe(true)
+            expect(await new Validator({date:new Date(CurrDate.getTime()).toUTCString()},Rules).passes()).toBe(true)
+            expect(await new Validator({date:new Date(CurrDate.getTime()).toJSON()},Rules).passes()).toBe(true)
+            expect(await new Validator({date:new Date(CurrDate.getTime()).toDateString()},Rules).passes()).toBe(true)
+            expect(await new Validator({date:new Date(CurrDate.getTime()).toISOString()},Rules).passes()).toBe(true)
+            expect(await new Validator({date:new Date(CurrDate.getTime()).toLocaleDateString()},Rules).passes()).toBe(true)
+            expect(await new Validator({date:new Date(CurrDate.getTime()).toString()},Rules).passes()).toBe(true)
             
         })
         test("test number",async()=>{
-            expect(await new Validator({date:(Date.now()-1e12).toString()},Rules).passes()).toBe(false)
-            expect(await new Validator({date:Date.now()},Rules).passes()).toBe(true)
-            expect(await new Validator({date:Date.now()+1e10},Rules).passes()).toBe(false)
-            expect(await new Validator({date:Date.now()-1e10},Rules).passes()).toBe(false)
-            expect(await new Validator({date:(Date.now()+1e10).toString()},Rules).passes()).toBe(false)
+            expect(await new Validator({date:(CurrDate.getTime()-1e12).toString()},Rules).passes()).toBe(false)
+            expect(await new Validator({date:CurrDate.getTime()},Rules).passes()).toBe(true)
+            expect(await new Validator({date:CurrDate.getTime()+1e10},Rules).passes()).toBe(false)
+            expect(await new Validator({date:CurrDate.getTime()-1e10},Rules).passes()).toBe(false)
+            expect(await new Validator({date:(CurrDate.getTime()+1e10).toString()},Rules).passes()).toBe(false)
             const str=(Date.now()+1e10).toString()
             expect(await new Validator({date:`${str} `},Rules).passes()).toBe(false)
             expect(await new Validator({date:` ${str}`},Rules).passes()).toBe(false)
@@ -536,19 +537,21 @@ describe("test dates",()=>{
             
         })
         describe("test now",()=>{
+            const CurrDate=new Date()
+
             test("increment operation",async()=>{
                 const rules={date:["date:now+100"]}
-                expect(await new Validator({date:Date.now()+1e4},rules).passes()).toBe(false)
-                expect(await new Validator({date:Date.now()},rules).passes()).toBe(true)
-                expect(await new Validator({date:Date.now()+100},rules).passes()).toBe(true)
-                expect(await new Validator({date:(Date.now()-1e10).toString()},rules).passes()).toBe(false)
+                expect(await new Validator({date:CurrDate.getTime()+1e4},rules).passes()).toBe(false)
+                expect(await new Validator({date:CurrDate.getTime()},rules).passes()).toBe(true)
+                expect(await new Validator({date:CurrDate.getTime()+100},rules).passes()).toBe(true)
+                expect(await new Validator({date:(CurrDate.getTime()-1e10).toString()},rules).passes()).toBe(false)
             })
             test("decrement operation",async()=>{
                 const rules={date:["date:now-100"]}
-                expect(await new Validator({date:Date.now()-100},rules).passes()).toBe(true)
-                expect(await new Validator({date:Date.now()-1e4},rules).passes()).toBe(false)
-                expect(await new Validator({date:Date.now()+1e4},rules).passes()).toBe(false)
-                // expect(await new Validator({date:(Date.now()-1e10).toString()},Rules).passes()).toBe(false)
+                expect(await new Validator({date:CurrDate.getTime()-100},rules).passes()).toBe(true)
+                expect(await new Validator({date:CurrDate.getTime()-1e4},rules).passes()).toBe(false)
+                expect(await new Validator({date:CurrDate.getTime()+1e4},rules).passes()).toBe(false)
+                // expect(await new Validator({date:(CurrDate.getTime()-1e10).toString()},Rules).passes()).toBe(false)
             })
         })
     })
