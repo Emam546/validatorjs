@@ -9,6 +9,8 @@ import arrayKind from "./utils/arrayKind";
 import { getValue, getAllValues } from "./utils/getValue";
 import validAttr from "./utils/validAttr";
 import compare from "./utils/compare";
+import inValidAttr from "./utils/inValidAttr";
+import isEmpty from "./utils/isEmpty";
 export type RulesGetter = Array<string> | null;
 export type Rules = Record<string, RulesGetter>;
 export const TYPE_ARRAY = ["object", "array"];
@@ -64,8 +66,10 @@ export default class Validator {
     CRules: Rules;
     options: ValidatorOptions;
     errors: Record<string, _Error[]> = {};
+    inValidErrors:Record<string,_Error>|null=null;
     public lang: LangTypes = "en";
     public static Rules: Rule[];
+    public readonly empty:boolean;
     constructor(
         inputs: Record<string, any>,
         rules: Rules,
@@ -74,6 +78,7 @@ export default class Validator {
         this.inputs = inputs;
         this.CRules = rules;
         this.options = options || {};
+        this.empty=isEmpty(inputs)
         if (options) this.lang = options.lang || this.lang;
     }
     async passes(): Promise<boolean> {
@@ -104,7 +109,7 @@ export default class Validator {
         }
         return Result;
     }
-    
+
     async _get_errors(
         inputs: any,
         path: string,
@@ -191,9 +196,9 @@ export default class Validator {
                 if (rule) {
                     for (let i = 0; i < rule.length; i++) {
                         const result = await this.validate(
-                            currentObj,//value
+                            currentObj, //value
                             rule[i],
-                            addedPath+path
+                            addedPath + path
                         );
                         if (result.length)
                             if (!Errors[addedPath + path])
@@ -212,12 +217,16 @@ export default class Validator {
         return getAllValues(this.inputs, path);
     }
     static parseRules = parseRules;
-    validAttr() {
+    validAttr(): any {
         return validAttr(this.inputs, this.CRules);
+    }
+    inValidAttr() {
+        return (this.inValidErrors=inValidAttr(this.inputs, this.CRules));
     }
     inside() {
         return compare(this.validAttr(), this.inputs);
     }
+    
     async validate(
         value: any,
         rule: string,
@@ -254,10 +263,10 @@ export default class Validator {
         name: RegExp | string,
         fun: RuleFun,
         initSubmit?: InitSubmitFun
-    ):Rule {
-        const rule=new Rule(name, fun, initSubmit)
+    ): Rule {
+        const rule = new Rule(name, fun, initSubmit);
         Validator.Rules.push(rule);
-        return rule
+        return rule;
     }
 }
 Validator.Rules = Object.values({ ...r });

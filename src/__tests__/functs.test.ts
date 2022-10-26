@@ -1,8 +1,10 @@
-import { parseRules } from "../main";
+import Validator, { parseRules } from "../main";
 import constructRule from "../utils/constructObj";
 import { getAllValues, getValue } from "../utils/getValue";
 import mergeObjects from "../utils/merge";
 import validAttr from "../utils/validAttr";
+import inValidAttr from "../utils/inValidAttr";
+import isEmpty from "../utils/isEmpty";
 
 describe("Test get value methods", () => {
     test("getValue", () => {
@@ -130,7 +132,7 @@ describe("Valid attr", () => {
         };
         expect(validAttr(f1, rules)).toStrictEqual(f1);
         expect(validAttr(f2, rules)).toStrictEqual(f1);
-        expect(validAttr(f3, rules)).toStrictEqual(f3);
+        expect(validAttr(f3, rules)).toStrictEqual(f1);
     });
     test("array of objects", () => {
         const rules = parseRules({
@@ -218,14 +220,14 @@ describe("test construct methods", () => {
         const rules = parseRules({
             name: ["string"],
             age: ["integer"],
-            location: [["integer"], "array"],
-            friends: [["string"], "object"],
+            location: [["integer"], "array", 0, Infinity],
+            friends: [["string"], "object", 0, Infinity],
         });
         const res = {
             name: null,
             age: null,
-            location: [null, "array"],
-            friends: [null, "object"],
+            location: [null, "array", 0, Infinity],
+            friends: [null, "object", 0, Infinity],
         };
         expect(constructRule(rules)).toStrictEqual(res);
     });
@@ -233,8 +235,18 @@ describe("test construct methods", () => {
         const rules = parseRules({
             name: ["string"],
             age: ["integer"],
-            locations: [{ x: ["integer"], y: ["integer"] }, "array"],
-            friends: [{ name: "string", age: "integer" }, "object"],
+            locations: [
+                { x: ["integer"], y: ["integer"] },
+                "array",
+                0,
+                Infinity,
+            ],
+            friends: [
+                { name: "string", age: "integer" },
+                "object",
+                0,
+                Infinity,
+            ],
             schools: [
                 {
                     locations: [
@@ -243,10 +255,14 @@ describe("test construct methods", () => {
                             y: ["integer"],
                         },
                         "array",
+                        0,
+                        Infinity,
                     ],
-                    names: [["string"], "array"],
+                    names: [["string"], "array", 0, Infinity],
                 },
                 "object",
+                0,
+                Infinity,
             ],
             email: null,
             site: null,
@@ -254,8 +270,8 @@ describe("test construct methods", () => {
         const res = {
             name: null,
             age: null,
-            locations: [{ x: null, y: null }, "array"],
-            friends: [{ name: null, age: null }, "object"],
+            locations: [{ x: null, y: null }, "array", 0, Infinity],
+            friends: [{ name: null, age: null }, "object", 0, Infinity],
             schools: [
                 {
                     locations: [
@@ -264,10 +280,14 @@ describe("test construct methods", () => {
                             y: null,
                         },
                         "array",
+                        0,
+                        Infinity,
                     ],
-                    names: [null, "array"],
+                    names: [null, "array", 0, Infinity],
                 },
                 "object",
+                0,
+                Infinity,
             ],
             email: null,
             site: null,
@@ -276,7 +296,122 @@ describe("test construct methods", () => {
     });
     test("direct array", () => {
         const rules = parseRules([{ name: "string", password: "string" }]);
-        const ex = [{ name: null, password: null }, "array"];
+        const ex = [{ name: null, password: null }, "array", 0, Infinity];
         expect(constructRule(rules)).toStrictEqual(ex);
+    });
+});
+describe("inValid attr", () => {
+    test("main task", () => {
+        const rules = parseRules({
+            name: "string",
+            age: ["integer"],
+            location: [["integer"], "array", 0, 2],
+        });
+        const f1 = {
+            name: "mahmoud",
+            age: 12,
+            location: [1, 2],
+        };
+        const f2 = {
+            name: "mahmoud",
+            age: 12,
+            location: [1, 2],
+            unusedAttr: "unused",
+        };
+        const f3 = {
+            name: "mahmoud",
+            age: 12,
+            location: [1, 2, { anotheri: 1234 }],
+        };
+        expect(inValidAttr(f1, rules)).toBeNull();
+        expect(inValidAttr(f2, rules)).not.toBeNull();
+        expect(inValidAttr(f3, rules)).not.toBeNull();
+    });
+    test("array of objects", () => {
+        const rules = parseRules({
+            friends: [{ name: "string", age: "integer" }],
+        });
+        const f1 = {
+            friends: [
+                { name: "mahmoud", age: 14 },
+                { name: "ali", age: 12 },
+                { name: "osama", age: 12 },
+                { name: "ahmed", age: 19 },
+            ],
+        };
+        const f2 = {
+            friends: [
+                { name: "mahmoud", age: 14 },
+                { name: "ali", age: 12 },
+                { name: "osama", age: 12 },
+                { name: "ahmed", age: 12, location: [123, 54645] },
+            ],
+        };
+        expect(inValidAttr(f1, rules)).toBeNull();
+        expect(inValidAttr(f2, rules)).not.toBeNull();
+    });
+    test("object map", () => {
+        const rules = parseRules({
+            friends: [
+                {
+                    age: "integer",
+                    email: "string",
+                    location: [["integer"]],
+                    friends: [{ age: ["integer"] }, "object"],
+                },
+                "object",
+            ],
+        });
+        const f1 = {
+            friends: {
+                ahmed: {
+                    age: 14,
+                    email: "g@g.com",
+                    location: [1, 2],
+                    friends: {
+                        ahmed: { age: 10 },
+                        ali: { age: 12 },
+                    },
+                },
+                elsayed: { age: 12, email: "a@g.com" },
+                ali: { age: 12, email: "c@g.com", location: [1, 2] },
+                osama: { age: 12, location: [1, 2] },
+            },
+        };
+        const f2 = {
+            friends: {
+                ahmed: {
+                    age: 14,
+                    email: "g@g.com",
+                    location: [1, 2],
+                    friends: {
+                        ahmed: { age: 10, number: 12 },
+                        ali: { age: 12 },
+                    },
+                },
+                elsayed: { age: 12, email: "a@g.com" },
+                ali: { age: 12, email: "c@g.com", location: [1, 2] },
+                osama: { age: 12, location: [1, 2] },
+            },
+        };
+        expect(inValidAttr(f1, rules)).toBeNull();
+        expect(inValidAttr(f2, rules)).not.toBeNull();
+    });
+});
+describe("Test isEmpty", () => {
+    it("simple tests", () => {
+        expect(isEmpty(0)).toBe(false);
+        expect(isEmpty({})).toBe(true);
+        expect(isEmpty(undefined)).toBe(true);
+        expect(isEmpty(true)).toBe(false);
+        expect(isEmpty(false)).toBe(false);
+        expect(isEmpty("string")).toBe(false);
+        expect(isEmpty("")).toBe(true);
+        expect(isEmpty([])).toBe(true);
+        expect(isEmpty([null])).toBe(false);
+        expect(isEmpty([undefined])).toBe(false);
+        expect(isEmpty(123213)).toBe(false);
+        expect(isEmpty(-1232131)).toBe(false);
+        expect(isEmpty(-1232131)).toBe(false);
     });
 });

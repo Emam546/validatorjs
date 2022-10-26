@@ -1,6 +1,7 @@
 import Rule, { MessagesStore, RuleFun } from "../Rule";
 import handelMessage from "../utils/handelMessage";
-import { isNumber, isNumeric, isString } from "../utils/types";
+import isEmpty from "../utils/isEmpty";
+import { isString } from "../utils/types";
 export const NotValidDate: MessagesStore = { en: "THE DATE IS NOT VALID" };
 export const After: MessagesStore = {
     en: (_, name) => `The Date is before ${getTimeName(name)} date`,
@@ -13,13 +14,13 @@ export const Equal: MessagesStore = {
 };
 
 function isValidDate(dateString: any):boolean {
-
     return getTime(dateString).toString() !== "Invalid Date"
-
 }
 function getTime(dateString:any):Date{
     if(dateString instanceof Date)
         return dateString
+    if(isEmpty(dateString))
+        return new Date("Invalid Date")
     if (isString(dateString)&&/(^\d+)$/.test(dateString) && !isNaN(parseInt(dateString))) {
         return new Date(parseInt(dateString));
     }else
