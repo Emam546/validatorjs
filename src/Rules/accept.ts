@@ -5,6 +5,7 @@ export const Messages :MessagesStore={"en":"THE VALUE is not accepted type"}
 export default new Rule("accepted", (value,...arr) => {
     return (
         value === 'on' ||
+        value === 'true' ||
         value === 'yes' ||
         value === 1 ||
         value === '1' ||
