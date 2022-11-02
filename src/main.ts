@@ -83,7 +83,9 @@ export default class Validator {
     }
     async passes(): Promise<boolean> {
         //Just object of paths and there current objects
-        let result: Record<string, any> = {};
+        return (await this.getErrors())===null
+    }
+    async getErrors():Promise<Record<string, _Error[]>|null>{
         //Just object of paths and Errors description
         let Errors: Record<string, _Error[]> = {};
         for (const path in this.CRules) {
@@ -96,7 +98,9 @@ export default class Validator {
             Errors = { ...Errors, ...r };
         }
         this.errors = Errors;
-        return Object.keys(Errors).length == 0;
+
+        if(Object.keys(Errors).length == 0)return null;
+        return Errors
     }
     async fails() {
         return !(await this.passes());
