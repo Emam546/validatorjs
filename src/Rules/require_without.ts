@@ -3,7 +3,8 @@ import Rule, { GetMessageFun, InitSubmitFun, RuleFun } from "../Rule";
 import LangTypes from "../types/lang";
 import compare from "../utils/compare";
 import { getAllValues, getValue } from "../utils/getValue";
-import { getValue as getValueRequired } from "./required";
+import { getValueMessage } from "./required";
+
 
 function _require_without(
     inputs: any,
@@ -20,8 +21,8 @@ function _require_without(
     if (Ppath)
         for (const key in allObjects) {
             const element = allObjects[key];
-            if (vpaths.some((vpath) => getValue(element, vpath) == undefined)) {
-                const res = getValueRequired(
+            if (vpaths.some((vpath) => getValue(element, vpath) === undefined)) {
+                const res = getValueMessage(
                     element,
                     "required",
                     validator,
@@ -50,7 +51,7 @@ function _require_withoutAll(
             if (
                 vpaths.every((vpath) => getValue(element, vpath) == undefined)
             ) {
-                const res = getValueRequired(
+                const res = getValueMessage(
                     element,
                     "required",
                     validator,

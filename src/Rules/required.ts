@@ -1,15 +1,17 @@
 import Validator from "../main";
-import Rule, { InitSubmitFun } from "../Rule";
+import Rule, { InitSubmitFun, RuleFun } from "../Rule";
 import LangTypes from "../types/lang";
+import { getAllValues, getValue } from "../utils/getValue";
 import handelMessage from "../utils/handelMessage";
 import ValueNotExist from "./Messages/valueNotExist";
 
-export function getValue(
+export function getValueMessage(
     inputs: any,
     name: string,
     validator: Validator,
     path: string,
-    lang: LangTypes
+    lang: LangTypes,
+    
 ): ReturnType<InitSubmitFun> {
     const paths = path.split(".");
     let currObj = inputs;
@@ -18,7 +20,8 @@ export function getValue(
             for (const ui in currObj) {
                 const element = currObj[ui];
                 if (
-                    getValue(
+                    element!=undefined&&
+                    getValueMessage(
                         element,
                         name,
                         validator,
@@ -47,9 +50,32 @@ export function getValue(
             );
         else currObj = currObj[paths[i]];
     }
+    
+}
+function require_if(...[inputs,name,validator,path,lang]:Parameters<RuleFun>){
+    const ObjectPath = path.split(".").slice(0, -1).join(".");
+    const allObjects = getAllValues(inputs, ObjectPath);
+    const Ppath = path.split(".").at(-1);
+
+    if (Ppath)
+        for (const key in allObjects) {
+            const element = allObjects[key];
+            
+            if (getValue(element, Ppath)===undefined) {
+                const res = getValueMessage(
+                    element,
+                    "required",
+                    validator,
+                    Ppath,
+                    lang
+                );
+                if (res != undefined) return res;
+            }
+            
+        }
 }
 export default new Rule(
     "required",
     () => undefined,
-    (name, Validator, ...a) => getValue(Validator.inputs, name, Validator, ...a)
+    (name, Validator, ...a) => require_if(Validator.inputs, name, Validator, ...a)
 );

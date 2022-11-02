@@ -1,19 +1,21 @@
 import { isNumber, isNumeric } from "./types";
 
 export function getAllValues(inputs: any, path: string): any[] {
-    if (!path.length) return [inputs];
+    if (!path.length) return [inputs]
     const keys = path.split(".");
     let currObj = inputs;
-    for (let i = 0; i < keys.length && currObj != undefined; i++) {
+    for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
+        if(currObj===undefined)
+            return []
         if (key.startsWith("*")) {
             const returnedPath = keys.slice(i + 1).join(".");
-            let allValues: any[] = [];
+            let allValues:ReturnType<typeof getAllValues> = [];
             for (const key in currObj)
-                allValues = [
+                allValues = {
                     ...allValues,
                     ...getAllValues(currObj[key], returnedPath),
-                ];
+                };
 
             return allValues;
         } else currObj = currObj[key];

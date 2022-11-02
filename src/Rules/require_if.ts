@@ -3,7 +3,7 @@ import Rule, { GetMessageFun, InitSubmitFun, RuleFun } from "../Rule";
 import LangTypes from "../types/lang";
 import compare from "../utils/compare";
 import { getAllValues, getValue } from "../utils/getValue";
-import { getValue as getValueRequired } from "./required";
+import { getValueMessage } from "./required";
 
 function _require_if(
     inputs: any,
@@ -23,7 +23,7 @@ function _require_if(
             const element = allObjects[key];
             const val = getValue(element, vpath);
             if (compare(val, value)) {
-                const res = getValueRequired(
+                const res = getValueMessage(
                     element,
                     "required",
                     validator,
@@ -52,7 +52,7 @@ function _require_unless(
             const element = allObjects[key];
             const val = getValue(element, vpath);
             if (!compare(val, value)) {
-                const res = getValueRequired(
+                const res = getValueMessage(
                     element,
                     "required",
                     validator,
