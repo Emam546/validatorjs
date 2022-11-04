@@ -25,7 +25,7 @@ export function parseRules(input: any): Rules {
     // - string that split with | sign
     const flattened: Rules = {};
     const _get_rule = (rules: any, property?: string) => {
-        if (Array.isArray(rules)) {
+        if (isArray(rules)) {
             // if there is added property before add .
             const p = property ? property + ".*" : "*";
             if (rules.length) {
@@ -34,10 +34,14 @@ export function parseRules(input: any): Rules {
                 // - array that describes a rules of the object or array
                 if (is_Rule(rules))
                     //check if it is array that describes some rule
-                    flattened[property || "*:array"] = rules;
-                else if (rules.length && rules.length <= 4)
+                    flattened[property || "."] = rules;
+                else if (rules.length && rules.length <= 3){
                     //get array rules and continue in parsing object
                     _get_rule(rules[0] as any, p + arrayKind(rules));
+                    if(rules[2] && isArray(rules)){
+                        _get_rule(rules[2],property)
+                    }
+                }
                 else throw new Error(`${rules} is not a valid rule input`);
             } else flattened[p] = null;
         } else {
@@ -128,10 +132,8 @@ export default class Validator {
         for (let i = 0; i < paths.length; i++) {
             if (paths[i].indexOf("*") == 0) {
                 let currPath = addedPath + paths.slice(0, i).join(".");
-                let [, type_, min, max]: Array<any> = paths[i].split(":");
+                let [, type_]: Array<any> = paths[i].split(":");
                 const oldPath = paths.slice(0, i + 1).join(".");
-                min = parseInt(min) || 0;
-                max = parseInt(max) || Infinity;
                 const newPath = paths.slice(i + 1).join(".");
                 if (type_ === "array" && isArray(currentObj)) {
                     for (let i = 0; i < currentObj.length; i++) {
@@ -167,22 +169,6 @@ export default class Validator {
                     ];
                     break;
                 }
-
-                let ArrErrors;
-                if (
-                    (ArrErrors = _arrayRange(
-                        min,
-                        max,
-                        currentObj,
-                        "",
-                        this,
-                        currPath
-                    ))
-                )
-                    Errors[currPath] = [
-                        { message: ArrErrors, value: currentObj },
-                    ];
-
                 //make _get_errors do the rest of work and break the loop
                 break;
             } else if (isObject(currentObj)) {

@@ -31,10 +31,11 @@ describe("Complex paths test", () => {
         });
     });
     test("object with limits", () => {
-        const Rules =Validator.parseRules( { person: [["string"],"object",0,2]});
+        const Rules =Validator.parseRules( { person: [["string"],"object",["limit:0:2"]]});
         const data = {};
         expect(new Validator(data, Rules, {}).CRules).toStrictEqual({
-            "person.*:object:0:2": ["string"],
+            "person.*:object": ["string"],
+            "person":["limit:0:2"]
         });
     });
 });

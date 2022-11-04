@@ -19,7 +19,7 @@ describe("test validate",  () => {
     test("test object describing", async () => {
         const Rules = Validator.parseRules({
             person: [
-                { age: ["integer"], friends: [["string"], "array", 0, 2] },
+                { age: ["integer"], friends: [["string"], "array", ["min:0","max:10"]] },
                 "object",
             ],
         });
@@ -32,7 +32,7 @@ describe("test validate",  () => {
                 ahmed: { age: 12, friends: ["ahmed", "ali", "new friend"] },
             },
         };
-        expect(await new Validator(data, Rules, {}).passes()).toBe(false);
+        expect(await new Validator(data, Rules, {}).getErrors()).toBeNull();
         data = {
             person: [{ age: 12, friends: ["ahmed", "ali", "new friend"] }],
         };
@@ -52,7 +52,7 @@ describe("test validate",  () => {
         expect(await new Validator(data2,rules).passes()).toBe(false)
     })
 });
-test("IF THE RULE EXIST",  async() => {
+test("if the rule exist",  async() => {
     const Rules = Validator.parseRules({
         name: "string",
     });
@@ -65,6 +65,7 @@ test("IF THE RULE EXIST",  async() => {
     expect(await valid.validate("name", "string", "")).toStrictEqual([]);
     expect(await valid.validate(1234, "string", "")).not.toStrictEqual([]);
 });
+
 describe("Confirm method",  () => {
     test("Main methods", async () => {
         let Rules = Validator.parseRules({

@@ -15,27 +15,12 @@ export function unMatchedValues(
     if (unMatchObj == null) return null;
     let errors: Record<string, _Error> = {};
     if (unMatchObj instanceof Array) {
-        const [, _type, min, max] = unMatchObj;
+        const [, _type] = unMatchObj;
         if (_type == "array" && !isArray(input))
             return {
                 [addedPath]: { message: "Unmatched type value", value: input },
             };
-        if (isArray(input)){
-            for (let i = max; i < input.length; i++)
-                errors[`${addedPath}${i}`] = {
-                    message: "invalid path ,value out of bounds",
-                    value: input[i],
-                };
-        }
-        else {
-            let i = 0;
-            for (const key in input)
-                if (max < i++) 
-                    errors[`${addedPath}${key}`] = {
-                        message: "invalid path ,value out of bounds",
-                        value: input[key],
-                    };
-        }
+
 
         if (unMatchObj[0])
             for (const key in input)

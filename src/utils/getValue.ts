@@ -1,5 +1,3 @@
-import { isNumber, isNumeric } from "./types";
-
 export function getAllValues(inputs: any, path: string): any[] {
     if (!path.length) return [inputs]
     const keys = path.split(".");
@@ -10,12 +8,12 @@ export function getAllValues(inputs: any, path: string): any[] {
             return []
         if (key.startsWith("*")) {
             const returnedPath = keys.slice(i + 1).join(".");
-            let allValues:ReturnType<typeof getAllValues> = [];
+            let allValues:any[] = [];
             for (const key in currObj)
-                allValues = {
+                allValues = [
                     ...allValues,
                     ...getAllValues(currObj[key], returnedPath),
-                };
+                ];
 
             return allValues;
         } else currObj = currObj[key];

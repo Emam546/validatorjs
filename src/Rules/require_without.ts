@@ -1,7 +1,6 @@
 import Validator from "../main";
-import Rule, { GetMessageFun, InitSubmitFun, RuleFun } from "../Rule";
+import Rule, {  RuleFun } from "../Rule";
 import LangTypes from "../types/lang";
-import compare from "../utils/compare";
 import { getAllValues, getValue } from "../utils/getValue";
 import { getValueMessage } from "./required";
 
