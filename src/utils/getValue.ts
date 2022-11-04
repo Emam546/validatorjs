@@ -4,8 +4,7 @@ export function getAllValues(inputs: any, path: string): any[] {
     let currObj = inputs;
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
-        if(currObj===undefined)
-            return []
+        
         if (key.startsWith("*")) {
             const returnedPath = keys.slice(i + 1).join(".");
             let allValues:any[] = [];
@@ -17,8 +16,9 @@ export function getAllValues(inputs: any, path: string): any[] {
 
             return allValues;
         } else currObj = currObj[key];
+        if(currObj===undefined)
+            return []
     }
-
     return [currObj];
 }
 export function getValue(inputs: any, path: string) {

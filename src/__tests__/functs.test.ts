@@ -10,75 +10,97 @@ describe("Test get value methods", () => {
     test("getValue", () => {
         expect(getValue({ name: "ahmed" }, "name")).toBe("ahmed");
         expect(
-            getValue({ persons: ["ahmed", "ali", "osama"] }, "persons.*1")
+            getValue({ person: ["ahmed", "ali", "osama"] }, "person.*1")
         ).toBe("ali");
         expect(
-            getValue({ persons: ["ahmed", "ali", "osama"] }, "persons.*1")
+            getValue({ person: ["ahmed", "ali", "osama"] }, "person.*1")
         ).toBe("ali");
         expect(
-            getValue({ persons: ["ahmed", "ali", "osama"] }, "persons.*2")
+            getValue({ person: ["ahmed", "ali", "osama"] }, "person.*2")
         ).toBe("osama");
-        expect(getValue({ persons: { 1: "ahmed" } }, "persons.1")).toBe(
+        expect(getValue({ person: { 1: "ahmed" } }, "person.1")).toBe(
             "ahmed"
         );
-        expect(getValue({ persons: { "1": "ahmed" } }, "persons.1")).toBe(
+        expect(getValue({ person: { "1": "ahmed" } }, "person.1")).toBe(
             "ahmed"
         );
         expect(
             getValue(
-                { persons: { "1": { name: ["ahmed"] } } },
-                "persons.1.name.*0"
+                { person: { "1": { name: ["ahmed"] } } },
+                "person.1.name.*0"
             )
         ).toBe("ahmed");
     });
-    test("get All Values", () => {
-        expect(getAllValues({ name: "ahmed" }, "name")).toStrictEqual([
-            "ahmed",
-        ]);
-        expect(
-            getAllValues(
-                { persons: ["ahmed", "ali", "osama"] },
-                "persons.*:array"
-            )
-        ).toStrictEqual(["ahmed", "ali", "osama"]);
-        expect(
-            getAllValues({ persons: { 1: "ahmed" } }, "persons.*:object")
-        ).toStrictEqual(["ahmed"]);
-        expect(
-            getAllValues({ persons: { "1": "ahmed" } }, "persons.*:1")
-        ).toStrictEqual(["ahmed"]);
-        expect(
-            getAllValues(
-                { persons: { "1": { name: ["ahmed"] } } },
-                "persons.*:array.name.*:array"
-            )
-        ).toStrictEqual(["ahmed"]);
-        expect(
-            getAllValues(
-                {
-                    persons: {
-                        "1": { name: ["ahmed"] },
-                        "2": { name: ["ali"] },
+    describe("get All Values", () => {
+        it("regular test", () => {
+            expect(getAllValues({ name: "ahmed" }, "name")).toStrictEqual([
+                "ahmed",
+            ]);
+            expect(
+                getAllValues(
+                    { person: ["ahmed", "ali", "osama"] },
+                    "person.*:array"
+                )
+            ).toStrictEqual(["ahmed", "ali", "osama"]);
+            expect(
+                getAllValues({ person: { 1: "ahmed" } }, "person.*:object")
+            ).toStrictEqual(["ahmed"]);
+            expect(
+                getAllValues({ person: { "1": "ahmed" } }, "person.*:1")
+            ).toStrictEqual(["ahmed"]);
+            expect(
+                getAllValues(
+                    { person: { "1": { name: ["ahmed"] } } },
+                    "person.*:array.name.*:array"
+                )
+            ).toStrictEqual(["ahmed"]);
+            expect(
+                getAllValues(
+                    {
+                        person: {
+                            "1": { name: ["ahmed"] },
+                            "2": { name: ["ali"] },
+                        },
                     },
-                },
-                "persons.*:array.name.*:array"
-            )
-        ).toStrictEqual(["ahmed", "ali"]);
-        expect(
-            getAllValues(
-                {
-                    persons: {
-                        "1": { name: ["ahmed"] },
-                        "2": { name: ["ali", "osama", "elsayed"] },
+                    "person.*:array.name.*:array"
+                )
+            ).toStrictEqual(["ahmed", "ali"]);
+            expect(
+                getAllValues(
+                    {
+                        person: {
+                            "1": { name: ["ahmed"] },
+                            "2": { name: ["ali", "osama", "elsayed"] },
+                        },
                     },
-                },
-                "persons.*:array.name.*:array"
-            )
-        ).toStrictEqual(["ahmed", "ali", "osama", "elsayed"]);
+                    "person.*:array.name.*:array"
+                )
+            ).toStrictEqual(["ahmed", "ali", "osama", "elsayed"]);
+        });
+        it("nested objects", () => {
+            expect(
+                getAllValues(
+                    { person:{name:"ali"} },
+                    "person.name"
+                )
+            ).toStrictEqual(["ali"]);
+            expect(
+                getAllValues(
+                    { person:{name:"ali"} },
+                    "person.friend.name"
+                )
+            ).toStrictEqual([]);
+            expect(
+                getAllValues(
+                    { person:{name:"ali"} },
+                    "person.friend"
+                )
+            ).toStrictEqual([]);
+        });
     });
 });
 describe("parseRules", () => {
-    it('main methods', () => {
+    it("main methods", () => {
         expect(parseRules({ name: "string" })).toStrictEqual({
             name: ["string"],
         });
@@ -107,25 +129,29 @@ describe("parseRules", () => {
         });
 
         expect(parseRules(["string"])).toStrictEqual({ ".": ["string"] });
-    })
-    describe('array methods', () => {
-        it("flattened object",()=>{
-            expect(parseRules([["string"],"array"])).toStrictEqual({
-                "*:array":["string"]
-            })
-            expect(parseRules([["string"],"array",["required"]])).toStrictEqual({
-                "*:array":["string"],
-                ".":["required"]
-            })
-        })
-        it("complex object",()=>{
-            expect(parseRules({names:[["string"],"array"]})).toStrictEqual({
-                "names.*:array":["string"]
-            })
-            expect(parseRules({names:[["string"],"array",["required"]]})).toStrictEqual({
-                "names.*:array":["string"],
-                "names":["required"]
-            })
+    });
+    describe("array methods", () => {
+        it("flattened object", () => {
+            expect(parseRules([["string"], "array"])).toStrictEqual({
+                "*:array": ["string"],
+            });
+            expect(
+                parseRules([["string"], "array", ["required"]])
+            ).toStrictEqual({
+                "*:array": ["string"],
+                ".": ["required"],
+            });
+        });
+        it("complex object", () => {
+            expect(parseRules({ names: [["string"], "array"] })).toStrictEqual({
+                "names.*:array": ["string"],
+            });
+            expect(
+                parseRules({ names: [["string"], "array", ["required"]] })
+            ).toStrictEqual({
+                "names.*:array": ["string"],
+                names: ["required"],
+            });
             const rules = parseRules({
                 name: ["string"],
                 age: ["integer"],
@@ -138,16 +164,28 @@ describe("parseRules", () => {
                 "location.*:array": ["integer"],
                 "friends.*:object": ["string"],
                 location: ["min:0"],
-                friends: ["min:0"]
-            })
-            ;
-            expect(parseRules([{ name: "string", password: "string" },"array",["min:0"]])).toStrictEqual({
-                "*:array.name":['string'],
-                "*:array.password":['string'],
-                ".":['min:0'],
+                friends: ["min:0"],
             });
-        })
-        
+            expect(
+                parseRules([
+                    { name: "string", password: "string" },
+                    "array",
+                    ["min:0"],
+                ])
+            ).toStrictEqual({
+                "*:array.name": ["string"],
+                "*:array.password": ["string"],
+                ".": ["min:0"],
+            });
+        });
+    });
+    it('use .', () => {
+        expect(parseRules({
+            ".":["string"]
+        })).toStrictEqual({".":["string"]})
+        expect(parseRules({
+            person:{name:["string"],".":"required"}
+        })).toStrictEqual({"person.name":["string"],"person":["required"]})
     })
 });
 describe("test construct methods", () => {
@@ -161,8 +199,8 @@ describe("test construct methods", () => {
         const res = {
             name: null,
             age: null,
-            location: [null, "array",null],
-            friends: [null, "object",null],
+            location: [null, "array", null],
+            friends: [null, "object", null],
         };
         expect(constructRule(rules)).toStrictEqual(res);
     });
@@ -170,15 +208,8 @@ describe("test construct methods", () => {
         const rules = parseRules({
             name: ["string"],
             age: ["integer"],
-            locations: [
-                { x: ["integer"], y: ["integer"] },
-                "array",
-            ],
-            friends: [
-                { name: "string", age: "integer" },
-                "object",
-                ["min:0"]
-            ],
+            locations: [{ x: ["integer"], y: ["integer"] }, "array"],
+            friends: [{ name: "string", age: "integer" }, "object", ["min:0"]],
             schools: [
                 {
                     locations: [
@@ -187,7 +218,7 @@ describe("test construct methods", () => {
                             y: ["integer"],
                         },
                         "array",
-                        ["limit:0"]
+                        ["limit:0"],
                     ],
                     names: [["string"], "array"],
                 },
@@ -199,7 +230,7 @@ describe("test construct methods", () => {
         const res = {
             name: null,
             age: null,
-            locations: [{ x: null, y: null }, "array", ],
+            locations: [{ x: null, y: null }, "array"],
             friends: [{ name: null, age: null }, "object", null],
             schools: [
                 {
@@ -209,7 +240,7 @@ describe("test construct methods", () => {
                             y: null,
                         },
                         "array",
-                        null
+                        null,
                     ],
                     names: [null, "array"],
                 },
@@ -221,19 +252,52 @@ describe("test construct methods", () => {
         expect(constructRule(rules)).toStrictEqual(res);
     });
     test("flattened array", () => {
-        let rules = parseRules([{ name: "string", password: "string" },"array"]);
-        let ex:any = [{ name: null, password: null }, "array"];
+        let rules = parseRules([
+            { name: "string", password: "string" },
+            "array",
+        ]);
+        let ex: any = [{ name: null, password: null }, "array"];
         expect(constructRule(rules)).toStrictEqual(ex);
-        rules = parseRules([{ name: "string", password: "string"},"array",["min:0"]]);
+        rules = parseRules([
+            { name: "string", password: "string" },
+            "array",
+            ["min:0"],
+        ]);
         expect(rules).toStrictEqual({
-            "*:array.name":["string"],
-            "*:array.password":["string"],
-            ".":["min:0"]
-        })
-        ex = {"*:array":[{ name: null, password: null }, "array"],".":null};
+            "*:array.name": ["string"],
+            "*:array.password": ["string"],
+            ".": ["min:0"],
+        });
+        ex = {
+            "*:array": [{ name: null, password: null }, "array"],
+            ".": null,
+        };
         expect(constructRule(rules)).toStrictEqual(ex);
-        
     });
+    test("use .",()=>{
+        const rules=parseRules({
+            person:{
+                ".":["required"],
+                "name":["string"],
+                "age":["integer"]
+            }
+        })
+        const rules2=parseRules({
+            person:{
+                "name":["string"],
+                "age":["integer"],
+                ".":["required"]
+            }
+        })
+        const ex={
+            person:{
+                "name":null,
+                "age":null
+            }
+        }
+        expect(constructRule(rules)).toStrictEqual(ex)
+        expect(constructRule(rules2)).toStrictEqual(ex)
+    })
 });
 describe("Valid attr", () => {
     test("main task", () => {
@@ -332,6 +396,7 @@ describe("Valid attr", () => {
         expect(validAttr(f1, rules)).toStrictEqual(f1);
         expect(validAttr(f2, rules)).toStrictEqual(f1);
     });
+
 });
 describe("test merge objs methods", () => {
     test("main way", () => {

@@ -322,6 +322,28 @@ describe("required if method", () => {
             await new Validator({ name: "not admin" }, rules, {}).getErrors()).toBeNull()
         expect(await new Validator({}, rules, {}).getErrors()).toBeNull()
     });
+    test("nestedObjects",async()=>{
+        const rules = Validator.parseRules({
+            account:{
+                password: [`required_if:name,"admin"`],
+            }
+        });
+        expect(
+            await new Validator(
+                {
+                    account:{
+                        name: "admin",
+                        password: "1234",
+                    }
+                },
+                rules,
+                {}
+            ).getErrors()).toBeNull()
+        expect(await new Validator({ account:{name: "admin"} }, rules, {}).getErrors()).not.toBeNull()
+        expect(
+            await new Validator({ account:{name: "not admin"} }, rules, {}).getErrors()).toBeNull()
+        expect(await new Validator({}, rules, {}).getErrors()).toBeNull()
+    })
     test("array objects", async () => {
         const rules = Validator.parseRules({
             users: [{ password: [`required_if:name,"admin"`] }],

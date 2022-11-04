@@ -49,7 +49,13 @@ export function parseRules(input: any): Rules {
                 if (!Object.prototype.hasOwnProperty.call(rules, prop))
                     continue;
                 const rule = rules[prop];
-                const p = property ? property + "." + prop : prop;
+                let p;
+                if(prop==".")
+                    p = property ? property: prop;
+                else
+                    p = property ? property + "." + prop : prop;
+                
+                    
                 switch (typeof rule) {
                     case "string":
                         flattened[p] = rule.split("|") as RulesGetter;
