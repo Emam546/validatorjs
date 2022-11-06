@@ -1,3 +1,2 @@
-import Validator from "./main";
+export default "./main";
 
-export= Validator

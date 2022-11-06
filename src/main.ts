@@ -11,6 +11,8 @@ import validAttr from "./utils/validAttr";
 import compare from "./utils/compare";
 import inValidAttr from "./utils/inValidAttr";
 import isEmpty from "./utils/isEmpty";
+import { setAllValues, setValue } from "./utils/setValue";
+
 export type RulesGetter = Array<string> | null;
 export type Rules = Record<string, RulesGetter>;
 export const TYPE_ARRAY = ["object", "array"];
@@ -35,14 +37,13 @@ export function parseRules(input: any): Rules {
                 if (is_Rule(rules))
                     //check if it is array that describes some rule
                     flattened[property || "."] = rules;
-                else if (rules.length && rules.length <= 3){
+                else if (rules.length && rules.length <= 3) {
                     //get array rules and continue in parsing object
                     _get_rule(rules[0] as any, p + arrayKind(rules));
-                    if(rules[2] && isArray(rules)){
-                        _get_rule(rules[2],property)
+                    if (rules[2] && isArray(rules)) {
+                        _get_rule(rules[2], property);
                     }
-                }
-                else throw new Error(`${rules} is not a valid rule input`);
+                } else throw new Error(`${rules} is not a valid rule input`);
             } else flattened[p] = null;
         } else {
             for (const prop in rules) {
@@ -50,12 +51,9 @@ export function parseRules(input: any): Rules {
                     continue;
                 const rule = rules[prop];
                 let p;
-                if(prop==".")
-                    p = property ? property: prop;
-                else
-                    p = property ? property + "." + prop : prop;
-                
-                    
+                if (prop == ".") p = property ? property : prop;
+                else p = property ? property + "." + prop : prop;
+
                 switch (typeof rule) {
                     case "string":
                         flattened[p] = rule.split("|") as RulesGetter;
@@ -71,31 +69,51 @@ export function parseRules(input: any): Rules {
     _get_rule(input);
     return flattened;
 }
-export default class Validator {
-    inputs: any;
+export declare type constructorValidator<Input> = [
+    Input,
+    Rules,
+    ValidatorOptions | undefined
+];
+
+export declare interface Validator<Input = any> {
+    inputs: Input;
+    CRules: Rules;
+    options: ValidatorOptions;
+    errors: Record<string, _Error[]>;
+    inValidErrors: Record<string, _Error> | null;
+    lang: LangTypes;
+    passes(): Promise<boolean>;
+    fails(): Promise<boolean>;
+    getErrors(): Promise<Record<string, _Error[]> | null>;
+    inside(): boolean;
+    validAttr(): any;
+    getValue(path: string): any;
+    getAllValues(path: string): any;
+    setValue(path: string, value: any): boolean;
+    setAllValues(path: string, value: any): Boolean[];
+}
+
+export default class ValidatorClass<Input = any> implements Validator<Input> {
+    inputs: Input;
     CRules: Rules;
     options: ValidatorOptions;
     errors: Record<string, _Error[]> = {};
-    inValidErrors:Record<string,_Error>|null=null;
+    inValidErrors: Record<string, _Error> | null = null;
     public lang: LangTypes = "en";
     public static Rules: Rule[];
-    public readonly empty:boolean;
-    constructor(
-        inputs: Record<string, any>,
-        rules: Rules,
-        options?: ValidatorOptions
-    ) {
+    public readonly empty: boolean;
+    constructor(inputs: Input, rules: Rules, options?: ValidatorOptions) {
         this.inputs = inputs;
         this.CRules = rules;
         this.options = options || {};
-        this.empty=isEmpty(inputs)
+        this.empty = isEmpty(inputs);
         if (options) this.lang = options.lang || this.lang;
     }
     async passes(): Promise<boolean> {
         //Just object of paths and there current objects
-        return (await this.getErrors())===null
+        return (await this.getErrors()) === null;
     }
-    async getErrors():Promise<Record<string, _Error[]>|null>{
+    async getErrors(): Promise<Record<string, _Error[]> | null> {
         //Just object of paths and Errors description
         let Errors: Record<string, _Error[]> = {};
         for (const path in this.CRules) {
@@ -109,16 +127,19 @@ export default class Validator {
         }
         this.errors = Errors;
 
-        if(Object.keys(Errors).length == 0)return null;
-        return Errors
+        if (Object.keys(Errors).length == 0) return null;
+        return Errors;
     }
     async fails() {
         return !(await this.passes());
     }
     async _getSubmitErrors(): Promise<Record<string, _Error[]>> {
         let Result = {};
-        for (let i = 0; i < Validator.Rules.length; i++) {
-            const res = await Validator.Rules[i].initSubmit(this, this.lang);
+        for (let i = 0; i < ValidatorClass.Rules.length; i++) {
+            const res = await ValidatorClass.Rules[i].initSubmit(
+                this,
+                this.lang
+            );
             Result = { ...Result, ...res };
         }
         return Result;
@@ -209,20 +230,26 @@ export default class Validator {
     getValue(path: string) {
         return getValue(this.inputs, path);
     }
+    setValue(path: string, value: any): boolean {
+        return setValue(this.inputs, path, value);
+    }
     getAllValues(path: string) {
         return getAllValues(this.inputs, path);
+    }
+    setAllValues(path: string,value:any): Boolean[] {
+        return setAllValues(this.inputs, path,value);
     }
     static parseRules = parseRules;
     validAttr(): any {
         return validAttr(this.inputs, this.CRules);
     }
     inValidAttr() {
-        return (this.inValidErrors=inValidAttr(this.inputs, this.CRules));
+        return (this.inValidErrors = inValidAttr(this.inputs, this.CRules));
     }
     inside() {
-        return compare(this.validAttr(), this.inputs);
+        return compare(this.validAttr(), this.inputs as any);
     }
-    
+
     async validate(
         value: any,
         rule: string,
@@ -231,8 +258,8 @@ export default class Validator {
     ): Promise<_Error[]> {
         let has = false;
         const arrMess: _Error[] = [];
-        for (let i = 0; i < Validator.Rules.length; i++) {
-            const ele = Validator.Rules[i];
+        for (let i = 0; i < ValidatorClass.Rules.length; i++) {
+            const ele = ValidatorClass.Rules[i];
             if (
                 ele.isequal(rule) &&
                 !(expect && !expect.some((rul) => ele.isequal(rul)))
@@ -261,8 +288,9 @@ export default class Validator {
         initSubmit?: InitSubmitFun
     ): Rule {
         const rule = new Rule(name, fun, initSubmit);
-        Validator.Rules.push(rule);
+        ValidatorClass.Rules.push(rule);
         return rule;
     }
 }
-Validator.Rules = Object.values({ ...r });
+
+ValidatorClass.Rules = Object.values({ ...r });

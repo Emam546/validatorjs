@@ -1,5 +1,5 @@
-import Validator from "../main";
-import Rule, { GetMessageFun, StoredMessage } from "../Rule";
+
+import Rule, {  RuleFun, StoredMessage } from "../Rule";
 import LangTypes from "../types/lang";
 import handelUndefined from "../utils/handelUndefined";
 import handelUnError from "../utils/handelUnError";
@@ -7,7 +7,6 @@ import { isArray, isNumber, isObject, isString } from "../utils/types";
 import { MinError, MaXError } from "./Messages/minMax";
 import UnKnownInputValue from "./Messages/unKnownValue";
 import UnKnownRuleValue from "./Messages/UnknownRule";
-import handelMessage from "../utils/handelMessage";
 
 function getNumber(value: any, lang: LangTypes): number | StoredMessage {
     if (isNumber(value)) return value;
@@ -34,11 +33,7 @@ function maxFun(
     if (value > max) return handelUndefined(MaXError[lang]);
 }
 function MinHandler(
-    value: any,
-    name: string,
-    validator: Validator,
-    path:string,
-    lang:LangTypes
+    ...[value,name,,,lang]:Parameters<RuleFun>
 ): StoredMessage | undefined {
     let min = parseFloat(name.split(":")[1]) || 0;
     const val = getNumber(value, lang);
@@ -47,11 +42,7 @@ function MinHandler(
     if (typeof val != "number") return val;
 }
 function MaxHandler(
-    value: any,
-    name: string,
-    validator: Validator,
-    path:string,
-    lang:LangTypes
+    ...[value,name,,,lang]:Parameters<RuleFun>
 ): StoredMessage | undefined {
     let max = parseFloat(name.split(":")[1]);
     const val = getNumber(value, lang);
@@ -60,14 +51,10 @@ function MaxHandler(
     if (typeof val != "number") return val;
 }
 function limit(
-    value: any,
-    name: string,
-    validator: Validator,
-    path:string,
-    lang:LangTypes
+    ...[value,name,,,lang]:Parameters<RuleFun>
 ): StoredMessage | undefined {
     let [, min, max]: number[] = name.split(":").map((e) => parseFloat(e));
-    const val = getNumber(value, validator.lang);
+    const val = getNumber(value, lang);
     if (typeof val == "number") {
         const minMess = minFun(val, min, lang);
         if (minMess == undefined) {

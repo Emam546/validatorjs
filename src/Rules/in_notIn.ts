@@ -1,9 +1,8 @@
-import Validator from "../main";
-import Rule, { MessagesStore } from "../Rule";
+import Rule, { MessagesStore, RuleFun } from "../Rule";
 import handelMessage from "../utils/handelMessage";
 export const MessagesIn:MessagesStore={"en":"The value is not in the array"}
 export const MessagesNotIn:MessagesStore={"en":"The value is in the array"}
-function contains(value:any,name:string,...arr:any[]){
+function contains(...[value,name]:Parameters<RuleFun>){
     const values=name.split(":").slice(1,name.split(":").length).join(":").split(",")
     return values.includes(value)
 }

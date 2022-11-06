@@ -5,6 +5,7 @@ import mergeObjects from "../utils/merge";
 import validAttr from "../utils/validAttr";
 import inValidAttr from "../utils/inValidAttr";
 import isEmpty from "../utils/isEmpty";
+import { setAllValues, setValue } from "../utils/setValue";
 
 describe("Test get value methods", () => {
     test("getValue", () => {
@@ -96,6 +97,115 @@ describe("Test get value methods", () => {
                     "person.friend"
                 )
             ).toStrictEqual([]);
+        });
+    });
+});
+describe("Test set value methods", () => {
+    describe("getValue", () => {
+        test("simple",()=>{
+            const data={ name: "ahmed" }
+            expect(setValue(data, "name","ali")).toBe(true);
+            expect(getValue(data,"name")).toBe("ali");
+        })
+        test("array objects",()=>{
+            let data:any={ person: ["ahmed", "sayed", "osama"] }
+            let path="person.*1"
+            let result="ali"
+            expect(setValue(data,path,result)).toBe(true)
+            expect(getValue(data, path)).toBe(result);
+            data={ person: ["ahmed", "sayed", "osama"] }
+            result="imam"
+            path="person.*1"
+            expect(setValue(data,path,result)).toBe(true)
+            expect(getValue(data, path)).toBe(result);
+            data={ person: ["ahmed", "sayed", "osama"] }
+            result="imam"
+            path="person.*2"
+            expect(setValue(data,path,result)).toBe(true)
+            expect(getValue(data, path)).toBe(result);
+        })
+        test("objects",()=>{
+            
+            let data:any={ person: { 1: "ahmed" } }
+            let result="ali"
+            let path="person.1"
+            expect(setValue(data,path,result)).toBe(true)
+            expect(getValue(data, path)).toBe(result);
+            data={ person: { person: { "1": "ahmed" } } }
+            result="ali"
+            path="person.1"
+            expect(setValue(data,path,result)).toBe(true)
+            expect(getValue(data, path)).toBe(result);
+            data={ person: { "1": { name: ["ahmed"] } } }
+            result="ali"
+            path="person.1.name.*0"
+            expect(setValue(data,path,result)).toBe(true)
+            expect(getValue(data, path)).toBe(result);
+        })
+
+    });
+    describe("set All Values", () => {
+        
+        it("regular test", () => {
+            let data:any={ name: "ahmed" }
+            let path="name"
+            let result:any="ali"
+            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
+            expect(getAllValues(data, path).every((val)=>val==result)).toBe(true)
+            data={ person: ["ahmed", "ali", "osama"] }
+            path="person.*:array"
+            result="ali"
+            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
+            expect(getAllValues(data, path).every((val)=>val==result)).toBe(true)
+            data={ person: { 1: "ahmed" } }
+            path="person.*:object"
+            result="ali"
+            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
+            expect(getAllValues(data, path).every((val)=>val==result)).toBe(true)
+            data={ person: { "1": { name: ["ahmed"] } } }
+            path="person.*:array.name.*:array"
+            result="ali"
+            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
+            expect(getAllValues(data, path).every((val)=>val==result)).toBe(true)
+            data={
+                person: {
+                    "1": { name: ["ahmed"] },
+                    "2": { name: ["ali"] },
+                },
+            }
+            path="person.*:array.name.*:array"
+            result="ali"
+            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
+            expect(getAllValues(data, path).every((val)=>val==result)).toBe(true)
+            data={
+                person: {
+                    "1": { name: ["ahmed"] },
+                    "2": { name: ["ali", "osama", "elsayed"] },
+                },
+            }
+            path="person.*:array.name.*:array"
+            result="ali"
+            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
+            expect(getAllValues(data, path).every((val)=>val==result)).toBe(true)
+        });
+        it("nested objects", () => {
+            let data:any={ person:{name:"osama"} }
+            let path="person.name"
+            let result:any="ali"
+            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
+            expect(getAllValues(data, path).every((val)=>val==result)).toBe(true)
+            data={ person:{friend:{name:"osama"}} }
+            path="person.friend.name"
+            result="ali"
+            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
+            expect(getAllValues(data, path).every((val)=>val==result)).toBe(true)
+            data={ person:{name:"osama"} }
+            path="person.friend.name"
+            result="ali"
+            expect(setAllValues(data, path,result).some((val)=>val)).toBe(false)
+            expect(getAllValues(data, path).some((val)=>val==result)).toBe(false)
+            
+            
         });
     });
 });

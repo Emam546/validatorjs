@@ -1,4 +1,3 @@
-import Validator from "../main";
 import Rule, { InitSubmitFun, RuleFun } from "../Rule";
 import LangTypes from "../types/lang";
 import { getAllValues, getValue } from "../utils/getValue";
@@ -6,11 +5,7 @@ import handelMessage from "../utils/handelMessage";
 import ValueNotExist from "./Messages/valueNotExist";
 
 export function getValueMessage(
-    inputs: any,
-    name: string,
-    validator: Validator,
-    path: string,
-    lang: LangTypes,
+    ...[inputs,name,validator,path,lang]:Parameters<RuleFun>
     
 ): ReturnType<InitSubmitFun> {
     const paths = path.split(".");

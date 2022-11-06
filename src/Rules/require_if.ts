@@ -1,16 +1,10 @@
-import Validator from "../main";
-import Rule, { GetMessageFun, InitSubmitFun, RuleFun } from "../Rule";
-import LangTypes from "../types/lang";
+import Rule, {  RuleFun } from "../Rule";
 import compare from "../utils/compare";
 import { getAllValues, getValue } from "../utils/getValue";
 import { getValueMessage } from "./required";
 
 function _require_if(
-    inputs: any,
-    name: string,
-    validator: Validator,
-    path: string,
-    lang: LangTypes
+    ...[inputs,name,validator,path,lang]:Parameters<RuleFun>
 ): ReturnType<RuleFun> {
     let vpath, value;
     vpath = name.split(":")[1].split(",")[0];
@@ -35,11 +29,7 @@ function _require_if(
         }
 }
 function _require_unless(
-    inputs: any,
-    name: string,
-    validator: Validator,
-    path: string,
-    lang: LangTypes
+    ...[inputs,name,validator,path,lang]:Parameters<RuleFun>
 ): ReturnType<RuleFun> {
     let vpath, value;
     vpath = name.split(":")[1].split(",")[0];

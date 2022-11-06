@@ -1,17 +1,13 @@
-import Validator from "../main";
-import Rule, { StoredMessage } from "../Rule";
-import LangTypes from "../types/lang";
+
+import Rule, { RuleFun, StoredMessage } from "../Rule";
+
 import compare from "../utils/compare";
 import handelUndefined from "../utils/handelUndefined";
 import handelUnError from "../utils/handelUnError";
-import ValueNotExist from "./Messages/valueNotExist";
 import ValuesNotSame from "./Messages/ValuesNotSame";
 function different(
-    value: any,
-    name: string,
-    Validator: Validator,
-    path: string,
-    lang: LangTypes
+    ...[value,name,Validator,path,lang]:Parameters<RuleFun>
+
 ): StoredMessage | undefined {
     const allPaths = path.split(".");
     const different = name.split(":").slice(1).join(":");

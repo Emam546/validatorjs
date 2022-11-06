@@ -1,16 +1,11 @@
-import Validator from "../main";
+
 import Rule, {  RuleFun } from "../Rule";
-import LangTypes from "../types/lang";
 import { getAllValues, getValue } from "../utils/getValue";
 import { getValueMessage } from "./required";
 
 
 function _require_without(
-    inputs: any,
-    name: string,
-    validator: Validator,
-    path: string,
-    lang: LangTypes
+    ...[inputs,name,validator,path,lang]:Parameters<RuleFun>
 ): ReturnType<RuleFun> {
     let vpaths = name.split(":")[1].split(",");
     const ObjectPath = path.split(".").slice(0, -1).join(".");
@@ -33,11 +28,7 @@ function _require_without(
         }
 }
 function _require_withoutAll(
-    inputs: any,
-    name: string,
-    validator: Validator,
-    path: string,
-    lang: LangTypes
+    ...[inputs,name,validator,path,lang]:Parameters<RuleFun>
 ): ReturnType<RuleFun> {
     let vpaths = name.split(":")[1].split(",");
     const ObjectPath = path.split(".").slice(0, -1).join(".");
