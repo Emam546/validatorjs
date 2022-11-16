@@ -3,8 +3,8 @@ import { _Error } from "../Rule";
 import constructObj from "./constructObj";
 import { isArray } from "./types";
 function matchObjs(input: any, matchObj: any): Object {
-    if (matchObj == null) return input;
-    if (input == undefined) return input;
+    if (matchObj === null) return input;
+    if (input === undefined) return input;
 
     if (matchObj instanceof Array) {
         const [, _type,] = matchObj;
@@ -18,14 +18,14 @@ function matchObjs(input: any, matchObj: any): Object {
         else{
             let i=0
             for (const key in input) 
-                    newObj[key] = matchObjs(input[key], matchObj[0]);
+                newObj[key] = matchObjs(input[key], matchObj[0]);
         }
             
         return newObj;
     } else {
         const newObj: any = {};
         for (const key in matchObj) {
-            if (input[key]) newObj[key] = matchObjs(input[key], matchObj[key]);
+            if (input[key]!==undefined) newObj[key] = matchObjs(input[key], matchObj[key]);
         }
         return newObj;
     }
