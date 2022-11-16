@@ -7,5 +7,5 @@ function contains(...[value,name]:Parameters<RuleFun>){
     return values.includes(value)
 }
 
-export const _in= new Rule(/(^in:)\S+/,(...arr)=>contains(...arr)?undefined:handelMessage(MessagesIn[arr[4]],...arr),)
-export const notIn= new Rule(/(^not_in:)\S+/,(...arr)=>!contains(...arr)?undefined:handelMessage(MessagesNotIn[arr[4]],...arr),)
+export const _in= new Rule(/^in:\S+/,(...arr)=>contains(...arr)?undefined:handelMessage(MessagesIn[arr[4]],...arr),)
+export const notIn= new Rule(/^not_in:\S+/,(...arr)=>!contains(...arr)?undefined:handelMessage(MessagesNotIn[arr[4]],...arr),)

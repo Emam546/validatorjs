@@ -18,8 +18,9 @@ function different(
     if (differentValue != undefined && compare(value, differentValue))
         return handelUndefined(ValuesNotSame[lang]);
 }
+const regEx=/^different:(.+)/ig
 export default new Rule(
-    /(^different:)\S+/,
+    regEx,
     (...arr) => {
         return handelUnError(different(...arr),...arr);
     },

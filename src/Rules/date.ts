@@ -12,7 +12,12 @@ export const Before: MessagesStore = {
 export const Equal: MessagesStore = {
     en: (_, name) => `The Date is not equal ${getTimeName(name)} date`,
 };
-
+function _getDateName(name:string):string{
+    const regExp=/^\w+:(.+)/gi
+    const res=regExp.exec(name)
+    if(!res)return ""
+    return res[1]
+}
 function isValidDate(dateString: any):boolean {
     return getTime(dateString).toString() !== "Invalid Date"
 }
@@ -27,7 +32,7 @@ function getTime(dateString:any):Date{
         return new Date(dateString);
 }
 function getTimeName(name: string):Date {
-    const dateName = name.split(":").slice(1).join(":");
+    const dateName = _getDateName(name);
     if (dateName.startsWith("now")) {
         if(isNaN(parseInt(dateName.slice(4))))
             return new Date(Date.now());

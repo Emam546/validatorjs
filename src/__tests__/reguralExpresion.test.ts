@@ -54,7 +54,7 @@ describe("test Regular Expression of Validators", () => {
         expect(r.require_if.isequal("required_if:foo")).toBe(false);
         expect(r.require_if.isequal("required_if:")).toBe(false);
         expect(r.require_if.isequal("required_if")).toBe(false);
-        expect(r.require_if.isequal(" required_if:myPat,value")).toBe(false);
+        expect(r.require_if.isequal(" required_if:myPath,value")).toBe(false);
         expect(r.require_if.isequal("r:myPath,value")).toBe(false);
     });
     test("require if", () => {
@@ -63,7 +63,7 @@ describe("test Regular Expression of Validators", () => {
         expect(r.require_if.isequal("required_if:foo")).toBe(false);
         expect(r.require_if.isequal("required_if:")).toBe(false);
         expect(r.require_if.isequal("required_if")).toBe(false);
-        expect(r.require_if.isequal(" required_if:myPat,value")).toBe(false);
+        expect(r.require_if.isequal(" required_if:myPath,value")).toBe(false);
         expect(r.require_if.isequal("r:myPath,value")).toBe(false);
     });
     test("require if", () => {
@@ -74,7 +74,7 @@ describe("test Regular Expression of Validators", () => {
         expect(r.require_without.isequal("required_without:foo,")).toBe(true);
         expect(r.require_without.isequal("required_without:")).toBe(false);
         expect(r.require_without.isequal("required_without")).toBe(false);
-        expect(r.require_without.isequal(" required_without:myPat,value")).toBe(
+        expect(r.require_without.isequal(" required_without:myPath,value")).toBe(
             false
         );
         expect(r.require_without.isequal("r:myPath,value")).toBe(false);

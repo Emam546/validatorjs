@@ -75,7 +75,8 @@ export declare type constructorValidator<Input> = [
     ValidatorOptions | undefined
 ];
 
-export declare interface Validator<Input = any> {
+export declare interface Validator<Input = any, Data = any> {
+    reqData: Data;
     inputs: Input;
     CRules: Rules;
     options: ValidatorOptions;
@@ -88,24 +89,32 @@ export declare interface Validator<Input = any> {
     inside(): boolean;
     validAttr(): any;
     getValue(path: string): any;
-    getAllValues(path: string): any;
+    getAllValues(path: string): Record<string,any>;
     setValue(path: string, value: any): boolean;
     setAllValues(path: string, value: any): Boolean[];
+
 }
 
-export default class ValidatorClass<Input = any> implements Validator<Input> {
+export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
     inputs: Input;
     CRules: Rules;
+    reqData: Data;
     options: ValidatorOptions;
     errors: Record<string, _Error[]> = {};
     inValidErrors: Record<string, _Error> | null = null;
     public lang: LangTypes = "en";
     public static Rules: Rule[];
     public readonly empty: boolean;
-    constructor(inputs: Input, rules: Rules, options?: ValidatorOptions) {
+    constructor(
+        inputs: Input,
+        rules: Rules,
+        reqData: Data,
+        options?: ValidatorOptions
+    ) {
         this.inputs = inputs;
         this.CRules = rules;
         this.options = options || {};
+        this.reqData = reqData;
         this.empty = isEmpty(inputs);
         if (options) this.lang = options.lang || this.lang;
     }
@@ -160,30 +169,29 @@ export default class ValidatorClass<Input = any> implements Validator<Input> {
             if (paths[i].indexOf("*") == 0) {
                 let currPath = addedPath + paths.slice(0, i).join(".");
                 let [, type_]: Array<any> = paths[i].split(":");
-                const oldPath = paths.slice(0, i + 1).join(".");
+                const oldPath = paths.slice(0, i).join(".");
                 const newPath = paths.slice(i + 1).join(".");
-                if (type_ === "array" && isArray(currentObj)) {
+                if (type_ == "array" && isArray(currentObj)) {
                     for (let i = 0; i < currentObj.length; i++) {
                         const r = await this._get_errors(
                             currentObj[i],
                             newPath,
                             rule,
-                            `${addedPath}${oldPath}.*${i}.`
+                            `${addedPath}${oldPath}.*${i}${newPath?".":""}`
                         );
-                        // result = { ...result, ...r[0] };
                         Errors = { ...Errors, ...r };
                     }
                 } else if (
-                    type_ === "object" &&
-                    !isArray(currentObj) &&
-                    currentObj instanceof Object
+                    type_=="object"&&
+                    isObject(currentObj)
                 ) {
+                    
                     for (const key in currentObj) {
                         const r = await this._get_errors(
                             currentObj[key],
                             newPath,
                             rule,
-                            `${addedPath}${oldPath}.${key}.`
+                            `${addedPath}${oldPath}.${key}${newPath?".":""}`
                         );
                         Errors = { ...Errors, ...r };
                     }
@@ -236,8 +244,8 @@ export default class ValidatorClass<Input = any> implements Validator<Input> {
     getAllValues(path: string) {
         return getAllValues(this.inputs, path);
     }
-    setAllValues(path: string,value:any): Boolean[] {
-        return setAllValues(this.inputs, path,value);
+    setAllValues(path: string, value: any): Boolean[] {
+        return setAllValues(this.inputs, path, value);
     }
     static parseRules = parseRules;
     validAttr(): any {
@@ -282,14 +290,28 @@ export default class ValidatorClass<Input = any> implements Validator<Input> {
         if (!has) throw new Error(`THE RULE ${rule} IS NOT EXIST`);
         return arrMess;
     }
-    static register(
+    static register<Data = any>(
         name: RegExp | string,
-        fun: RuleFun,
-        initSubmit?: InitSubmitFun
-    ): Rule {
+        fun: RuleFun<Data>,
+        initSubmit?: InitSubmitFun<Data>
+    ): Rule<Data> {
         const rule = new Rule(name, fun, initSubmit);
         ValidatorClass.Rules.push(rule);
         return rule;
+    }
+    
+}
+export default class S<Input = any, Data = any> extends ValidatorClass<
+    Input,
+    Data
+> {
+    constructor(
+        inputs: Input,
+        rules: Rules,
+        reqData?: Data,
+        options?: ValidatorOptions
+    ) {
+        super(inputs, rules, reqData as Data, options);
     }
 }
 

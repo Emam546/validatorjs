@@ -10,10 +10,10 @@ describe("test validate",  () => {
         const data2 = {
             name: 123,
         };
-        let valid = new Validator(data, Rules, {});
+        let valid:any = new Validator(data, Rules);
         expect(valid.CRules).toStrictEqual({ name: ["string"] });
         expect(await valid.passes()).toBe(true);
-        valid = new Validator(data2, Rules, {});
+        valid = new Validator(data2, Rules);
         expect(await valid.passes()).toBe(false);
     });
     test("test object describing", async () => {

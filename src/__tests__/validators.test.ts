@@ -499,8 +499,7 @@ describe("required without method", () => {
             await new Validator(
                 { users: { 1: { email: "123", phone: "123" } } },
                 rules,
-                {}
-            ).getErrors()).not.toBeNull()
+            ).getErrors()).toBeNull()
         expect(
             await new Validator(
                 {},
