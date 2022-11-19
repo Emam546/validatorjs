@@ -2,7 +2,7 @@ import { Rules } from "../main";
 import { _Error } from "../Rule";
 import constructObj from "./constructObj";
 import { isArray } from "./types";
-function matchObjs(input: any, matchObj: any): Object {
+function matchObjs(input: any, matchObj: any): any {
     if (matchObj === null) return input;
     if (input === undefined) return input;
 
@@ -31,7 +31,7 @@ function matchObjs(input: any, matchObj: any): Object {
     }
 }
 
-export default function (input: any, rules: Rules): Object {
+export default function (input: any, rules: Rules): any {
     const RulesObj = constructObj(rules);
     return matchObjs(input, RulesObj);
 }

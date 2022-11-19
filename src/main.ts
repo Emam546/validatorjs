@@ -87,7 +87,7 @@ export declare interface Validator<Input = any, Data = any> {
     fails(): Promise<boolean>;
     getErrors(): Promise<Record<string, _Error[]> | null>;
     inside(): boolean;
-    validAttr(): any;
+    validAttr(): Data;
     getValue(path: string): any;
     getAllValues(path: string): Record<string,any>;
     setValue(path: string, value: any): boolean;
@@ -248,14 +248,14 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
         return setAllValues(this.inputs, path, value);
     }
     static parseRules = parseRules;
-    validAttr(): any {
-        return validAttr(this.inputs, this.CRules);
+    validAttr(): Data {
+        return validAttr(this.inputs, this.CRules) as Data;
     }
     inValidAttr() {
         return (this.inValidErrors = inValidAttr(this.inputs, this.CRules));
     }
     inside() {
-        return compare(this.validAttr(), this.inputs as any);
+        return compare(this.validAttr() as any, this.inputs as any);
     }
 
     async validate(

@@ -1,5 +1,5 @@
-import Validator, { parseRules, Rules } from "../main";
-import { string, int, min, limit, regExp } from "../Rules";
+import Validator, { parseRules } from "../main";
+import { string, int, min, limit } from "../Rules";
 
 describe("test some validators", () => {
     const DefaultValidator = new Validator({}, {}, {});
