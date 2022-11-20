@@ -160,6 +160,41 @@ describe("limit method", () => {
             )
         ).toBe(undefined);
     });
+    test("negative value", async () => {
+        expect(
+            await limit.validate(9, "limit:-3:10", DefaultValidator, "", "en")
+        ).toBe(undefined);
+        expect(
+            await limit.validate(2, "limit:3:5", DefaultValidator, "", "en")
+        ).not.toBe(undefined);
+        expect(
+            await limit.validate(11, "limit:0:11", DefaultValidator, "", "en")
+        ).toBe(undefined);
+        expect(
+            await limit.validate(-1, "limit:0:10", DefaultValidator, "", "en")
+        ).not.toBe(undefined);
+        expect(
+            await limit.validate(0, "limit:0.5:10", DefaultValidator, "", "en")
+        ).not.toBe(undefined);
+        expect(
+            await limit.validate(
+                0.5,
+                "limit:0.5:10",
+                DefaultValidator,
+                "",
+                "en"
+            )
+        ).toBe(undefined);
+        expect(
+            await limit.validate(
+                9.5,
+                "limit:0.5:9.5",
+                DefaultValidator,
+                "",
+                "en"
+            )
+        ).toBe(undefined);
+    });
     test("object and other data types", async () => {
         expect(
             await limit.validate(
@@ -499,7 +534,7 @@ describe("required without method", () => {
             await new Validator(
                 { users: { 1: { email: "123", phone: "123" } } },
                 rules,
-            ).getErrors()).toBeNull()
+            ).getErrors()).not.toBeNull()
         expect(
             await new Validator(
                 {},

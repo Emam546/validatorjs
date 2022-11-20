@@ -3,7 +3,7 @@ import Rule, {  RuleFun, StoredMessage } from "../Rule";
 import LangTypes from "../types/lang";
 import handelUndefined from "../utils/handelUndefined";
 import handelUnError from "../utils/handelUnError";
-import { isArray, isNumber, isObject, isString } from "../utils/types";
+import { isArray, isNumber, isNumeric, isObject, isString } from "../utils/types";
 import { MinError, MaXError } from "./Messages/minMax";
 import UnKnownInputValue from "./Messages/unKnownValue";
 import UnKnownRuleValue from "./Messages/UnknownRule";
@@ -66,21 +66,21 @@ function limit(
 }
 
 export const min = new Rule(
-    /^min(:\d+)?$/g,
+    /^min(:-?\d+)?$/g,
     (...arr) => {
         return handelUnError(MinHandler(...arr),...arr);
     },
 
 );
 export const max = new Rule(
-    /^max:\d+$/g,
+    /^max:-?\d+$/g,
     (...arr) => {
         return handelUnError(MaxHandler(...arr),...arr);
     },
 );
 
 export default new Rule(
-    /^limit:\d+:\d+$/,
+    /^limit:-?\d+:-?\d+$/,
     (...arr) => {
         return handelUnError(limit(...arr),...arr);
     },

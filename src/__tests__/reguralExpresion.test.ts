@@ -17,6 +17,9 @@ describe("test Regular Expression of Validators", () => {
     });
     test("limit", () => {
         expect(r.limit.isequal("limit:10:20")).toBe(true);
+        expect(r.limit.isequal("limit:10:-20")).toBe(true);
+        expect(r.limit.isequal("limit:-10:20")).toBe(true);
+        expect(r.limit.isequal("limit:-10:-20")).toBe(true);
         expect(r.limit.isequal("limit:10")).toBe(false);
         expect(r.limit.isequal("limit::30")).toBe(false);
         expect(r.limit.isequal("limit")).toBe(false);
