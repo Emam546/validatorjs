@@ -16,7 +16,6 @@ function matchObjs(input: any, matchObj: any): any {
                 newObj[i] = matchObjs(input[i], matchObj[0]);
             
         else{
-            let i=0
             for (const key in input) 
                 newObj[key] = matchObjs(input[key], matchObj[0]);
         }

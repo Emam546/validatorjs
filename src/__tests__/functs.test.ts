@@ -569,7 +569,7 @@ describe("test merge objs methods", () => {
 describe("inValid attr", () => {
     test("main task", () => {
         const rules = parseRules({
-            name: "string",
+            name: "string|int",
             age: ["integer"],
             location: [["integer"], "array", ["min:0"]],
         });

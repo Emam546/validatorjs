@@ -18,9 +18,6 @@ function constructRule(rule: string, input?: any): Object | null {
                 currObj[path].push(constructRule(lastPath, currObj[path]));
             else if(lastPath)
                     currObj[path]= constructRule(lastPath, currObj[path]);
-            
-
-            
         }else
             currObj[path] = constructRule(lastPath, currObj[path]);
     }

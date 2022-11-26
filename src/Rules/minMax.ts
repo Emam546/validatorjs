@@ -1,9 +1,8 @@
-
 import Rule, {  RuleFun, StoredMessage } from "../Rule";
 import LangTypes from "../types/lang";
 import handelUndefined from "../utils/handelUndefined";
 import handelUnError from "../utils/handelUnError";
-import { isArray, isNumber, isNumeric, isObject, isString } from "../utils/types";
+import { isArray, isNumber, isObject, isString } from "../utils/types";
 import { MinError, MaXError } from "./Messages/minMax";
 import UnKnownInputValue from "./Messages/unKnownValue";
 import UnKnownRuleValue from "./Messages/UnknownRule";

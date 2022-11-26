@@ -52,12 +52,11 @@ export function parseRules(input: any): Rules {
                 const rule = rules[prop];
                 let p;
                 if (prop == ".") p = property ? property : prop;
-                else p = property ? property + "." + prop : prop;
+                else p = (property ? property + "." + prop : prop);
 
                 switch (typeof rule) {
                     case "string":
                         flattened[p] = rule.split("|") as RulesGetter;
-
                         break;
                     case "object":
                         if (rule === null) flattened[p] = rule;
