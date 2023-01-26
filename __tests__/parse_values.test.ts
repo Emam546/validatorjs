@@ -1,4 +1,4 @@
-import Validator, { parseRules } from "../src/main";
+import Validator, { parseRules } from "../src/index";
 describe("test validate", () => {
     test("main", async () => {
         const Rules = Validator.parseRules({

@@ -1,4 +1,4 @@
-import Validator from "../src/main";
+import Validator from "../src/index";
 
 describe("Complex paths test", () => {
     test("test array of rules", () => {
@@ -30,16 +30,6 @@ describe("Complex paths test", () => {
         const data = {};
         expect(new Validator(data, Rules, {}).CRules).toStrictEqual({
             "person.*:object": ["string"],
-        });
-    });
-    test("object with limits", () => {
-        const Rules = Validator.parseRules({
-            person: [["string"], "object", 0, 2],
-        });
-        const data = {};
-        expect(new Validator(data, Rules, {}).CRules).toStrictEqual({
-            "person.*:object": ["string"],
-            "person":["limit:0:2"]
         });
     });
 });

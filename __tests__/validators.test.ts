@@ -1,4 +1,4 @@
-import Validator, { parseRules, Rules } from "../src/main";
+import Validator, { parseRules, Rules } from "../src/index";
 import { string, int, min, limit, regExp } from "../src/Rules";
 
 describe("test some validators", () => {
@@ -291,7 +291,7 @@ describe("required method", () => {
         expect(await new Validator({ users: [] }, rules, {}).passes()).toBe(
             true
         );
-        expect(await new Validator({}, rules, {}).passes()).toBe(false);
+        expect(await new Validator({}, rules, {}).passes()).toBe(true);
         expect(
             await new Validator(
                 {

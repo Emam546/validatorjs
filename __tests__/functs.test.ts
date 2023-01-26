@@ -1,4 +1,4 @@
-import { parseRules } from "../src/main";
+import { parseRules } from "../src/index";
 import constructRule from "../src/utils/constructObj";
 import { getAllValues, getValue } from "../src/utils/getValue";
 import inValidAttr from "../src/utils/inValidAttr";
