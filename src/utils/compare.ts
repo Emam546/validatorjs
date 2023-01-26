@@ -1,3 +1,8 @@
+import _arrayRange from "../lang/minMaxErrors";
+import { Rules, RulesGetter } from "../main";
+import { _Error } from "../Rule";
+import { isArray, isObject } from "./types";
+
 export default function (...arr: Object[]):boolean {
     const defaultValue = JSON.stringify(arr[0]);
     for (let i = 1; i < arr.length; i++) {

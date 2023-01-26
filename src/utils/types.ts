@@ -1,4 +1,3 @@
-import { boolean } from "../Rules";
 
 export function isObject(attr: any): boolean {
     return typeof attr === "object" && !Array.isArray(attr) && attr !== null;

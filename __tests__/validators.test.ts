@@ -1,5 +1,10 @@
+<<<<<<< HEAD:__tests__/validators.test.ts
 import Validator, { parseRules, Rules } from "../src/main";
 import { string, int, min, limit, regExp } from "../src/Rules";
+=======
+import Validator, { parseRules } from "../main";
+import { string, int, min, limit } from "../Rules";
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/validators.test.ts
 
 describe("test some validators", () => {
     const DefaultValidator = new Validator({}, {}, {});
@@ -160,6 +165,7 @@ describe("limit method", () => {
             )
         ).toBe(undefined);
     });
+<<<<<<< HEAD:__tests__/validators.test.ts
     test("object and other data types", async () => {
         expect(
             await limit.validate(
@@ -171,6 +177,54 @@ describe("limit method", () => {
             )
         ).toBe(undefined);
         expect(
+=======
+    test("negative value", async () => {
+        expect(
+            await limit.validate(9, "limit:-3:10", DefaultValidator, "", "en")
+        ).toBe(undefined);
+        expect(
+            await limit.validate(2, "limit:3:5", DefaultValidator, "", "en")
+        ).not.toBe(undefined);
+        expect(
+            await limit.validate(11, "limit:0:11", DefaultValidator, "", "en")
+        ).toBe(undefined);
+        expect(
+            await limit.validate(-1, "limit:0:10", DefaultValidator, "", "en")
+        ).not.toBe(undefined);
+        expect(
+            await limit.validate(0, "limit:0.5:10", DefaultValidator, "", "en")
+        ).not.toBe(undefined);
+        expect(
+            await limit.validate(
+                0.5,
+                "limit:0.5:10",
+                DefaultValidator,
+                "",
+                "en"
+            )
+        ).toBe(undefined);
+        expect(
+            await limit.validate(
+                9.5,
+                "limit:0.5:9.5",
+                DefaultValidator,
+                "",
+                "en"
+            )
+        ).toBe(undefined);
+    });
+    test("object and other data types", async () => {
+        expect(
+            await limit.validate(
+                [0, 1, 2],
+                "limit:0:5",
+                DefaultValidator,
+                "",
+                "en"
+            )
+        ).toBe(undefined);
+        expect(
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/validators.test.ts
             await limit.validate(
                 [0, 1, 2],
                 "limit:0:2",
@@ -245,8 +299,7 @@ describe("required method", () => {
                 },
                 rules,
                 {}
-            ).passes()
-        ).toBe(true);
+            ).getErrors()).toBeNull()
         expect(
             await new Validator(
                 {
@@ -254,8 +307,7 @@ describe("required method", () => {
                 },
                 rules,
                 {}
-            ).passes()
-        ).toBe(false);
+            ).getErrors()).not.toBeNull()
     });
     test("array objects", async () => {
         const rules = Validator.parseRules({
@@ -271,8 +323,7 @@ describe("required method", () => {
                 },
                 rules,
                 {}
-            ).passes()
-        ).toBe(true);
+            ).getErrors()).toBeNull()
         expect(
             await new Validator(
                 {
@@ -283,19 +334,26 @@ describe("required method", () => {
                 },
                 rules,
                 {}
-            ).passes()
-        ).toBe(false);
+            ).getErrors()).not.toBeNull()
         expect(
             await new Validator(
                 { users: [{ email: "g@g", password: "123" }] },
                 rules,
                 {}
+<<<<<<< HEAD:__tests__/validators.test.ts
             ).passes()
         ).toBe(true);
         expect(await new Validator({ users: [] }, rules, {}).passes()).toBe(
             true
         );
         expect(await new Validator({}, rules, {}).passes()).toBe(false);
+=======
+            ).getErrors()).toBeNull()
+        expect(await new Validator({ users: [] }, rules, {}).passes()).toBe(
+            true
+        );
+        expect(await new Validator({}, rules, {}).passes()).toBe(true);
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/validators.test.ts
         expect(
             await new Validator(
                 {
@@ -304,9 +362,9 @@ describe("required method", () => {
                 },
                 rules,
                 {}
-            ).passes()
-        ).toBe(false);
+            ).getErrors()).toBeNull()
     });
+    
 });
 describe("required if method", () => {
     test("regular Test", async () => {
@@ -321,6 +379,7 @@ describe("required if method", () => {
                 },
                 rules,
                 {}
+<<<<<<< HEAD:__tests__/validators.test.ts
             ).passes()
         ).toBe(true);
         expect(await new Validator({ name: "admin" }, rules, {}).passes()).toBe(
@@ -331,6 +390,36 @@ describe("required if method", () => {
         ).toBe(true);
         expect(await new Validator({}, rules, {}).passes()).toBe(true);
     });
+=======
+            ).getErrors()).toBeNull()
+        expect(await new Validator({ name: "admin" }, rules, {}).getErrors()).not.toBeNull()
+        expect(
+            await new Validator({ name: "not admin" }, rules, {}).getErrors()).toBeNull()
+        expect(await new Validator({}, rules, {}).getErrors()).toBeNull()
+    });
+    test("nestedObjects",async()=>{
+        const rules = Validator.parseRules({
+            account:{
+                password: [`required_if:name,"admin"`],
+            }
+        });
+        expect(
+            await new Validator(
+                {
+                    account:{
+                        name: "admin",
+                        password: "1234",
+                    }
+                },
+                rules,
+                {}
+            ).getErrors()).toBeNull()
+        expect(await new Validator({ account:{name: "admin"} }, rules, {}).getErrors()).not.toBeNull()
+        expect(
+            await new Validator({ account:{name: "not admin"} }, rules, {}).getErrors()).toBeNull()
+        expect(await new Validator({}, rules, {}).getErrors()).toBeNull()
+    })
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/validators.test.ts
     test("array objects", async () => {
         const rules = Validator.parseRules({
             users: [{ password: [`required_if:name,"admin"`] }],
@@ -340,22 +429,24 @@ describe("required if method", () => {
                 { users: [{ password: "123", name: "admin" }] },
                 rules,
                 {}
-            ).passes()
-        ).toBe(true);
+            ).getErrors()).toBeNull()
         expect(
             await new Validator(
                 { users: [{ name: "admin" }] },
                 rules,
                 {}
+<<<<<<< HEAD:__tests__/validators.test.ts
             ).passes()
         ).toBe(false);
+=======
+            ).getErrors()).not.toBeNull()
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/validators.test.ts
         expect(
             await new Validator(
                 { users: [{ name: "not admin" }] },
                 rules,
                 {}
-            ).passes()
-        ).toBe(true);
+            ).getErrors()).toBeNull()
         expect(
             await new Validator(
                 {
@@ -366,8 +457,7 @@ describe("required if method", () => {
                 },
                 rules,
                 {}
-            ).passes()
-        ).toBe(true);
+            ).getErrors()).toBeNull()
         expect(
             await new Validator(
                 {
@@ -378,8 +468,7 @@ describe("required if method", () => {
                 },
                 rules,
                 {}
-            ).passes()
-        ).toBe(true);
+            ).getErrors()).toBeNull()
     });
     test("objects", async () => {
         const rules = Validator.parseRules({
@@ -390,8 +479,7 @@ describe("required if method", () => {
                 { users: [{ password: "123", name: "admin" }] },
                 rules,
                 {}
-            ).passes()
-        ).toBe(false);
+            ).getErrors()).not.toBeNull()
         expect(
             await new Validator(
                 {
@@ -402,8 +490,7 @@ describe("required if method", () => {
                 },
                 rules,
                 {}
-            ).passes()
-        ).toBe(true);
+            ).getErrors()).toBeNull()
         expect(
             await new Validator(
                 {
@@ -414,8 +501,7 @@ describe("required if method", () => {
                 },
                 rules,
                 {}
-            ).passes()
-        ).toBe(true);
+            ).getErrors()).toBeNull()
         expect(
             await new Validator(
                 {
@@ -426,8 +512,7 @@ describe("required if method", () => {
                 },
                 rules,
                 {}
-            ).passes()
-        ).toBe(false);
+            ).getErrors()).not.toBeNull()
     });
 });
 describe("required without method", () => {
@@ -436,62 +521,84 @@ describe("required without method", () => {
             email: ["required_without:name,phone"],
         });
         expect(
+<<<<<<< HEAD:__tests__/validators.test.ts
             await new Validator({ email: "123@g.com" }, rules, {}).passes()
         ).toBe(true);
+=======
+            await new Validator({ email: "123@g.com" }, rules, {}).getErrors()).toBeNull()
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/validators.test.ts
         expect(
             await new Validator(
                 { name: "ali", phone: "123" },
                 rules,
                 {}
+<<<<<<< HEAD:__tests__/validators.test.ts
             ).passes()
         ).toBe(true);
         expect(await new Validator({ name: "ali" }, rules, {}).passes()).toBe(
             false
         );
+=======
+            ).getErrors()).toBeNull()
+        expect(await new Validator({ name: "ali" }, rules, {}).getErrors()).not.toBeNull()
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/validators.test.ts
         expect(await new Validator({}, rules, {}).passes()).toBe(false);
         expect(
             await new Validator(
                 { email: "123", phone: "123" },
                 rules,
                 {}
+<<<<<<< HEAD:__tests__/validators.test.ts
             ).passes()
         ).toBe(true);
+=======
+            ).getErrors()).toBeNull()
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/validators.test.ts
     });
     test("array object", async () => {
         const rules = parseRules({
             users: [{ email: ["required_without:name,phone"] }],
         });
         expect(
+            await new Validator({ users: [
+                { email: "123@g.com" },
+                { name: "ali", phone: "123" },
+                {  name: "ali"}
+            ] },rules).getErrors()
+        ).not.toBeNull()
+        expect(
             await new Validator(
                 { users: [{ email: "123@g.com" }] },
                 rules,
                 {}
-            ).passes()
-        ).toBe(true);
+            ).getErrors()).toBeNull()
         expect(
             await new Validator(
                 { users: [{ name: "ali", phone: "123" }] },
                 rules,
                 {}
-            ).passes()
-        ).toBe(true);
+            ).getErrors()).toBeNull()
         expect(
             await new Validator(
                 { users: [{ name: "ali", phone: "123" }, {}] },
                 rules,
                 {}
-            ).passes()
-        ).toBe(false);
+            ).getErrors()).not.toBeNull()
         expect(
             await new Validator(
                 { users: [{ name: "ali" }] },
                 rules,
                 {}
+<<<<<<< HEAD:__tests__/validators.test.ts
             ).passes()
         ).toBe(false);
         expect(await new Validator({ users: [{}] }, rules, {}).passes()).toBe(
             false
         );
+=======
+            ).getErrors()).not.toBeNull()
+        expect(await new Validator({ users: [{}] }, rules, {}).getErrors()).not.toBeNull()
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/validators.test.ts
         expect(await new Validator({ users: [] }, rules, {}).passes()).toBe(
             true
         );
@@ -499,9 +606,14 @@ describe("required without method", () => {
             await new Validator(
                 { users: { 1: { email: "123", phone: "123" } } },
                 rules,
+            ).getErrors()).not.toBeNull()
+        expect(
+            await new Validator(
+                {},
+                rules,
                 {}
             ).passes()
-        ).toBe(false);
+        ).toBe(true);
     });
 });
 describe("test regEx", () => {
@@ -511,6 +623,7 @@ describe("test regEx", () => {
         expect(await new Validator({ val: "myWord" }, myExp, {}).passes()).toBe(
             true
         );
+<<<<<<< HEAD:__tests__/validators.test.ts
         expect(await new Validator({ val: "string" }, myExp, {}).passes()).toBe(
             false
         );
@@ -520,5 +633,316 @@ describe("test regEx", () => {
         expect(
             await new Validator({ val: "myWord " }, myExp, {}).passes()
         ).toBe(false);
+=======
+        expect(await new Validator({ val: "string" }, myExp, {}).getErrors()).not.toBeNull()
+        expect(
+            await new Validator({ val: " myWord" }, myExp, {}).getErrors()).not.toBeNull()
+        expect(
+            await new Validator({ val: "myWord " }, myExp, {}).getErrors()).not.toBeNull()
+    });
+});
+describe("test dates", () => {
+    const CurrDate = new Date();
+    describe("isDate", () => {
+        const Rules = parseRules({ date: [`isDate`] });
+        test("string data", async () => {
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10).toUTCString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10).toJSON() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10).toDateString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10).toISOString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10).toLocaleDateString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() - 1e10).toString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator({ date: Date.now() }, Rules).getErrors()).toBeNull()
+            expect(
+                await new Validator({ date: Date.now() + 1e10 }, Rules).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: (Date.now() + 1e10).toString() },
+                    Rules
+                ).getErrors()).toBeNull()
+        });
+        test("wrong values", async () => {
+            expect(await new Validator({ date: "" }, Rules).getErrors()).not.toBeNull()
+            expect(await new Validator({ date: null }, Rules).getErrors()).not.toBeNull()
+            expect(
+                await new Validator({ date: undefined }, Rules).getErrors()).not.toBeNull()
+            expect(
+                await new Validator(
+                    { date: "Wrong time formate" },
+                    Rules
+                ).getErrors()).not.toBeNull()
+            expect(await new Validator({ date: {} }, Rules).getErrors()).not.toBeNull()
+            expect(await new Validator({ date: [] }, Rules).getErrors()).not.toBeNull()
+            expect(await new Validator({ date: CurrDate.getTime() }, Rules).passes()).toBe(
+                true
+            );
+        });
+    });
+    describe("after", () => {
+        const Rules = parseRules({ date: [`after:${CurrDate}`] });
+        test("simple date", async () => {
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now()) },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10) },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() - 1e10) },
+                    Rules
+                ).getErrors()).not.toBeNull()
+        });
+        test("string data", async () => {
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10).toUTCString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10).toJSON() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10).toDateString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10).toISOString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() + 1e10).toLocaleDateString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(Date.now() - 1e10).toString() },
+                    Rules
+                ).getErrors()).not.toBeNull()
+        });
+        test("test number", async () => {
+            expect(
+                await new Validator(
+                    { date: (Date.now() - 1e12).toString() },
+                    Rules
+                ).getErrors()).not.toBeNull()
+            expect(
+                await new Validator({ date: Date.now() }, Rules).getErrors()).toBeNull()
+            expect(
+                await new Validator({ date: Date.now() + 1e10 }, Rules).getErrors()).toBeNull()
+            expect(
+                await new Validator({ date: Date.now() - 1e10 }, Rules).getErrors()).not.toBeNull()
+            expect(
+                await new Validator(
+                    { date: (Date.now() + 1e10).toString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            const str = (Date.now() + 1e10).toString();
+            expect(
+                await new Validator({ date: `${str} ` }, Rules).getErrors()).not.toBeNull()
+            expect(
+                await new Validator({ date: ` ${str}` }, Rules).getErrors()).not.toBeNull()
+            expect(await new Validator({ date: ` 111` }, Rules).getErrors()).not.toBeNull()
+            expect(await new Validator({ date: `111 ` }, Rules).getErrors()).not.toBeNull()
+        });
+        describe("test now", () => {
+            test("increment operation", async () => {
+                const rules = { date: ["after:now+100"] };
+                expect(
+                    await new Validator({ date: Date.now() }, rules).getErrors()).not.toBeNull()
+                expect(
+                    await new Validator(
+                        { date: Date.now() + 101 },
+                        rules
+                    ).getErrors()).toBeNull()
+                expect(
+                    await new Validator(
+                        { date: (Date.now() - 1e10).toString() },
+                        rules
+                    ).getErrors()).not.toBeNull()
+            });
+            test("decrement operation", async () => {
+                const rules = { date: ["after:now-1000"] };
+                expect(
+                    await new Validator({ date: Date.now() }, rules).getErrors()).toBeNull()
+                expect(
+                    await new Validator(
+                        { date: Date.now() - 100 },
+                        rules
+                    ).getErrors()).toBeNull()
+                expect(
+                    await new Validator(
+                        { date: Date.now() - 1050 },
+                        rules
+                    ).getErrors()).not.toBeNull()
+                // expect(await new Validator({date:(Date.now()-1e10).toString()},Rules).passes()).toBe(false)
+            });
+        });
+    });
+    describe("date", () => {
+        const CurrDate = new Date(new Date().toDateString());
+        const Rules = parseRules({ date: [`date:${CurrDate}`] });
+        
+        test("simple date", async () => {
+            expect(
+                await new Validator({ date: CurrDate }, Rules).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(CurrDate.getTime() + 1e10) },
+                    Rules
+                ).getErrors()).not.toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(CurrDate.getTime() - 1e10) },
+                    Rules
+                ).getErrors()).not.toBeNull()
+        });
+        test("string data", async () => {
+            expect(
+                await new Validator(
+                    { date: new Date(CurrDate.getTime()).toUTCString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(CurrDate.getTime()).toJSON() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(CurrDate.getTime()).toDateString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(CurrDate.getTime()).toISOString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(CurrDate.getTime()).toLocaleDateString() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: new Date(CurrDate.getTime()).toString() },
+                    Rules
+                ).getErrors()).toBeNull()
+        });
+        test("test number", async () => {
+            expect(
+                await new Validator(
+                    { date: (CurrDate.getTime() - 1e12).toString() },
+                    Rules
+                ).getErrors()).not.toBeNull()
+            expect(
+                await new Validator(
+                    { date: CurrDate.getTime() },
+                    Rules
+                ).getErrors()).toBeNull()
+            expect(
+                await new Validator(
+                    { date: CurrDate.getTime() + 1e10 },
+                    Rules
+                ).getErrors()).not.toBeNull()
+            expect(
+                await new Validator(
+                    { date: CurrDate.getTime() - 1e10 },
+                    Rules
+                ).getErrors()).not.toBeNull()
+            expect(
+                await new Validator(
+                    { date: (CurrDate.getTime() + 1e10).toString() },
+                    Rules
+                ).getErrors()).not.toBeNull()
+            const str = (Date.now() + 1e10).toString();
+            expect(
+                await new Validator({ date: `${str} ` }, Rules).getErrors()).not.toBeNull()
+            expect(
+                await new Validator({ date: ` ${str}` }, Rules).getErrors()).not.toBeNull()
+            expect(await new Validator({ date: ` 111` }, Rules).getErrors()).not.toBeNull()
+            expect(await new Validator({ date: `111 ` }, Rules).getErrors()).not.toBeNull()
+        });
+        describe("test now", () => {
+            const CurrDate = new Date();
+
+            test("increment operation", async () => {
+                const rules = { date: ["date:now+100"] };
+                expect(
+                    await new Validator(
+                        { date: CurrDate.getTime() + 1e4 },
+                        rules
+                    ).getErrors()).not.toBeNull()
+                expect(
+                    await new Validator(
+                        { date: CurrDate.getTime() },
+                        rules
+                    ).getErrors()).toBeNull()
+                expect(
+                    await new Validator(
+                        { date: CurrDate.getTime() + 100 },
+                        rules
+                    ).getErrors()).toBeNull()
+                expect(
+                    await new Validator(
+                        { date: (CurrDate.getTime() - 1e10).toString() },
+                        rules
+                    ).getErrors()).not.toBeNull()
+            });
+            test("decrement operation", async () => {
+                const rules = { date: ["date:now-100"] };
+                expect(
+                    await new Validator(
+                        { date: CurrDate.getTime() - 100 },
+                        rules
+                    ).getErrors()).toBeNull()
+                expect(
+                    await new Validator(
+                        { date: CurrDate.getTime() - 1e4 },
+                        rules
+                    ).getErrors()).not.toBeNull()
+                expect(
+                    await new Validator(
+                        { date: CurrDate.getTime() + 1e4 },
+                        rules
+                    ).getErrors()).not.toBeNull()
+                // expect(await new Validator({date:(CurrDate.getTime()-1e10).toString()},Rules).passes()).toBe(false)
+            });
+        });
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/validators.test.ts
     });
 });

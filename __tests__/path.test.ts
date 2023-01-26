@@ -33,12 +33,17 @@ describe("Complex paths test", () => {
         });
     });
     test("object with limits", () => {
+<<<<<<< HEAD:__tests__/path.test.ts
         const Rules = Validator.parseRules({
             person: [["string"], "object", 0, 2],
         });
+=======
+        const Rules =Validator.parseRules( { person: [["string"],"object",["limit:0:2"]]});
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/path.test.ts
         const data = {};
         expect(new Validator(data, Rules, {}).CRules).toStrictEqual({
-            "person.*:object:0:2": ["string"],
+            "person.*:object": ["string"],
+            "person":["limit:0:2"]
         });
     });
 });

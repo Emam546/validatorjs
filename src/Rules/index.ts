@@ -1,7 +1,7 @@
 import accept from "./accept";
 import array from "./array";
 import boolean from "./boolean";
-import date from "./date";
+import { isDate, date, after, before } from "./date";
 import email from "./email";
 import password from "./password";
 import string from "./string";
@@ -24,7 +24,10 @@ export {
     accept,
     array,
     boolean,
+    isDate,
     date,
+    after,
+    before,
     email,
     password,
     string,
@@ -46,5 +49,5 @@ export {
     require_without,
     require_withoutAll,
     require_unless,
-    regExp
+    regExp,
 };

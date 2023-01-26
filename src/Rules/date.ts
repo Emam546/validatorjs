@@ -1,50 +1,85 @@
-import Rule, { MessagesStore }  from "../Rule"
-import handelMessage from "../utils/handelMessage"
-export const Messages:MessagesStore={"en":"THE DATE IS NOT VALID"}
-function leapYear(year: number) {
-    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
+import Rule, { MessagesStore, RuleFun } from "../Rule";
+import handelMessage from "../utils/handelMessage";
+import isEmpty from "../utils/isEmpty";
+import { isString } from "../utils/types";
+export const NotValidDate: MessagesStore = { en: "THE DATE IS NOT VALID" };
+export const After: MessagesStore = {
+    en: (_, name) => `The Date is before ${getTimeName(name)} date`,
+};
+export const Before: MessagesStore = {
+    en: (_, name) => `The Date is after ${getTimeName(name)} date`,
+};
+export const Equal: MessagesStore = {
+    en: (_, name) => `The Date is not equal ${getTimeName(name)} date`,
+};
+function _getDateName(name:string):string{
+    const regExp=/^\w+:(.+)/gi
+    const res=regExp.exec(name)
+    if(!res)return ""
+    return res[1]
 }
-function checkFalsePositiveDates(dateString: string) {
-    if (dateString.length === 10) {
-        const normalizedDate = dateString.replace('.', '-').replace('/', '-')
-        const parts = normalizedDate.split('-')
-        if (parts.length === 3) {
-            if (parts[0].length === 4) {
-                const y = parseInt(parts[0])
-                const m = parseInt(parts[1])
-                const d = parseInt(parts[2])
-                if (m === 2) {
-                    if (leapYear(y)) {
-                        if (d > 29) {
-                            return false
-                        }
-                    } else {
-                        if (d > 28) {
-                            return false
-                        }
-                    }
-                }
-                if (m === 4 || m === 6 || m === 9 || m === 11) {
-                    if (d > 30) {
-                        return false
-                    }
-                }
-            }
+function isValidDate(dateString: any):boolean {
+    return getTime(dateString).toString() !== "Invalid Date"
+}
+function getTime(dateString:any):Date{
+    if(dateString instanceof Date)
+        return dateString
+    if(isEmpty(dateString))
+        return new Date("Invalid Date")
+    if (isString(dateString)&&/(^\d+)$/.test(dateString) && !isNaN(parseInt(dateString))) {
+        return new Date(parseInt(dateString));
+    }else
+        return new Date(dateString);
+}
+function getTimeName(name: string):Date {
+    const dateName = _getDateName(name);
+    if (dateName.startsWith("now")) {
+        if(isNaN(parseInt(dateName.slice(4))))
+            return new Date(Date.now());
+        let num=Date.now()
+        const inNum=parseInt(dateName.slice(4))
+        switch (dateName.at(3)) {
+            case "+":
+                num+=inNum
+                break;
+            case "-":
+                num-=inNum
+                
         }
-        return true
+        return new Date(num)
     }
-    return true
+    
+    else{
+        if(!isValidDate(dateName))
+            throw new Error(`THE DATE ${dateName} IS NOT VALID`)
+        return getTime(dateName);
+    }
 }
-function isValidDate(dateString: any) {
-    let testDate
-    if (typeof dateString === 'number') {
-        testDate = new Date(dateString)
-        return typeof testDate === 'object'
-    }
-    testDate = new Date(dateString)
-    if (testDate.toString() === 'Invalid Date') {
-        return false
-    }
-    return checkFalsePositiveDates(dateString)
+function isDateFn(...arr: Parameters<RuleFun>){
+    const [value, name, , , lang] = arr;
+    if (!isValidDate(value)) return handelMessage(NotValidDate[lang], ...arr);
 }
-export default new Rule("date", (value: string,...arr) => isValidDate(value)?undefined:handelMessage(Messages[arr[3]],value,...arr),);
+function afterfn(...arr: Parameters<RuleFun>): ReturnType<RuleFun> {
+    const [dateV, name, , , lang] = arr;
+    if (!isValidDate(dateV)) return handelMessage(NotValidDate[lang], ...arr);
+    if (getTimeName(name) > getTime(dateV))
+        return handelMessage(After[lang], ...arr);
+}
+function beforefn(...arr: Parameters<RuleFun>): ReturnType<RuleFun> {
+    const [value, name, , , lang] = arr;
+    if (!isValidDate(value)) return handelMessage(NotValidDate[lang], ...arr);
+    if (getTimeName(name) < getTime(value))
+        return handelMessage(Before[lang], ...arr);
+}
+function equal(...arr: Parameters<RuleFun>): ReturnType<RuleFun> {
+    const [value, name, , , lang] = arr;
+    if (!isValidDate(value)) return handelMessage(NotValidDate[lang], ...arr);
+    if (Math.abs(getTimeName(name).getTime()-getTime(value).getTime())>1000)
+        return handelMessage(Before[lang], ...arr);
+}
+export const isDate = new Rule("isDate", isDateFn);
+export const date = new Rule(/(^date:)/, equal);
+export const after = new Rule(/(^after:)/, afterfn);
+export const before = new Rule(/(^before:)/, beforefn);
+
+

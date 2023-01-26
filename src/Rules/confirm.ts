@@ -1,5 +1,5 @@
-import Validator from "../main";
-import Rule, { StoredMessage } from "../Rule";
+import {Validator} from "../main";
+import Rule, { RuleFun, StoredMessage } from "../Rule";
 import LangTypes from "../types/lang";
 import compare from "../utils/compare";
 import handelMessage from "../utils/handelMessage";
@@ -9,11 +9,7 @@ import ValueNotExist from "./Messages/valueNotExist";
 import ValuesNotSame from "./Messages/ValuesNotSame";
 
 function Confirm(
-    value: any,
-    name: string,
-    validator: Validator,
-    path: string,
-    lang: LangTypes
+    ...[value,name,validator,path,lang]:Parameters<RuleFun>
 ): StoredMessage | undefined {
     const returnedValue = validator.getValue(path + "_confirmation");
     if (returnedValue == undefined) return handelUndefined(ValueNotExist[lang]);

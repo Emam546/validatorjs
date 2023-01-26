@@ -1,5 +1,10 @@
+<<<<<<< HEAD:__tests__/parse_values.test.ts
 import Validator from "../src/main";
 describe("test validate", () => {
+=======
+import Validator, { parseRules } from "../main";
+describe("test validate",  () => {
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/parse_values.test.ts
     test("main", async () => {
         const Rules = Validator.parseRules({
             name: "string",
@@ -10,16 +15,16 @@ describe("test validate", () => {
         const data2 = {
             name: 123,
         };
-        let valid = new Validator(data, Rules, {});
+        let valid:any = new Validator(data, Rules);
         expect(valid.CRules).toStrictEqual({ name: ["string"] });
         expect(await valid.passes()).toBe(true);
-        valid = new Validator(data2, Rules, {});
+        valid = new Validator(data2, Rules);
         expect(await valid.passes()).toBe(false);
     });
     test("test object describing", async () => {
         const Rules = Validator.parseRules({
             person: [
-                { age: ["integer"], friends: [["string"], "array", 0, 2] },
+                { age: ["integer"], friends: [["string"], "array", ["min:0","max:10"]] },
                 "object",
             ],
         });
@@ -32,14 +37,31 @@ describe("test validate", () => {
                 ahmed: { age: 12, friends: ["ahmed", "ali", "new friend"] },
             },
         };
-        expect(await new Validator(data, Rules, {}).passes()).toBe(false);
+        expect(await new Validator(data, Rules, {}).getErrors()).toBeNull();
         data = {
             person: [{ age: 12, friends: ["ahmed", "ali", "new friend"] }],
         };
         expect(await new Validator(data, Rules, {}).passes()).toBe(false);
     });
+    test("test with array",async()=>{
+        const rules=parseRules({
+            friendsNames:[["string"]]
+        })
+        const data={
+            friendsNames:["ahmed","ali","osama","said",]
+        }
+        expect(await new Validator(data,rules).passes()).toBe(true)
+        const data2={
+            friendsNames:["ahmed",12,231,"osama","said",]
+        }
+        expect(await new Validator(data2,rules).passes()).toBe(false)
+    })
 });
+<<<<<<< HEAD:__tests__/parse_values.test.ts
 test("IF THE RULE EXIST", async () => {
+=======
+test("if the rule exist",  async() => {
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/parse_values.test.ts
     const Rules = Validator.parseRules({
         name: "string",
     });
@@ -52,7 +74,12 @@ test("IF THE RULE EXIST", async () => {
     expect(await valid.validate("name", "string", "")).toStrictEqual([]);
     expect(await valid.validate(1234, "string", "")).not.toStrictEqual([]);
 });
+<<<<<<< HEAD:__tests__/parse_values.test.ts
 describe("Confirm method", () => {
+=======
+
+describe("Confirm method",  () => {
+>>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/parse_values.test.ts
     test("Main methods", async () => {
         let Rules = Validator.parseRules({
             password: ["confirm", "string"],
