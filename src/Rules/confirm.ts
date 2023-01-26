@@ -1,4 +1,4 @@
-import {Validator} from "../main";
+import { Validator } from "..";
 import Rule, { RuleFun, StoredMessage } from "../Rule";
 import LangTypes from "../types/lang";
 import compare from "../utils/compare";
@@ -9,7 +9,7 @@ import ValueNotExist from "./Messages/valueNotExist";
 import ValuesNotSame from "./Messages/ValuesNotSame";
 
 function Confirm(
-    ...[value,name,validator,path,lang]:Parameters<RuleFun>
+    ...[value, name, validator, path, lang]: Parameters<RuleFun>
 ): StoredMessage | undefined {
     const returnedValue = validator.getValue(path + "_confirmation");
     if (returnedValue == undefined) return handelUndefined(ValueNotExist[lang]);
@@ -17,10 +17,6 @@ function Confirm(
         return handelUndefined(ValuesNotSame[lang]);
 }
 
-export default new Rule(
-    "confirm",
-    (...arr) => {
-        return handelUnError(Confirm(...arr),...arr);
-    },
-
-);
+export default new Rule("confirm", (...arr) => {
+    return handelUnError(Confirm(...arr), ...arr);
+});

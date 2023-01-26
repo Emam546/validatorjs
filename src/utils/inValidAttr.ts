@@ -1,4 +1,4 @@
-import { Rules } from "../main";
+import { Rules } from "..";
 import { _Error } from "../Rule";
 import { max } from "../Rules";
 import constructObj from "./constructObj";
@@ -21,7 +21,6 @@ export function unMatchedValues(
                 [addedPath]: { message: "Unmatched type value", value: input },
             };
 
-
         if (unMatchObj[0])
             for (const key in input)
                 errors = {
@@ -33,7 +32,7 @@ export function unMatchedValues(
                     ),
                 };
     } else {
-        for (const key in input) 
+        for (const key in input)
             errors = {
                 ...errors,
                 ...unMatchedValues(
@@ -42,7 +41,6 @@ export function unMatchedValues(
                     `${addedPath}${key}.`
                 ),
             };
-        
     }
 
     if (Object.values(errors).length == 0) return null;

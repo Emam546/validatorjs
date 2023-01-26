@@ -1,19 +1,11 @@
-<<<<<<< HEAD:__tests__/functs.test.ts
 import { parseRules } from "../src/main";
 import constructRule from "../src/utils/constructObj";
 import { getAllValues, getValue } from "../src/utils/getValue";
+import inValidAttr from "../src/utils/inValidAttr";
+import isEmpty from "../src/utils/isEmpty";
 import mergeObjects from "../src/utils/merge";
+import { setAllValues, setValue } from "../src/utils/setValue";
 import validAttr from "../src/utils/validAttr";
-=======
-import Validator, { parseRules } from "../main";
-import constructRule from "../utils/constructObj";
-import { getAllValues, getValue } from "../utils/getValue";
-import mergeObjects from "../utils/merge";
-import validAttr from "../utils/validAttr";
-import inValidAttr from "../utils/inValidAttr";
-import isEmpty from "../utils/isEmpty";
-import { setAllValues, setValue } from "../utils/setValue";
->>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/functs.test.ts
 
 describe("Test get value methods", () => {
     test("getValue", () => {
@@ -27,9 +19,7 @@ describe("Test get value methods", () => {
         expect(
             getValue({ person: ["ahmed", "ali", "osama"] }, "person.*2")
         ).toBe("osama");
-        expect(getValue({ person: { 1: "ahmed" } }, "person.1")).toBe(
-            "ahmed"
-        );
+        expect(getValue({ person: { 1: "ahmed" } }, "person.1")).toBe("ahmed");
         expect(getValue({ person: { "1": "ahmed" } }, "person.1")).toBe(
             "ahmed"
         );
@@ -42,31 +32,33 @@ describe("Test get value methods", () => {
     });
     describe("get All Values", () => {
         it("regular test", () => {
-            expect(getAllValues({ name: "ahmed" }, "name")).toStrictEqual({ name: "ahmed" });
+            expect(getAllValues({ name: "ahmed" }, "name")).toStrictEqual({
+                name: "ahmed",
+            });
             expect(
                 getAllValues(
                     { person: ["ahmed", "ali", "osama"] },
                     "person.*:array"
                 )
             ).toStrictEqual({
-                "person.*0":"ahmed",
-                "person.*1":"ali",
-                "person.*2":"osama",
+                "person.*0": "ahmed",
+                "person.*1": "ali",
+                "person.*2": "osama",
             });
             expect(
                 getAllValues({ person: { 1: "ahmed" } }, "person.*:object")
             ).toStrictEqual({
-                "person.1":"ahmed",
+                "person.1": "ahmed",
             });
             expect(
                 getAllValues({ person: { "1": "ahmed" } }, "person.*:object")
-            ).toStrictEqual({"person.1":"ahmed"});
+            ).toStrictEqual({ "person.1": "ahmed" });
             expect(
                 getAllValues(
                     { person: { "1": { name: ["ahmed"] } } },
                     "person.*:object.name.*:array"
                 )
-            ).toStrictEqual({"person.1.name.*0":"ahmed"});
+            ).toStrictEqual({ "person.1.name.*0": "ahmed" });
             expect(
                 getAllValues(
                     {
@@ -77,12 +69,10 @@ describe("Test get value methods", () => {
                     },
                     "person.*:object.name.*:array"
                 )
-            ).toStrictEqual(
-                {
-                    "person.1.name.*0":"ahmed",
-                    "person.2.name.*0":"ali",
-                }
-            );
+            ).toStrictEqual({
+                "person.1.name.*0": "ahmed",
+                "person.2.name.*0": "ali",
+            });
             expect(
                 getAllValues(
                     {
@@ -94,147 +84,187 @@ describe("Test get value methods", () => {
                     "person.*:object.name.*:array"
                 )
             ).toStrictEqual({
-                "person.1.name.*0":"ahmed",
-                "person.2.name.*0":"ali",
-                "person.2.name.*1":"osama",
-                "person.2.name.*2":"elsayed",
+                "person.1.name.*0": "ahmed",
+                "person.2.name.*0": "ali",
+                "person.2.name.*1": "osama",
+                "person.2.name.*2": "elsayed",
             });
         });
         it("nested objects", () => {
             expect(
-                getAllValues(
-                    { person:{name:"ali"} },
-                    "person.name"
-                )
+                getAllValues({ person: { name: "ali" } }, "person.name")
             ).toStrictEqual({
-                "person.name":"ali",
+                "person.name": "ali",
             });
             expect(
-                getAllValues(
-                    { person:{name:"ali"} },
-                    "person.friend.name"
-                )
+                getAllValues({ person: { name: "ali" } }, "person.friend.name")
             ).toStrictEqual({});
             expect(
-                getAllValues(
-                    { person:{name:"ali"} },
-                    "person.friend"
-                )
+                getAllValues({ person: { name: "ali" } }, "person.friend")
             ).toStrictEqual({});
         });
     });
 });
 describe("Test set value methods", () => {
     describe("set Value", () => {
-        test("simple",()=>{
-            const data={ name: "ahmed" }
-            expect(setValue(data, "name","ali")).toBe(true);
-            expect(getValue(data,"name")).toBe("ali");
-        })
-        test('test bad path',()=>{
-            const data={ name: "ahmed" }
-            expect(setValue(data, "badBath","ali")).toBe(true);
-            expect(getValue(data,"badBath")).toBe("ali");
-        })
-        test("array objects",()=>{
-            let data:any={ person: ["ahmed", "sayed", "osama"] }
-            let path="person.*1"
-            let result="ali"
-            expect(setValue(data,path,result)).toBe(true)
+        test("simple", () => {
+            const data = { name: "ahmed" };
+            expect(setValue(data, "name", "ali")).toBe(true);
+            expect(getValue(data, "name")).toBe("ali");
+        });
+        test("test bad path", () => {
+            const data = { name: "ahmed" };
+            expect(setValue(data, "badBath", "ali")).toBe(true);
+            expect(getValue(data, "badBath")).toBe("ali");
+        });
+        test("array objects", () => {
+            let data: any = { person: ["ahmed", "sayed", "osama"] };
+            let path = "person.*1";
+            let result = "ali";
+            expect(setValue(data, path, result)).toBe(true);
             expect(getValue(data, path)).toBe(result);
-            data={ person: ["ahmed", "sayed", "osama"] }
-            result="imam"
-            path="person.*1"
-            expect(setValue(data,path,result)).toBe(true)
+            data = { person: ["ahmed", "sayed", "osama"] };
+            result = "imam";
+            path = "person.*1";
+            expect(setValue(data, path, result)).toBe(true);
             expect(getValue(data, path)).toBe(result);
-            data={ person: ["ahmed", "sayed", "osama"] }
-            result="imam"
-            path="person.*2"
-            expect(setValue(data,path,result)).toBe(true)
+            data = { person: ["ahmed", "sayed", "osama"] };
+            result = "imam";
+            path = "person.*2";
+            expect(setValue(data, path, result)).toBe(true);
             expect(getValue(data, path)).toBe(result);
-        })
-        test("objects",()=>{
-            
-            let data:any={ person: { 1: "ahmed" } }
-            let result="ali"
-            let path="person.1"
-            expect(setValue(data,path,result)).toBe(true)
+        });
+        test("objects", () => {
+            let data: any = { person: { 1: "ahmed" } };
+            let result = "ali";
+            let path = "person.1";
+            expect(setValue(data, path, result)).toBe(true);
             expect(getValue(data, path)).toBe(result);
-            data={ person: { person: { "1": "ahmed" } } }
-            result="ali"
-            path="person.1"
-            expect(setValue(data,path,result)).toBe(true)
+            data = { person: { person: { "1": "ahmed" } } };
+            result = "ali";
+            path = "person.1";
+            expect(setValue(data, path, result)).toBe(true);
             expect(getValue(data, path)).toBe(result);
-            data={ person: { "1": { name: ["ahmed"] } } }
-            result="ali"
-            path="person.1.name.*0"
-            expect(setValue(data,path,result)).toBe(true)
+            data = { person: { "1": { name: ["ahmed"] } } };
+            result = "ali";
+            path = "person.1.name.*0";
+            expect(setValue(data, path, result)).toBe(true);
             expect(getValue(data, path)).toBe(result);
-        })
-
+        });
     });
     describe("set All Values", () => {
-        
         it("regular test", () => {
-            let data:any={ name: "ahmed" }
-            let path="name"
-            let result:any="ali"
-            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
-            expect(Object.values(getAllValues(data, path)).every((val)=>val==result)).toBe(true)
-            data={ person: ["ahmed", "ali", "osama"] }
-            path="person.*:array"
-            result="ali"
-            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
-            expect(Object.values(getAllValues(data, path)).every((val)=>val==result)).toBe(true)
-            data={ person: { 1: "ahmed" } }
-            path="person.*:object"
-            result="ali"
-            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
-            expect(Object.values(getAllValues(data, path)).every((val)=>val==result)).toBe(true)
-            data={ person: { "1": { name: ["ahmed"] } } }
-            path="person.*:array.name.*:array"
-            result="ali"
-            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
-            expect(Object.values(getAllValues(data, path)).every((val)=>val==result)).toBe(true)
-            data={
+            let data: any = { name: "ahmed" };
+            let path = "name";
+            let result: any = "ali";
+            expect(setAllValues(data, path, result).every((val) => val)).toBe(
+                true
+            );
+            expect(
+                Object.values(getAllValues(data, path)).every(
+                    (val) => val == result
+                )
+            ).toBe(true);
+            data = { person: ["ahmed", "ali", "osama"] };
+            path = "person.*:array";
+            result = "ali";
+            expect(setAllValues(data, path, result).every((val) => val)).toBe(
+                true
+            );
+            expect(
+                Object.values(getAllValues(data, path)).every(
+                    (val) => val == result
+                )
+            ).toBe(true);
+            data = { person: { 1: "ahmed" } };
+            path = "person.*:object";
+            result = "ali";
+            expect(setAllValues(data, path, result).every((val) => val)).toBe(
+                true
+            );
+            expect(
+                Object.values(getAllValues(data, path)).every(
+                    (val) => val == result
+                )
+            ).toBe(true);
+            data = { person: { "1": { name: ["ahmed"] } } };
+            path = "person.*:array.name.*:array";
+            result = "ali";
+            expect(setAllValues(data, path, result).every((val) => val)).toBe(
+                true
+            );
+            expect(
+                Object.values(getAllValues(data, path)).every(
+                    (val) => val == result
+                )
+            ).toBe(true);
+            data = {
                 person: {
                     "1": { name: ["ahmed"] },
                     "2": { name: ["ali"] },
                 },
-            }
-            path="person.*:array.name.*:array"
-            result="ali"
-            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
-            expect(Object.values(getAllValues(data, path)).every((val)=>val==result)).toBe(true)
-            data={
+            };
+            path = "person.*:array.name.*:array";
+            result = "ali";
+            expect(setAllValues(data, path, result).every((val) => val)).toBe(
+                true
+            );
+            expect(
+                Object.values(getAllValues(data, path)).every(
+                    (val) => val == result
+                )
+            ).toBe(true);
+            data = {
                 person: {
                     "1": { name: ["ahmed"] },
                     "2": { name: ["ali", "osama", "elsayed"] },
                 },
-            }
-            path="person.*:array.name.*:array"
-            result="ali"
-            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
-            expect(Object.values(getAllValues(data, path)).every((val)=>val==result)).toBe(true)
+            };
+            path = "person.*:array.name.*:array";
+            result = "ali";
+            expect(setAllValues(data, path, result).every((val) => val)).toBe(
+                true
+            );
+            expect(
+                Object.values(getAllValues(data, path)).every(
+                    (val) => val == result
+                )
+            ).toBe(true);
         });
         it("nested objects", () => {
-            let data:any={ person:{name:"osama"} }
-            let path="person.name"
-            let result:any="ali"
-            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
-            expect(Object.values(getAllValues(data, path)).every((val)=>val==result)).toBe(true)
-            data={ person:{friend:{name:"osama"}} }
-            path="person.friend.name"
-            result="ali"
-            expect(setAllValues(data, path,result).every((val)=>val)).toBe(true)
-            expect(Object.values(getAllValues(data, path)).every((val)=>val==result)).toBe(true)
-            data={ person:{name:"osama"} }
-            path="person.friend.name"
-            result="ali"
-            expect(setAllValues(data, path,result).some((val)=>val)).toBe(false)
-            expect(Object.values(getAllValues(data, path)).some((val)=>val==result)).toBe(false)
-            
-            
+            let data: any = { person: { name: "osama" } };
+            let path = "person.name";
+            let result: any = "ali";
+            expect(setAllValues(data, path, result).every((val) => val)).toBe(
+                true
+            );
+            expect(
+                Object.values(getAllValues(data, path)).every(
+                    (val) => val == result
+                )
+            ).toBe(true);
+            data = { person: { friend: { name: "osama" } } };
+            path = "person.friend.name";
+            result = "ali";
+            expect(setAllValues(data, path, result).every((val) => val)).toBe(
+                true
+            );
+            expect(
+                Object.values(getAllValues(data, path)).every(
+                    (val) => val == result
+                )
+            ).toBe(true);
+            data = { person: { name: "osama" } };
+            path = "person.friend.name";
+            result = "ali";
+            expect(setAllValues(data, path, result).some((val) => val)).toBe(
+                false
+            );
+            expect(
+                Object.values(getAllValues(data, path)).some(
+                    (val) => val == result
+                )
+            ).toBe(false);
         });
     });
 });
@@ -318,14 +348,18 @@ describe("parseRules", () => {
             });
         });
     });
-    it('use .', () => {
-        expect(parseRules({
-            ".":["string"]
-        })).toStrictEqual({".":["string"]})
-        expect(parseRules({
-            person:{name:["string"],".":"required"}
-        })).toStrictEqual({"person.name":["string"],"person":["required"]})
-    })
+    it("use .", () => {
+        expect(
+            parseRules({
+                ".": ["string"],
+            })
+        ).toStrictEqual({ ".": ["string"] });
+        expect(
+            parseRules({
+                person: { name: ["string"], ".": "required" },
+            })
+        ).toStrictEqual({ "person.name": ["string"], person: ["required"] });
+    });
 });
 describe("test construct methods", () => {
     test("main method", () => {
@@ -413,33 +447,33 @@ describe("test construct methods", () => {
         };
         expect(constructRule(rules)).toStrictEqual(ex);
     });
-    test("use .",()=>{
-        const rules=parseRules({
-            person:{
-                ".":["required"],
-                "name":["string"],
-                "age":["integer"]
-            }
-        })
-        const rules2=parseRules({
-            person:{
-                "name":["string"],
-                "age":["integer"],
-                ".":["required"]
-            }
-        })
-        const ex={
-            person:{
-                "name":null,
-                "age":null
-            }
-        }
-        expect(constructRule(rules)).toStrictEqual(ex)
-        expect(constructRule(rules2)).toStrictEqual(ex)
-    })
+    test("use .", () => {
+        const rules = parseRules({
+            person: {
+                ".": ["required"],
+                name: ["string"],
+                age: ["integer"],
+            },
+        });
+        const rules2 = parseRules({
+            person: {
+                name: ["string"],
+                age: ["integer"],
+                ".": ["required"],
+            },
+        });
+        const ex = {
+            person: {
+                name: null,
+                age: null,
+            },
+        };
+        expect(constructRule(rules)).toStrictEqual(ex);
+        expect(constructRule(rules2)).toStrictEqual(ex);
+    });
 });
 describe("Valid attr", () => {
-    test("false values",()=>{
+    test("false values", () => {
         const rules = parseRules({
             name: "string",
             age: ["integer"],
@@ -464,7 +498,7 @@ describe("Valid attr", () => {
         expect(validAttr(f1, rules)).toStrictEqual(f1);
         expect(validAttr(f2, rules)).toStrictEqual(f1);
         expect(validAttr(f3, rules)).toStrictEqual(f3);
-    })
+    });
     test("main task", () => {
         const rules = parseRules({
             name: "string",
@@ -561,7 +595,6 @@ describe("Valid attr", () => {
         expect(validAttr(f1, rules)).toStrictEqual(f1);
         expect(validAttr(f2, rules)).toStrictEqual(f1);
     });
-
 });
 describe("test merge objs methods", () => {
     test("main way", () => {

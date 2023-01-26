@@ -1,13 +1,21 @@
 {
   "name": "validator",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-
-  "scripts": {
-    "test": "jest"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Emam546/validatorjs.git"
   },
-  "author": "Emam",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "jest",
+    "build":"tsc"
+  },
+  "author": "Imam",
   "license": "ISC",
   "devDependencies": {
     "@babel/preset-typescript": "^7.18.6",

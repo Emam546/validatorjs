@@ -1,10 +1,5 @@
-<<<<<<< HEAD:__tests__/parse_values.test.ts
-import Validator from "../src/main";
+import Validator, { parseRules } from "../src/main";
 describe("test validate", () => {
-=======
-import Validator, { parseRules } from "../main";
-describe("test validate",  () => {
->>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/parse_values.test.ts
     test("main", async () => {
         const Rules = Validator.parseRules({
             name: "string",
@@ -57,11 +52,7 @@ describe("test validate",  () => {
         expect(await new Validator(data2,rules).passes()).toBe(false)
     })
 });
-<<<<<<< HEAD:__tests__/parse_values.test.ts
 test("IF THE RULE EXIST", async () => {
-=======
-test("if the rule exist",  async() => {
->>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/parse_values.test.ts
     const Rules = Validator.parseRules({
         name: "string",
     });
@@ -74,12 +65,7 @@ test("if the rule exist",  async() => {
     expect(await valid.validate("name", "string", "")).toStrictEqual([]);
     expect(await valid.validate(1234, "string", "")).not.toStrictEqual([]);
 });
-<<<<<<< HEAD:__tests__/parse_values.test.ts
 describe("Confirm method", () => {
-=======
-
-describe("Confirm method",  () => {
->>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/parse_values.test.ts
     test("Main methods", async () => {
         let Rules = Validator.parseRules({
             password: ["confirm", "string"],

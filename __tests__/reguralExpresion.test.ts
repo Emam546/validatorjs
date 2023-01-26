@@ -82,7 +82,6 @@ describe("test Regular Expression of Validators", () => {
         );
         expect(r.require_without.isequal("r:myPath,value")).toBe(false);
     });
-<<<<<<< HEAD:__tests__/reguralExpresion.test.ts
     test("regExp", () => {
         expect(r.regExp.isequal("regex:/myXp/ig")).toBe(true);
         expect(r.regExp.isequal("regex:/myReg/")).toBe(true);
@@ -91,38 +90,4 @@ describe("test Regular Expression of Validators", () => {
         expect(r.regExp.isequal(" regex:/myXp/ig")).toBe(false);
         expect(r.regExp.isequal("regex:/myXp/ig ")).toBe(false);
     });
-=======
-    test("regExp",()=>{
-        expect(r.regExp.isequal("regex:/myXp/ig")).toBe(true)
-        expect(r.regExp.isequal("regex:/myReg/")).toBe(true)
-        expect(r.regExp.isequal("regex://ig")).toBe(false)
-        expect(r.regExp.isequal("regex:")).toBe(false)
-        expect(r.regExp.isequal(" regex:/myXp/ig")).toBe(false)
-        expect(r.regExp.isequal("regex:/myXp/ig ")).toBe(false)
-    })
-    describe("date",()=>{
-        const currDate=new Date()
-        test("after",()=>{
-            expect(r.after.isequal(`after:${currDate}`)).toBe(true)
-            expect(r.after.isequal(`after: ${currDate}`)).toBe(true)
-            expect(r.after.isequal(`after:`)).toBe(true)
-            expect(r.after.isequal(`after:1231234234`)).toBe(true)
-            expect(r.after.isequal(` after:1231234234`)).toBe(false)
-        })
-        test("before",()=>{
-            expect(r.before.isequal(`before:${currDate}`)).toBe(true)
-            expect(r.before.isequal(`before: ${currDate}`)).toBe(true)
-            expect(r.before.isequal(`before:`)).toBe(true)
-            expect(r.before.isequal(`before:1231234234`)).toBe(true)
-            expect(r.before.isequal(` before:1231234234`)).toBe(false)
-        })
-        test("date",()=>{
-            expect(r.date.isequal(`date:${currDate}`)).toBe(true)
-            expect(r.date.isequal(`date: ${currDate}`)).toBe(true)
-            expect(r.date.isequal(`date:`)).toBe(true)
-            expect(r.date.isequal(`date:1231234234`)).toBe(true)
-            expect(r.date.isequal(` date:1231234234`)).toBe(false)
-        })
-    })
->>>>>>> e6c1d4918e955b233ce008fcb35e3610b8ed9a85:src/__tests__/reguralExpresion.test.ts
 });
