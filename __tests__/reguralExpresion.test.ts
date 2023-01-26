@@ -1,4 +1,4 @@
-import * as r from "../Rules";
+import * as r from "../src/Rules";
 describe("test Regular Expression of Validators", () => {
     test("string", () => {
         expect(r.string.isequal("string")).toBe(true);
@@ -79,12 +79,12 @@ describe("test Regular Expression of Validators", () => {
         );
         expect(r.require_without.isequal("r:myPath,value")).toBe(false);
     });
-    test("regExp",()=>{
-        expect(r.regExp.isequal("regex:/myXp/ig")).toBe(true)
-        expect(r.regExp.isequal("regex:/myReg/")).toBe(true)
-        expect(r.regExp.isequal("regex://ig")).toBe(false)
-        expect(r.regExp.isequal("regex:")).toBe(false)
-        expect(r.regExp.isequal(" regex:/myXp/ig")).toBe(false)
-        expect(r.regExp.isequal("regex:/myXp/ig ")).toBe(false)
-    })
+    test("regExp", () => {
+        expect(r.regExp.isequal("regex:/myXp/ig")).toBe(true);
+        expect(r.regExp.isequal("regex:/myReg/")).toBe(true);
+        expect(r.regExp.isequal("regex://ig")).toBe(false);
+        expect(r.regExp.isequal("regex:")).toBe(false);
+        expect(r.regExp.isequal(" regex:/myXp/ig")).toBe(false);
+        expect(r.regExp.isequal("regex:/myXp/ig ")).toBe(false);
+    });
 });

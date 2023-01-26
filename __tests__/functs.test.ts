@@ -1,8 +1,8 @@
-import { parseRules } from "../main";
-import constructRule from "../utils/constructObj";
-import { getAllValues, getValue } from "../utils/getValue";
-import mergeObjects from "../utils/merge";
-import validAttr from "../utils/validAttr";
+import { parseRules } from "../src/main";
+import constructRule from "../src/utils/constructObj";
+import { getAllValues, getValue } from "../src/utils/getValue";
+import mergeObjects from "../src/utils/merge";
+import validAttr from "../src/utils/validAttr";
 
 describe("Test get value methods", () => {
     test("getValue", () => {

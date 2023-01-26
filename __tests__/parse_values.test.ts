@@ -1,5 +1,5 @@
-import Validator from "../main";
-describe("test validate",  () => {
+import Validator from "../src/main";
+describe("test validate", () => {
     test("main", async () => {
         const Rules = Validator.parseRules({
             name: "string",
@@ -39,7 +39,7 @@ describe("test validate",  () => {
         expect(await new Validator(data, Rules, {}).passes()).toBe(false);
     });
 });
-test("IF THE RULE EXIST",  async() => {
+test("IF THE RULE EXIST", async () => {
     const Rules = Validator.parseRules({
         name: "string",
     });
@@ -52,7 +52,7 @@ test("IF THE RULE EXIST",  async() => {
     expect(await valid.validate("name", "string", "")).toStrictEqual([]);
     expect(await valid.validate(1234, "string", "")).not.toStrictEqual([]);
 });
-describe("Confirm method",  () => {
+describe("Confirm method", () => {
     test("Main methods", async () => {
         let Rules = Validator.parseRules({
             password: ["confirm", "string"],
@@ -78,9 +78,9 @@ describe("Confirm method",  () => {
                 {}
             ).passes()
         ).toBe(false);
-        expect(await new Validator({ password: "1234" }, Rules, {}).passes()).toBe(
-            false
-        );
+        expect(
+            await new Validator({ password: "1234" }, Rules, {}).passes()
+        ).toBe(false);
     });
     test("Complex objects", async () => {
         let Rules = Validator.parseRules({
@@ -151,7 +151,9 @@ describe("Confirm method",  () => {
         let rules = Validator.parseRules({
             relatives: [{ email: ["confirm"] }, "array"],
         });
-        expect(await new Validator({ relatives: [] }, rules, {}).passes()).toBe(true);
+        expect(await new Validator({ relatives: [] }, rules, {}).passes()).toBe(
+            true
+        );
         expect(
             await new Validator(
                 { relatives: [{ email: "111", email_confirmation: "111" }] },
@@ -194,7 +196,7 @@ describe("Confirm method",  () => {
         ).toBe(false);
     });
 });
-describe("different method",  () => {
+describe("different method", () => {
     test("Main methods", async () => {
         let Rules = Validator.parseRules({
             password: ["different:email", "string"],
@@ -206,9 +208,9 @@ describe("different method",  () => {
                 {}
             ).passes()
         ).toBe(true);
-        expect(await new Validator({ password: "1234" }, Rules, {}).passes()).toBe(
-            true
-        );
+        expect(
+            await new Validator({ password: "1234" }, Rules, {}).passes()
+        ).toBe(true);
         expect(
             await new Validator(
                 { password: "1234", email: "1234" },
@@ -217,7 +219,11 @@ describe("different method",  () => {
             ).passes()
         ).toBe(false);
         expect(
-            await new Validator({ password: "1234", email: 1234 }, Rules, {}).passes()
+            await new Validator(
+                { password: "1234", email: 1234 },
+                Rules,
+                {}
+            ).passes()
         ).toBe(true);
     });
     test("Complex objects", async () => {
@@ -296,7 +302,11 @@ describe("different method",  () => {
             ).passes()
         ).toBe(true);
         expect(
-            await new Validator({ relatives: [{ email: "sss" }] }, rules, {}).passes()
+            await new Validator(
+                { relatives: [{ email: "sss" }] },
+                rules,
+                {}
+            ).passes()
         ).toBe(true);
         expect(
             await new Validator(
@@ -307,27 +317,33 @@ describe("different method",  () => {
         ).toBe(true);
     });
 });
-describe("in && not_in methods",  () => {
+describe("in && not_in methods", () => {
     test("main _in methods", async () => {
         const rules = Validator.parseRules({ name: "in:ahmed,ali,mohamed" });
-        expect(await new Validator({ name: "ahmed" }, rules, {}).passes()).toBe(true);
-        expect(await new Validator({ name: "ali" }, rules, {}).passes()).toBe(true);
-        expect(await new Validator({ name: "mohamed" }, rules, {}).passes()).toBe(
+        expect(await new Validator({ name: "ahmed" }, rules, {}).passes()).toBe(
             true
         );
-        expect(await new Validator({ name: "mohamed" }, rules, {}).passes()).toBe(
+        expect(await new Validator({ name: "ali" }, rules, {}).passes()).toBe(
             true
         );
-        expect(await new Validator({ name: "noName" }, rules, {}).passes()).toBe(
+        expect(
+            await new Validator({ name: "mohamed" }, rules, {}).passes()
+        ).toBe(true);
+        expect(
+            await new Validator({ name: "mohamed" }, rules, {}).passes()
+        ).toBe(true);
+        expect(
+            await new Validator({ name: "noName" }, rules, {}).passes()
+        ).toBe(false);
+        expect(await new Validator({ name: "" }, rules, {}).passes()).toBe(
             false
         );
-        expect(await new Validator({ name: "" }, rules, {}).passes()).toBe(false);
-        expect(await new Validator({ name: "ahmed," }, rules, {}).passes()).toBe(
-            false
-        );
-        expect(await new Validator({ name: "ahmed," }, rules, {}).passes()).toBe(
-            false
-        );
+        expect(
+            await new Validator({ name: "ahmed," }, rules, {}).passes()
+        ).toBe(false);
+        expect(
+            await new Validator({ name: "ahmed," }, rules, {}).passes()
+        ).toBe(false);
     });
     test("main not_in methods", async () => {
         const rules = Validator.parseRules({
@@ -336,22 +352,26 @@ describe("in && not_in methods",  () => {
         expect(await new Validator({ name: "ahmed" }, rules, {}).passes()).toBe(
             false
         );
-        expect(await new Validator({ name: "ali" }, rules, {}).passes()).toBe(false);
-        expect(await new Validator({ name: "mohamed" }, rules, {}).passes()).toBe(
+        expect(await new Validator({ name: "ali" }, rules, {}).passes()).toBe(
             false
         );
-        expect(await new Validator({ name: "mohamed" }, rules, {}).passes()).toBe(
-            false
-        );
-        expect(await new Validator({ name: "noName" }, rules, {}).passes()).toBe(
+        expect(
+            await new Validator({ name: "mohamed" }, rules, {}).passes()
+        ).toBe(false);
+        expect(
+            await new Validator({ name: "mohamed" }, rules, {}).passes()
+        ).toBe(false);
+        expect(
+            await new Validator({ name: "noName" }, rules, {}).passes()
+        ).toBe(true);
+        expect(await new Validator({ name: "" }, rules, {}).passes()).toBe(
             true
         );
-        expect(await new Validator({ name: "" }, rules, {}).passes()).toBe(true);
-        expect(await new Validator({ name: "ahmed," }, rules, {}).passes()).toBe(
-            true
-        );
-        expect(await new Validator({ name: "ahmed," }, rules, {}).passes()).toBe(
-            true
-        );
+        expect(
+            await new Validator({ name: "ahmed," }, rules, {}).passes()
+        ).toBe(true);
+        expect(
+            await new Validator({ name: "ahmed," }, rules, {}).passes()
+        ).toBe(true);
     });
 });
