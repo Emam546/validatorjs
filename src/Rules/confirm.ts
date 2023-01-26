@@ -1,4 +1,4 @@
-import { Validator } from "..";
+import { Validator } from "../main";
 import Rule, { RuleFun, StoredMessage } from "../Rule";
 import LangTypes from "../types/lang";
 import compare from "../utils/compare";

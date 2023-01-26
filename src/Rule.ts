@@ -1,5 +1,5 @@
 import LangType from "./types/lang";
-import { Validator } from ".";
+import { Validator } from "./index";
 import { isString } from "./utils/types";
 
 export type RuleFun<Data = any> = (
