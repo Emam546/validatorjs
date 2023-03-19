@@ -1,64 +1,70 @@
-import Rule, {  InitSubmitFun, RuleFun } from "../Rule";
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import Rule, { InitSubmitFun, RuleFun, _Error } from "../Rule";
 import compare from "../utils/compare";
 import { getAllValues, getValue } from "../utils/getValue";
 import { getValueMessage } from "./required";
 
-function _require_if(
-    ...[inputs,name,validator,path,lang]:Parameters<RuleFun>
-): ReturnType<InitSubmitFun> {
-    let vpath, value;
-    vpath = name.split(":")[1].split(",")[0];
-    value = JSON.parse(name.split(":")[1].split(",").slice(1).join(","));
+function _require_if<Input, Data>(
+    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Input, Data>>
+): ReturnType<InitSubmitFun<Input, Data>> {
+    const vpath = name.split(":")[1].split(",")[0];
+    const value = JSON.parse(name.split(":")[1].split(",").slice(1).join(","));
     const ObjectPath = path.split(".").slice(0, -1).join(".");
     const allObjects = getAllValues(inputs, ObjectPath);
     const Ppath = path.split(".").at(-1);
-    let errors:ReturnType<InitSubmitFun>={}
+    let errors: Record<string, _Error[]> = {};
 
     if (Ppath)
         for (const objPath in allObjects) {
             const element = allObjects[objPath];
             const val = getValue(element, vpath);
-            const finalPath=objPath?objPath+"."+Ppath:Ppath
+            const finalPath = objPath ? objPath + "." + Ppath : Ppath;
             if (compare(val, value)) {
-                errors={...errors,...getValueMessage(
-                    finalPath,
-                    inputs,
-                    "required",
-                    validator,
-                    Ppath,
-                    lang
-                )}
+                errors = {
+                    ...errors,
+                    ...getValueMessage(
+                        finalPath,
+                        inputs,
+                        "required",
+                        validator,
+                        Ppath,
+                        lang
+                    ),
+                };
             }
         }
-    return errors
+    return errors;
 }
-function _require_unless(
-    ...[inputs,name,validator,path,lang]:Parameters<RuleFun>
-): ReturnType<InitSubmitFun> {
-    let vpath, value;
-    vpath = name.split(":")[1].split(",")[0];
-    value = JSON.parse(name.split(":")[1].split(",").slice(1).join(","));
+function _require_unless<Input, Data>(
+    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Input, Data>>
+): ReturnType<InitSubmitFun<unknown, unknown>> {
+    const vpath = name.split(":")[1].split(",")[0];
+    const value = JSON.parse(name.split(":")[1].split(",").slice(1).join(","));
     const ObjectPath = path.split(".").slice(0, -1).join(".");
     const allObjects = getAllValues(inputs, ObjectPath);
     const Ppath = path.split(".").at(-1);
-    let errors:ReturnType<InitSubmitFun>={}
+    let errors: Record<string, _Error[]> = {};
+
     if (Ppath)
         for (const objPath in allObjects) {
             const element = allObjects[objPath];
             const val = getValue(element, vpath);
-            const finalPath=objPath?objPath+"."+Ppath:Ppath
+            const finalPath = objPath ? objPath + "." + Ppath : Ppath;
             if (!compare(val, value)) {
-                errors={...errors, ...getValueMessage(
-                    finalPath,
-                    inputs,
-                    "required",
-                    validator,
-                    Ppath,
-                    lang
-                )}
+                errors = {
+                    ...errors,
+                    ...getValueMessage(
+                        finalPath,
+                        inputs,
+                        "required",
+                        validator,
+                        Ppath,
+                        lang
+                    ),
+                };
             }
         }
-    return errors
+    return errors;
 }
 export const require_if = new Rule(
     /(^required_if:).+,[^,]+/,
@@ -70,5 +76,5 @@ export const require_unless = new Rule(
     /(^required_unless:).+,[^,]+/,
     () => undefined,
     (name, Validator, ...a) =>
-    _require_unless(Validator.inputs, name, Validator, ...a)
+        _require_unless(Validator.inputs, name, Validator, ...a)
 );

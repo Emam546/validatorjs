@@ -2,40 +2,40 @@ import LangType from "./types/lang";
 import { Validator } from "./index";
 import { isString } from "./utils/types";
 
-export type RuleFun<Data = any> = (
-    value: any,
+export type RuleFun<Data, T> = (
+    value: T,
     name: string,
-    validator: Validator<any, Data>,
+    validator: Validator<T, Data>,
     path: string,
     lang: LangType
 ) => string | undefined | Promise<string | undefined>;
 export interface _Error {
-    value: any;
+    value: unknown;
     message: string;
 }
-export type GetMessageFun = (
-    value: any,
+export type GetMessageFun<T> = (
+    value: T,
     name: string,
     validator: Validator,
     path: string,
-    ...a: any[]
+    ...a: unknown[]
 ) => string;
-export type StoredMessage = string | GetMessageFun;
-export type MessagesStore = Record<LangType, StoredMessage>;
-export type InitSubmitFun<Data = any> = (
+export type StoredMessage<T> = string | GetMessageFun<T>;
+export type MessagesStore<T> = Record<LangType, StoredMessage<T>>;
+export type InitSubmitFun<Data, T> = (
     name: string,
-    validator: Validator<any, Data>,
+    validator: Validator<T, Data>,
     path: string,
     lang: LangType
-) => Record<string, _Error[]>;
-export default class Rule<Data = any> {
-    private readonly name: RegExp | String;
-    private readonly fn: RuleFun<Data>;
-    private readonly initFn;
+) => Promise<Record<string, _Error[]>> | Record<string, _Error[]>;
+export default class Rule<Data, Input> {
+    private readonly name: RegExp | string;
+    private readonly fn: RuleFun<Data, Input>;
+    private readonly initFn?: InitSubmitFun<Data, Input>;
     constructor(
-        name: RegExp | String,
-        fn: RuleFun<Data>,
-        initFn?: InitSubmitFun
+        name: RegExp | string,
+        fn: RuleFun<Data, Input>,
+        initFn?: InitSubmitFun<Data, Input>
     ) {
         this.name = name;
         this.fn = fn;
@@ -48,9 +48,9 @@ export default class Rule<Data = any> {
         return false;
     }
     async validate(
-        value: any,
+        value: Input,
         name: string,
-        validator: Validator<any>,
+        validator: Validator<Input, Data>,
         path: string,
         lang: LangType
     ): Promise<string | undefined> {
@@ -58,7 +58,7 @@ export default class Rule<Data = any> {
     }
 
     async initSubmit(
-        validator: Validator,
+        validator: Validator<Input, Data>,
         lang: LangType
     ): Promise<Record<string, _Error[]>> {
         const { CRules: rules } = validator;

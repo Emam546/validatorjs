@@ -1,27 +1,26 @@
 import { Rules } from "..";
-import { _Error } from "../Rule";
 import constructObj from "./constructObj";
-import { isArray } from "./types";
-function matchObjs(input: any, matchObj: any): any {
+import { isArray, isObject } from "./types";
+function matchObjs(input: unknown, matchObj: unknown): unknown {
     if (matchObj === null) return input;
     if (input === undefined) return input;
 
-    if (matchObj instanceof Array) {
+    if (isArray<string>(matchObj)) {
         const [, _type] = matchObj;
-        const newObj: any = _type == "array" ? [] : {};
+        const newObj: Array<unknown> | Record<string, unknown> =
+            _type == "array" ? [] : {};
 
         if (_type == "array" && !isArray(input)) return [];
-        if (isArray(input))
+        if (isArray(input) && isArray(newObj))
             for (let i = 0; i < input.length; i++)
                 newObj[i] = matchObjs(input[i], matchObj[0]);
-        else {
+        else if (isObject(input) && isObject(newObj))
             for (const key in input)
                 newObj[key] = matchObjs(input[key], matchObj[0]);
-        }
 
         return newObj;
-    } else {
-        const newObj: any = {};
+    } else if (isObject(input) && isObject(matchObj)) {
+        const newObj: Record<string, unknown> = {};
         for (const key in matchObj) {
             if (input[key] !== undefined)
                 newObj[key] = matchObjs(input[key], matchObj[key]);
@@ -30,7 +29,7 @@ function matchObjs(input: any, matchObj: any): any {
     }
 }
 
-export default function (input: any, rules: Rules): any {
+export default function (input: unknown, rules: Rules): unknown {
     const RulesObj = constructObj(rules);
     return matchObjs(input, RulesObj);
 }

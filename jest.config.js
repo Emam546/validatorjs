@@ -5,7 +5,7 @@ module.exports = {
     },
     roots: ["<rootDir>/__tests__"],
     testMatch: [
-        "**/__tests__/**/*.+(ts|tsx|js)",
+        "**/*.+(spec|test).+(ts|tsx|js)",
         "**/?(*.)+(spec|test).+(ts|tsx|js)",
     ],
     testEnvironment: "node",
@@ -15,4 +15,5 @@ module.exports = {
             tsconfig: "tsconfig.test.json",
         },
     },
+
 };

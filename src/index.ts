@@ -1,3 +1,3 @@
-export * from "./main"
-import Validator from "./main"
-export default Validator
+export * from "./main";
+import Validator from "./main";
+export default Validator;

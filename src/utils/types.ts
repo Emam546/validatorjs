@@ -1,25 +1,29 @@
-
-export function isObject(attr: any): boolean {
-    return typeof attr === "object" && !Array.isArray(attr) && attr !== null;
+export function isObject<T>(value: unknown): value is Record<string, T> {
+    return typeof value === "object" && !Array.isArray(value) && value !== null;
 }
-export function isString(value: any): boolean {
+export function isAny<T>(
+    value: unknown
+): value is Record<string, T> | Array<T> {
+    return typeof value === "object" && value !== null;
+}
+export function isString(value: unknown): value is string {
     return typeof value === "string" || value instanceof String;
 }
-export function isArray(value: any): boolean {
+export function isArray<T>(value: unknown): value is Array<T> {
     return (
         value instanceof Array ||
         Object.prototype.toString.call(value) === "[object Array]"
     );
 }
-export function isNumber(value: any): boolean {
+export function isNumber(value: unknown): value is number {
     return (
-        !isNaN(value) && (value instanceof Number || typeof value == "number")
+        (typeof value == "number" && !isNaN(value)) || value instanceof Number
     );
 }
 export function onlyDigits(str: string | boolean | number) {
     const num = Number(str);
     return !isNaN(num) && typeof str !== "boolean";
 }
-export function isNumeric(value:any):boolean{
-    return (onlyDigits(value) && !isArray(value))
+export function isNumeric(value: string | boolean | number): boolean {
+    return onlyDigits(value) && !isArray(value);
 }

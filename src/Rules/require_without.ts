@@ -1,63 +1,71 @@
-
-import Rule, {  InitSubmitFun, RuleFun } from "../Rule";
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import Rule, { InitSubmitFun, RuleFun, _Error } from "../Rule";
 import { getAllValues, getValue } from "../utils/getValue";
 import { getValueMessage } from "./required";
 
-
-function _require_without(
-    ...[inputs,name,validator,path,lang]:Parameters<RuleFun>
-): ReturnType<InitSubmitFun> {
-    let vpaths = name.split(":")[1].split(",");
+ function _require_without<Input, Data>(
+    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Input, Data>>
+): ReturnType<InitSubmitFun<Input, Data>> {
+    const vpaths = name.split(":")[1].split(",");
     const ObjectPath = path.split(".").slice(0, -1).join(".");
     const allObjects = getAllValues(inputs, ObjectPath);
     const Ppath = path.split(".").at(-1);
-    let errors: ReturnType<InitSubmitFun>={}
+    let errors: Record<string, _Error[]> = {};
+
     if (Ppath)
         for (const objPath in allObjects) {
             const element = allObjects[objPath];
-            const finalPath=objPath?objPath+"."+Ppath:Ppath
+            const finalPath = objPath ? objPath + "." + Ppath : Ppath;
 
-            if (vpaths.some((vpath) => getValue(element, vpath) === undefined)) {
-                errors={...errors,...getValueMessage(
-                    finalPath,
-                    inputs,
-                    "required",
-                    validator,
-                    Ppath,
-                    lang
-                )}
+            if (
+                vpaths.some((vpath) => getValue(element, vpath) === undefined)
+            ) {
+                errors = {
+                    ...errors,
+                    ...( getValueMessage(
+                        finalPath,
+                        inputs,
+                        "required",
+                        validator,
+                        Ppath,
+                        lang
+                    )),
+                };
             }
         }
-    return errors
+    return errors;
 }
-function _require_withoutAll(
-    ...[inputs,name,validator,path,lang]:Parameters<RuleFun>
-): ReturnType<InitSubmitFun> {
-    let vpaths = name.split(":")[1].split(",");
+ function _require_withoutAll<Input, Data>(
+    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Input, Data>>
+): ReturnType<InitSubmitFun<Input, Data>> {
+    const vpaths = name.split(":")[1].split(",");
     const ObjectPath = path.split(".").slice(0, -1).join(".");
     const allObjects = getAllValues(inputs, ObjectPath);
     const Ppath = path.split(".").at(-1);
-    let errors: ReturnType<InitSubmitFun>={}
+    let errors: Record<string, _Error[]> = {};
 
     if (Ppath)
         for (const objPath in allObjects) {
             const element = allObjects[objPath];
-            const finalPath=objPath?objPath+"."+Ppath:Ppath
+            const finalPath = objPath ? objPath + "." + Ppath : Ppath;
 
             if (
                 vpaths.every((vpath) => getValue(element, vpath) === undefined)
             ) {
-                errors={...errors,...getValueMessage(
-                    finalPath,
-                    inputs,
-                    "required",
-                    validator,
-                    Ppath,
-                    lang
-                )}
+                errors = {
+                    ...errors,
+                    ...(getValueMessage(
+                        finalPath,
+                        inputs,
+                        "required",
+                        validator,
+                        Ppath,
+                        lang
+                    )),
+                };
             }
         }
-    return errors
+    return errors;
 }
 export const require_without = new Rule(
     /^required_without:(.+,)*[^,]+/,

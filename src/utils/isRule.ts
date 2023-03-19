@@ -1,5 +1,6 @@
+import {  RulesGetter } from "../main";
 import { isArray, isString } from "./types";
-export function is_Rule(array: any): boolean {
+export function is_Rule(array: unknown): array is RulesGetter {
     return (
         array != null &&
         isArray(array) && array instanceof Array &&

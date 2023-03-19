@@ -1,17 +1,20 @@
-import Validator from "..";
 import { GetMessageFun, MessagesStore } from "../Rule";
-export const MinErrors: MessagesStore = {
+import { isArray } from "../utils/types";
+export const MinErrors: MessagesStore<unknown> = {
     en: "YOU DIDN'T REACH THE MINIMUM LIMIT OF ARRAY",
 };
-export const MaXErrors: MessagesStore = {
+export const MaXErrors: MessagesStore<unknown> = {
     en: "YOU REACHED THE MAXIMUM LIMIT OF ARRAY",
 };
 export default function _arrayRange(
     min: number,
     max: number,
-    ...[obj, , validator, ...arr]: Exclude<Parameters<GetMessageFun>, string>
+    ...[obj, , validator, ...arr]: Exclude<
+        Parameters<GetMessageFun<number>>,
+        string
+    >
 ): string | undefined {
-    let length = obj instanceof Array ? obj.length : Object.keys(obj).length;
+    const length = isArray(obj) ? obj.length : Object.keys(obj).length;
     let minError, maxError;
     if (
         !(minError = MinErrors[validator.lang]) ||

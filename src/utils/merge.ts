@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+import { hasOwnProperty } from "./compare";
 import { isArray, isNumber, isString } from "./types";
-function filterObj(obj: any) {
+function filterObj(obj: unknown): obj is Record<string, unknown> {
     return (
         !(
             isString(obj) &&
@@ -18,18 +21,20 @@ export default function mergeObjects(...objs: any[]) {
     if (objs.length == 1) return objs[0];
     const allKeys = objs.reduce((acc, cObj) => {
         return { ...acc, ...cObj };
-    });
+    }, {});
     for (const objKey in allKeys) {
-        if (Object.prototype.hasOwnProperty.call(allKeys, objKey)) {
+        if (hasOwnProperty(allKeys, objKey)) {
             const element = allKeys[objKey];
-            if (element instanceof Array) {
-                const maxLength = objs.reduce((acc, v) => acc + v.length, 0);
+            if (isArray(element) && isArray<unknown[]>(objs)) {
+                const maxLength = objs.reduce<number>(
+                    (acc, v) => acc + v.length,
+                    0
+                );
                 for (let i = 0; i < maxLength; i++)
-                    allKeys[objKey][i] = mergeObjects(
-                        ...objs.map((obj) => obj[i])
-                    );
+                    element[i] = mergeObjects(...objs.map((obj) => obj[i]));
             } else
                 allKeys[objKey] = mergeObjects(
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
                     ...objs.map((obj) => obj[objKey])
                 );
         }

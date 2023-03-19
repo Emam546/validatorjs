@@ -1,4 +1,6 @@
 import { MessagesStore } from "../../Rule";
 
-const UnKnownInputValue:MessagesStore={ en: "the input value is not recognizable" }
-export default UnKnownInputValue
+const UnKnownInputValue: MessagesStore<unknown> = {
+    en: "the input value is not recognizable",
+};
+export default UnKnownInputValue;
