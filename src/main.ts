@@ -1,4 +1,4 @@
-import { isArray, isObject } from "./utils/types";
+import { isArray, isObject, isString } from "./utils/types";
 import Rule, { InitSubmitFun, RuleFun, _Error } from "./Rule";
 import * as r from "./Rules";
 import LangTypes from "./types/lang";
@@ -167,7 +167,7 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
         let currentObj = inputs;
         // let result: Record<string, any> = {};
         let Errors: Record<string, _Error[]> = await this._getSubmitErrors();
-        const validations: Promise<_Error[]>[] = [];
+        const validations: Array<Promise<_Error | undefined> | _Error>[] = [];
         const addPaths: string[] = [];
         for (let i = 0; i < paths.length; i++) {
             if (paths[i].indexOf("*") == 0) {
@@ -232,13 +232,19 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
                 }
             }
         }
-        (await Promise.all(validations)).forEach((result, i) => {
-            const path = addPaths[i];
-            if (result.length)
-                if (!Errors[addedPath + path])
-                    Errors[addedPath + path] = result;
-                else Errors[addedPath + path].push(...result);
-        });
+        await Promise.all(
+            validations.map(async (val, i) => {
+                const path = addPaths[i];
+                const result = (await Promise.all(val)).filter(
+                    (res) => res != undefined
+                ) as _Error[];
+                if (result.length) {
+                    if (!Errors[addedPath + path])
+                        Errors[addedPath + path] = result;
+                    else Errors[addedPath + path].push(...result);
+                }
+            })
+        );
         return Errors;
     }
     getValue(path: string) {
@@ -264,14 +270,14 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
         return compare(this.validAttr(), this.inputs);
     }
 
-    async validate(
+    validate(
         value: unknown,
         rule: string,
         path: string,
         expect?: [string]
-    ): Promise<_Error[]> {
+    ): Array<Promise<_Error | undefined> | _Error> {
         let has = false;
-        const arrMess: _Error[] = [];
+        const arrMess: Array<Promise<_Error | undefined> | _Error> = [];
         for (let i = 0; i < ValidatorClass.Rules.length; i++) {
             const ele = ValidatorClass.Rules[i];
             if (
@@ -279,14 +285,25 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
                 !(expect && !expect.some((rul) => ele.isequal(rul)))
             ) {
                 has = true;
-                const message = await ele.validate(
+                const message = ele.validate(
                     value,
                     rule,
                     this,
                     path,
                     this.lang
                 );
-                if (message)
+                if (message instanceof Promise) {
+                    arrMess.push(
+                        new Promise<_Error | undefined>((res, rej) => {
+                            message
+                                .then((message) => {
+                                    if (message) res({ value, message });
+                                    else res(undefined);
+                                })
+                                .catch((err) => rej(err));
+                        })
+                    );
+                } else if (isString(message))
                     arrMess.push({
                         value,
                         message,

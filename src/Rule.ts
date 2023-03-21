@@ -47,14 +47,14 @@ export default class Rule<Data, Input> {
             return value.match(this.name) != null;
         return false;
     }
-    async validate(
+    validate(
         value: Input,
         name: string,
         validator: Validator<Input, Data>,
         path: string,
         lang: LangType
-    ): Promise<string | undefined> {
-        return await this.fn(value, name, validator, path, lang);
+    ) {
+        return this.fn(value, name, validator, path, lang);
     }
 
     async initSubmit(
