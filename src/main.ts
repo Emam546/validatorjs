@@ -78,20 +78,23 @@ export declare type constructorValidator<Input> = [
     Rules,
     ValidatorOptions | undefined
 ];
-
+// function shake(key:unknown): this is boolean {
+//     return true;
+// }
 export declare interface Validator<Input = unknown, Data = unknown> {
     reqData: Data;
-    inputs: Input;
+    inputs: unknown;
     CRules: Rules;
     options: ValidatorOptions;
     errors: Record<string, _Error[]>;
     inValidErrors: Record<string, _Error> | null;
     lang: LangTypes;
-    passes(): Promise<boolean>;
+
+    passes(): this is { inputs: Input };
     fails(): Promise<boolean>;
     getErrors(): Promise<Record<string, _Error[]> | null>;
     inside(): boolean;
-    validAttr(): Data;
+    validAttr(): Input;
     getValue(path: string): unknown;
     getAllValues(path: string): Record<string, unknown>;
     setValue(path: string, value: unknown): boolean;
@@ -121,7 +124,7 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
         this.empty = isEmpty(inputs);
         if (options) this.lang = options.lang || this.lang;
     }
-    async passes(): Promise<boolean> {
+    async passes() {
         //Just object of paths and there current objects
         return (await this.getErrors()) === null;
     }
@@ -260,8 +263,8 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
         return setAllValues(this.inputs, path, value);
     }
     static parseRules = parseRules;
-    validAttr(): Data {
-        return validAttr(this.inputs, this.CRules) as Data;
+    validAttr(): Input {
+        return validAttr(this.inputs, this.CRules) as Input;
     }
     inValidAttr() {
         return (this.inValidErrors = inValidAttr(this.inputs, this.CRules));
