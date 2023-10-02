@@ -77,9 +77,9 @@ describe("test Regular Expression of Validators", () => {
         expect(r.require_without.isequal("required_without:foo,")).toBe(true);
         expect(r.require_without.isequal("required_without:")).toBe(false);
         expect(r.require_without.isequal("required_without")).toBe(false);
-        expect(r.require_without.isequal(" required_without:myPath,value")).toBe(
-            false
-        );
+        expect(
+            r.require_without.isequal(" required_without:myPath,value")
+        ).toBe(false);
         expect(r.require_without.isequal("r:myPath,value")).toBe(false);
     });
     test("regExp", () => {

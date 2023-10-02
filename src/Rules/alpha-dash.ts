@@ -1,5 +1,5 @@
-import Rule, { MessagesStore } from "../Rule";
-import handelMessage from "../utils/handelMessage";
+import Rule, { MessagesStore } from "@/Rule";
+import handelMessage from "@/utils/handelMessage";
 export const Messages: MessagesStore<unknown> = {
     en: "The input value contains alpha-numeric characters, as well as dashes and underscores.",
 };

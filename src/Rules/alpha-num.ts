@@ -1,5 +1,5 @@
-import Rule, { MessagesStore } from "../Rule";
-import handelMessage from "../utils/handelMessage";
+import Rule, { MessagesStore } from "@/Rule";
+import handelMessage from "@/utils/handelMessage";
 const Messages: MessagesStore<unknown> = {
     en: "The input value must contains only characters or numeric values",
 };

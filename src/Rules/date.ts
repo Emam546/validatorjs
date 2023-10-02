@@ -1,7 +1,7 @@
-import Rule, { MessagesStore, RuleFun } from "../Rule";
-import handelMessage from "../utils/handelMessage";
-import isEmpty from "../utils/isEmpty";
-import { isNumber, isString } from "../utils/types";
+import Rule, { MessagesStore, RuleFun } from "@/Rule";
+import handelMessage from "@/utils/handelMessage";
+import isEmpty from "@/utils/isEmpty";
+import { isNumber, isString } from "@/utils/types";
 export const NotValidDate: MessagesStore<unknown> = {
     en: "THE DATE IS NOT VALID",
 };

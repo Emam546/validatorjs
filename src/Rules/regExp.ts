@@ -1,8 +1,10 @@
-import Rule, { RuleFun } from "../Rule";
-import handelMessage from "../utils/handelMessage";
+import Rule, { RuleFun } from "@/Rule";
+import handelMessage from "@/utils/handelMessage";
 import ValueNOTtheSame from "./Messages/ValuesNotSame";
 export const _regExp = /^regex:\/(.+)\/(\w*)$/gi;
-function regExp(...arr: Parameters<RuleFun<unknown,string>>): ReturnType<RuleFun<unknown,string>> {
+function regExp(
+    ...arr: Parameters<RuleFun<unknown, string>>
+): ReturnType<RuleFun<unknown, string>> {
     const [value, name, , , lang] = arr;
     const match = _regExp.exec(name);
     if (!match) return "undefined regular expression";

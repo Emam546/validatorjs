@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Rule, { InitSubmitFun, RuleFun, _Error } from "../Rule";
-import compare from "../utils/compare";
-import { getAllValues, getValue } from "../utils/getValue";
+import Rule, { InitSubmitFun, RuleFun, _Error } from "@/Rule";
+import compare from "@/utils/compare";
+import { getAllValues, getValue } from "@/utils/getValue";
 import { getValueMessage } from "./required";
 
 function _require_if<Input, Data>(

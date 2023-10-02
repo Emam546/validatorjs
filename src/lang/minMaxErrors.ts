@@ -1,5 +1,5 @@
-import { GetMessageFun, MessagesStore } from "../Rule";
-import { isArray } from "../utils/types";
+import { GetMessageFun, MessagesStore } from "@/Rule";
+import { isArray } from "@/utils/types";
 export const MinErrors: MessagesStore<unknown> = {
     en: "YOU DIDN'T REACH THE MINIMUM LIMIT OF ARRAY",
 };

@@ -1,5 +1,5 @@
 import { Validator } from "..";
-import { MessagesStore } from "../Rule";
+import { MessagesStore } from "@/Rule";
 export const message: MessagesStore<unknown> = {
     en: "the inserted data type is not matching with the object type",
 };

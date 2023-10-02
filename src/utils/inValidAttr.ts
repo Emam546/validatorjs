@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Rules } from "..";
-import { _Error } from "../Rule";
+import { _Error } from "@/Rule";
 import constructObj from "./constructObj";
 import { isArray } from "./types";
 export type ReturnTypeUnMatch = Record<string, _Error> | null;

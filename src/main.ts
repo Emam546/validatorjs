@@ -78,9 +78,7 @@ export declare type constructorValidator<Input> = [
     Rules,
     ValidatorOptions | undefined
 ];
-// function shake(key:unknown): this is boolean {
-//     return true;
-// }
+
 export declare interface Validator<Input = unknown, Data = unknown> {
     reqData: Data;
     inputs: unknown;
@@ -109,7 +107,7 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
     errors: Record<string, _Error[]> = {};
     inValidErrors: Record<string, _Error> | null = null;
     public lang: LangTypes = "en";
-    public static Rules: Rule<any, any>[];
+    public static Rules: Rule<unknown, unknown>[];
     public readonly empty: boolean;
     constructor(
         inputs: Input,
@@ -316,13 +314,13 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
         if (!has) throw new Error(`THE RULE ${rule} IS NOT EXIST`);
         return arrMess;
     }
-    static register<Data>(
+    static register<T>(
         name: RegExp | string,
-        fun: RuleFun<Data, unknown>,
-        initSubmit?: InitSubmitFun<Data, unknown>
-    ): Rule<Data, unknown> {
-        const rule = new Rule<Data, unknown>(name, fun, initSubmit);
-        ValidatorClass.Rules.push(rule);
+        fun: RuleFun<T, unknown>,
+        initSubmit?: InitSubmitFun<T, unknown>
+    ): Rule<T, unknown> {
+        const rule = new Rule<T, unknown>(name, fun, initSubmit);
+        ValidatorClass.Rules.push(rule as unknown as Rule<unknown, unknown>);
         return rule;
     }
 }
@@ -340,4 +338,4 @@ export default class S<Input = unknown, Data = unknown> extends ValidatorClass<
     }
 }
 
-ValidatorClass.Rules = Object.values({ ...r });
+ValidatorClass.Rules = Object.values({ ...r }) as Rule<unknown, unknown>[];

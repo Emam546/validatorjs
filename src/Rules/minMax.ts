@@ -1,8 +1,8 @@
-import Rule, { RuleFun, StoredMessage } from "../Rule";
+import Rule, { RuleFun, StoredMessage } from "@/Rule";
 import LangTypes from "../types/lang";
-import handelUndefined from "../utils/handelUndefined";
-import handelUnError from "../utils/handelUnError";
-import { isArray, isNumber, isObject, isString } from "../utils/types";
+import handelUndefined from "@/utils/handelUndefined";
+import handelUnError from "@/utils/handelUnError";
+import { isArray, isNumber, isObject, isString } from "@/utils/types";
 import { MinError, MaXError } from "./Messages/minMax";
 import UnKnownInputValue from "./Messages/unKnownValue";
 import UnKnownRuleValue from "./Messages/UnknownRule";
@@ -62,13 +62,13 @@ function limit<Data>(
     } else return val;
 }
 
-export const min = new Rule<unknown,number>(/^min(:-?\d+)?$/g, (...arr) => {
+export const min = new Rule<unknown, number>(/^min(:-?\d+)?$/g, (...arr) => {
     return handelUnError(MinHandler(...arr), ...arr);
 });
-export const max = new Rule<unknown,number>(/^max:-?\d+$/g, (...arr) => {
+export const max = new Rule<unknown, number>(/^max:-?\d+$/g, (...arr) => {
     return handelUnError(MaxHandler(...arr), ...arr);
 });
 
-export default new Rule<unknown,number>(/^limit:-?\d+:-?\d+$/, (...arr) => {
+export default new Rule<unknown, number>(/^limit:-?\d+:-?\d+$/, (...arr) => {
     return handelUnError(limit(...arr), ...arr);
 });

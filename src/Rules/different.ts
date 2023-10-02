@@ -1,8 +1,8 @@
-import Rule, { RuleFun, StoredMessage } from "../Rule";
+import Rule, { RuleFun, StoredMessage } from "@/Rule";
 
-import compare from "../utils/compare";
-import handelUndefined from "../utils/handelUndefined";
-import handelUnError from "../utils/handelUnError";
+import compare from "@/utils/compare";
+import handelUndefined from "@/utils/handelUndefined";
+import handelUnError from "@/utils/handelUnError";
 import ValuesNotSame from "./Messages/ValuesNotSame";
 function different<Input, Data>(
     ...[value, name, Validator, path, lang]: Parameters<RuleFun<Input, Data>>

@@ -1,6 +1,6 @@
-import Rule, { MessagesStore } from "../Rule";
-import handelMessage from "../utils/handelMessage";
-import { isNumber } from "../utils/types";
+import Rule, { MessagesStore } from "@/Rule";
+import handelMessage from "@/utils/handelMessage";
+import { isNumber } from "@/utils/types";
 export const Messages: MessagesStore<unknown> = {
     en: "the input value is not a number",
 };

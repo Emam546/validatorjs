@@ -16,8 +16,12 @@
         "no-console": 1,
         "no-extra-boolean-cast": 0,
         "semi": 1,
-        "@typescript-eslint/no-misused-promises": 0,
+        // "@typescript-eslint/no-misused-promises": 0,
         "@typescript-eslint/no-floating-promises": 0,
+        "@typescript-eslint/no-unsafe-call": 0,
+        "@typescript-eslint/no-unsafe-assignment": 0,
+        "@typescript-eslint/no-unsafe-return": 0,
+        "@typescript-eslint/no-unsafe-argument": 0,
         "node/no-process-env": 1,
         "node/no-unsupported-features/es-syntax": [
             "error",
@@ -28,7 +32,7 @@
             }
         ],
         "node/no-missing-import": 0,
-        "node/no-unpublished-import": 0
+        "node/no-unpublished-import": 1
     },
     "settings": {
         "node": {
@@ -39,5 +43,10 @@
                 ".ts"
             ]
         }
-    }
+    },
+    "ignorePatterns": [
+        "dist",
+        "__tests__",
+        "jest.config.js"
+    ]
 }

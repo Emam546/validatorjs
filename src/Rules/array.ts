@@ -1,6 +1,6 @@
-import Rule, { MessagesStore } from "../Rule";
-import handelMessage from "../utils/handelMessage";
-import { isArray } from "../utils/types";
+import Rule, { MessagesStore } from "@/Rule";
+import handelMessage from "@/utils/handelMessage";
+import { isArray } from "@/utils/types";
 export const Messages: MessagesStore<unknown> = {
     en: "ARRAY REQUIREMENTS HAVEN'T BEEN APPLIED ",
 };

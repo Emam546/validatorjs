@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Rule, { InitSubmitFun, RuleFun, _Error } from "../Rule";
-import { getAllValues, getValue } from "../utils/getValue";
+import Rule, { InitSubmitFun, RuleFun, _Error } from "@/Rule";
+import { getAllValues, getValue } from "@/utils/getValue";
 import { getValueMessage } from "./required";
 
- function _require_without<Input, Data>(
+function _require_without<Input, Data>(
     ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Input, Data>>
 ): ReturnType<InitSubmitFun<Input, Data>> {
     const vpaths = name.split(":")[1].split(",");
@@ -22,20 +22,20 @@ import { getValueMessage } from "./required";
             ) {
                 errors = {
                     ...errors,
-                    ...( getValueMessage(
+                    ...getValueMessage(
                         finalPath,
                         inputs,
                         "required",
                         validator,
                         Ppath,
                         lang
-                    )),
+                    ),
                 };
             }
         }
     return errors;
 }
- function _require_withoutAll<Input, Data>(
+function _require_withoutAll<Input, Data>(
     ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Input, Data>>
 ): ReturnType<InitSubmitFun<Input, Data>> {
     const vpaths = name.split(":")[1].split(",");
@@ -54,14 +54,14 @@ import { getValueMessage } from "./required";
             ) {
                 errors = {
                     ...errors,
-                    ...(getValueMessage(
+                    ...getValueMessage(
                         finalPath,
                         inputs,
                         "required",
                         validator,
                         Ppath,
                         lang
-                    )),
+                    ),
                 };
             }
         }

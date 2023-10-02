@@ -1,6 +1,6 @@
-import Rule, { MessagesStore } from "../Rule";
-import handelMessage from "../utils/handelMessage";
-import { isString } from "../utils/types";
+import Rule, { MessagesStore } from "@/Rule";
+import handelMessage from "@/utils/handelMessage";
+import { isString } from "@/utils/types";
 export const Messages: MessagesStore<unknown> = {
     en: "THE TYPE OF INPUT IS NOT STRING",
 };

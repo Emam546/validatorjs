@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
-import Rule, { MessagesStore } from "../Rule";
-import handelMessage from "../utils/handelMessage";
+import Rule, { MessagesStore } from "@/Rule";
+import handelMessage from "@/utils/handelMessage";
 export const Messages: MessagesStore<string> = { en: "THE URL IS NOT VALID" };
 
 export default new Rule<unknown, string>("url", (value, ...arr) => {
