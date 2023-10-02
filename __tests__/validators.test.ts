@@ -1,5 +1,5 @@
-import Validator, { parseRules, Rules } from "../src/index";
-import { string, int, min, limit, regExp } from "../src/Rules";
+import Validator, { parseRules, Rules } from "@/index";
+import { string, int, min, limit, regExp } from "@/Rules";
 
 describe("test some validators", () => {
     test("test int method", async () => {

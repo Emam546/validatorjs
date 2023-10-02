@@ -1,4 +1,4 @@
-import * as r from "../src/Rules";
+import * as r from "@/Rules";
 describe("test Regular Expression of Validators", () => {
     test("string", () => {
         expect(r.string.isequal("string")).toBe(true);

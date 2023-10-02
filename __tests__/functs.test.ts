@@ -1,11 +1,11 @@
-import { parseRules } from "../src/index";
-import constructRule from "../src/utils/constructObj";
-import { getAllValues, getValue } from "../src/utils/getValue";
-import inValidAttr from "../src/utils/inValidAttr";
-import isEmpty from "../src/utils/isEmpty";
-import mergeObjects from "../src/utils/merge";
-import { setAllValues, setValue } from "../src/utils/setValue";
-import validAttr from "../src/utils/validAttr";
+import { parseRules } from "@/index";
+import constructRule from "@/utils/constructObj";
+import { getAllValues, getValue } from "@/utils/getValue";
+import inValidAttr from "@/utils/inValidAttr";
+import isEmpty from "@/utils/isEmpty";
+import mergeObjects from "@/utils/merge";
+import { setAllValues, setValue } from "@/utils/setValue";
+import validAttr from "@/utils/validAttr";
 
 describe("Test get value methods", () => {
     test("getValue", () => {

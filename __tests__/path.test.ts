@@ -1,4 +1,4 @@
-import Validator from "../src/index";
+import Validator from "@/index";
 
 describe("Complex paths test", () => {
     test("test array of rules", () => {
