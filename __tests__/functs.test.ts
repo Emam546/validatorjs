@@ -1,4 +1,4 @@
-import { parseRules } from "@/index";
+import { Rules, parseRules } from "@/index";
 import constructRule from "@/utils/constructObj";
 import { getAllValues, getValue } from "@/utils/getValue";
 import inValidAttr from "@/utils/inValidAttr";
@@ -6,7 +6,6 @@ import isEmpty from "@/utils/isEmpty";
 import mergeObjects from "@/utils/merge";
 import { setAllValues, setValue } from "@/utils/setValue";
 import validAttr from "@/utils/validAttr";
-
 describe("Test get value methods", () => {
     test("getValue", () => {
         expect(getValue({ name: "ahmed" }, "name")).toBe("ahmed");
@@ -270,9 +269,14 @@ describe("Test set value methods", () => {
 });
 describe("parseRules", () => {
     it("main methods", () => {
-        expect(parseRules({ name: "string" })).toStrictEqual({
+        expect(
+            parseRules({
+                name: "string",
+            })
+        ).toStrictEqual({
             name: ["string"],
         });
+
         expect(parseRules({ name: "string|integer" })).toStrictEqual({
             name: ["string", "integer"],
         });
@@ -425,7 +429,7 @@ describe("test construct methods", () => {
         expect(constructRule(rules)).toStrictEqual(res);
     });
     test("flattened array", () => {
-        let rules = parseRules([
+        let rules: Rules<unknown> = parseRules([
             { name: "string", password: "string" },
             "array",
         ]);

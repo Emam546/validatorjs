@@ -3,9 +3,9 @@ import Rule, { InitSubmitFun, RuleFun, _Error } from "@/Rule";
 import { getAllValues, getValue } from "@/utils/getValue";
 import { getValueMessage } from "./required";
 
-function _require_without<Input, Data>(
-    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Input, Data>>
-): ReturnType<InitSubmitFun<Input, Data>> {
+function _require_without<Data>(
+    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Data>>
+): ReturnType<InitSubmitFun<Data>> {
     const vpaths = name.split(":")[1].split(",");
     const ObjectPath = path.split(".").slice(0, -1).join(".");
     const allObjects = getAllValues(inputs, ObjectPath);
@@ -35,9 +35,9 @@ function _require_without<Input, Data>(
         }
     return errors;
 }
-function _require_withoutAll<Input, Data>(
-    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Input, Data>>
-): ReturnType<InitSubmitFun<Input, Data>> {
+function _require_withoutAll<Data>(
+    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Data>>
+): ReturnType<InitSubmitFun<Data>> {
     const vpaths = name.split(":")[1].split(",");
     const ObjectPath = path.split(".").slice(0, -1).join(".");
     const allObjects = getAllValues(inputs, ObjectPath);

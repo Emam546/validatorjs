@@ -1,117 +1,60 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
 import { isArray, isObject, isString } from "./utils/types";
 import Rule, { InitSubmitFun, RuleFun, _Error } from "./Rule";
 import * as r from "./Rules";
 import LangTypes from "./types/lang";
 import UnMatchedType from "./lang/notMatch";
-import { is_Rule } from "./utils/isRule";
-import arrayKind from "./utils/arrayKind";
 import { getValue, getAllValues } from "./utils/getValue";
 import validAttr from "./utils/validAttr";
-import compare, { hasOwnProperty } from "./utils/compare";
+import compare from "./utils/compare";
 import inValidAttr from "./utils/inValidAttr";
 import isEmpty from "./utils/isEmpty";
 import { setAllValues, setValue } from "./utils/setValue";
+import { Rules, parseRules } from "./parseRules";
+import { RulesGetter } from "./Rules";
 
-export type RulesGetter = Array<string> | null;
-export type Rules = Record<string, RulesGetter>;
 export const TYPE_ARRAY = ["object", "array"];
 export type ValidatorOptions = {
     lang?: LangTypes;
 };
 
-export function parseRules(input: unknown): Rules {
-    //just parse rules from the object
-    //it must alway finishes with
-    // - array of string  that describes rules
-    // - string that split with | sign
-    const flattened: Rules = {};
-    const _get_rule = (rules: unknown, property?: string) => {
-        if (isArray(rules)) {
-            // if there is added property before add .
-            const p = property ? property + ".*" : "*";
-            if (rules.length) {
-                //get the type of the array
-                // - array of rules
-                // - array that describes a rules of the object or array
-                if (is_Rule(rules))
-                    //check if it is array that describes some rule
-                    flattened[property || "."] = rules;
-                else if (
-                    isArray<string>(rules) &&
-                    rules.length &&
-                    rules.length <= 3
-                ) {
-                    //get array rules and continue in parsing object
-                    _get_rule(rules[0], p + arrayKind(rules));
-                    if (rules[2] && isArray(rules)) {
-                        _get_rule(rules[2], property);
-                    }
-                } else
-                    throw new Error(
-                        `${rules.toString()} is not a valid rule input`
-                    );
-            } else flattened[p] = null;
-        } else if (rules != undefined) {
-            for (const prop in rules) {
-                if (!hasOwnProperty(rules, prop)) continue;
-                const rule = rules[prop];
-                let p;
-                if (prop == ".") p = property ? property : prop;
-                else p = property ? property + "." + prop : prop;
-
-                switch (typeof rule) {
-                    case "string":
-                        flattened[p] = rule.split("|") as RulesGetter;
-                        break;
-                    case "object":
-                        if (rule === null) flattened[p] = rule;
-                        else _get_rule(rule, p);
-                }
-            }
-        }
-    };
-    _get_rule(input);
-    return flattened;
-}
-export declare type constructorValidator<Input> = [
-    Input,
-    Rules,
-    ValidatorOptions | undefined
-];
-
-export declare interface Validator<Input = unknown, Data = unknown> {
+export declare interface Validator<Data = unknown, T = {}> {
     reqData: Data;
     inputs: unknown;
-    CRules: Rules;
+    CRules: Rules<T>;
     options: ValidatorOptions;
     errors: Record<string, _Error[]>;
     inValidErrors: Record<string, _Error> | null;
     lang: LangTypes;
 
-    passes(): this is { inputs: Input };
+    passes(): this is { inputs: any };
     fails(): Promise<boolean>;
     getErrors(): Promise<Record<string, _Error[]> | null>;
     inside(): boolean;
-    validAttr(): Input;
+    validAttr(): any;
     getValue(path: string): unknown;
     getAllValues(path: string): Record<string, unknown>;
     setValue(path: string, value: unknown): boolean;
     setAllValues(path: string, value: unknown): boolean[];
 }
 
-export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
-    inputs: Input;
-    CRules: Rules;
+export class ValidatorClass<Data, T = {}> implements Validator<Data, T> {
+    inputs: unknown;
+    CRules: Rules<T>;
     reqData: Data;
     options: ValidatorOptions;
     errors: Record<string, _Error[]> = {};
     inValidErrors: Record<string, _Error> | null = null;
     public lang: LangTypes = "en";
-    public static Rules: Rule<unknown, unknown>[];
+    public static Rules: Rule<any, string | RegExp>[] = Object.values({
+        ...r,
+    });
     public readonly empty: boolean;
     constructor(
-        inputs: Input,
-        rules: Rules,
+        inputs: unknown,
+        rules: Rules<T>,
         reqData: Data,
         options?: ValidatorOptions
     ) {
@@ -133,7 +76,7 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
             const r = await this._get_errors(
                 this.inputs,
                 path,
-                this.CRules[path]
+                (this.CRules as any)[path]
             );
             // result = { ...result, ...r[0] };
             Errors = { ...Errors, ...r };
@@ -199,7 +142,7 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
                 } else {
                     Errors[addedPath + paths.slice(0, i).join(".")] = [
                         {
-                            message: UnMatchedType(currentObj, this, currPath),
+                            message: UnMatchedType(currentObj, this, currPath,this.lang),
                             value: currentObj,
                         },
                     ];
@@ -261,8 +204,8 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
         return setAllValues(this.inputs, path, value);
     }
     static parseRules = parseRules;
-    validAttr(): Input {
-        return validAttr(this.inputs, this.CRules) as Input;
+    validAttr(): unknown {
+        return validAttr(this.inputs, this.CRules);
     }
     inValidAttr() {
         return (this.inValidErrors = inValidAttr(this.inputs, this.CRules));
@@ -314,28 +257,23 @@ export class ValidatorClass<Input, Data> implements Validator<Input, Data> {
         if (!has) throw new Error(`THE RULE ${rule} IS NOT EXIST`);
         return arrMess;
     }
-    static register<T>(
-        name: RegExp | string,
-        fun: RuleFun<T, unknown>,
-        initSubmit?: InitSubmitFun<T, unknown>
-    ): Rule<T, unknown> {
-        const rule = new Rule<T, unknown>(name, fun, initSubmit);
-        ValidatorClass.Rules.push(rule as unknown as Rule<unknown, unknown>);
+    static register<Data, Name extends RegExp | string>(
+        name: Name,
+        fun: RuleFun<Data>,
+        initSubmit?: InitSubmitFun<Data>
+    ): Rule<Data, Name> {
+        const rule = new Rule<Data, Name>(name, fun, initSubmit);
+        ValidatorClass.Rules.push(rule as unknown as Rule<Data, Name>);
         return rule;
     }
 }
-export default class S<Input = unknown, Data = unknown> extends ValidatorClass<
-    Input,
-    Data
-> {
+export default class S<Data = unknown, T = {}> extends ValidatorClass<Data, T> {
     constructor(
-        inputs: Input,
-        rules: Rules,
+        inputs: unknown,
+        rules: Rules<T>,
         reqData?: Data,
         options?: ValidatorOptions
     ) {
         super(inputs, rules, reqData as Data, options);
     }
 }
-
-ValidatorClass.Rules = Object.values({ ...r }) as Rule<unknown, unknown>[];

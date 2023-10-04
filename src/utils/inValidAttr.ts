@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Rules } from "..";
+
 import { _Error } from "@/Rule";
 import constructObj from "./constructObj";
 import { isArray } from "./types";
+import { Rules } from "@/parseRules";
 export type ReturnTypeUnMatch = Record<string, _Error> | null;
 export function unMatchedValues(
     input: any,
@@ -48,7 +49,7 @@ export function unMatchedValues(
     if (Object.values(errors).length == 0) return null;
     return errors;
 }
-export default function (input: unknown, rules: Rules): ReturnTypeUnMatch {
+export default function <T>(input: unknown, rules: Rules<T>): ReturnTypeUnMatch {
     const RulesObj = constructObj(rules);
     return unMatchedValues(input, RulesObj);
 }

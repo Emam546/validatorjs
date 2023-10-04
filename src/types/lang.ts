@@ -48,6 +48,5 @@ type LangTypes =
     | "uz"
     | "vi"
     | "zh"
-    | "zh_TW"
-    | string;
+    | "zh_TW";
 export default LangTypes;

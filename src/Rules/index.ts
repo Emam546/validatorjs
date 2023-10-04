@@ -19,6 +19,8 @@ import required from "./required";
 import { require_if, require_unless } from "./require_if";
 import { require_without, require_withoutAll } from "./require_without";
 import regExp from "./regExp";
+export type RulesNames = string;
+export type RulesGetter = Array<RulesNames> | null;
 
 export {
     accept,

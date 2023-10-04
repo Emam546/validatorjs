@@ -2,18 +2,18 @@ import Rule, { MessagesStore, RuleFun } from "@/Rule";
 import handelMessage from "@/utils/handelMessage";
 import isEmpty from "@/utils/isEmpty";
 import { isNumber, isString } from "@/utils/types";
-export const NotValidDate: MessagesStore<unknown> = {
+export const NotValidDate: MessagesStore = {
     en: "THE DATE IS NOT VALID",
 };
-export const After: MessagesStore<unknown> = {
+export const After: MessagesStore = {
     en: (_, name) =>
         `The Date is before ${getTimeName(name).toUTCString()} date`,
 };
-export const Before: MessagesStore<unknown> = {
+export const Before: MessagesStore = {
     en: (_, name) =>
         `The Date is after ${getTimeName(name).toUTCString()} date`,
 };
-export const Equal: MessagesStore<unknown> = {
+export const Equal: MessagesStore = {
     en: (_, name) =>
         `The Date is not equal ${getTimeName(name).toUTCString()} date`,
 };
@@ -58,29 +58,29 @@ function getTimeName(name: string): Date {
         return getTime(dateName);
     }
 }
-function isDateFn<Input, Data>(...arr: Parameters<RuleFun<Input, Data>>) {
+function isDateFn<Data>(...arr: Parameters<RuleFun<Data>>) {
     const [value, , , , lang] = arr;
     if (!isValidDate(value)) return handelMessage(NotValidDate[lang], ...arr);
 }
-function afterfn<Input, Data>(
-    ...arr: Parameters<RuleFun<Input, Data>>
-): ReturnType<RuleFun<Input, Data>> {
+function afterfn<Data>(
+    ...arr: Parameters<RuleFun<Data>>
+): ReturnType<RuleFun<Data>> {
     const [dateV, name, , , lang] = arr;
     if (!isValidDate(dateV)) return handelMessage(NotValidDate[lang], ...arr);
     if (getTimeName(name) > getTime(dateV))
         return handelMessage(After[lang], ...arr);
 }
-function beforefn<Input, Data>(
-    ...arr: Parameters<RuleFun<Input, Data>>
-): ReturnType<RuleFun<Input, Data>> {
+function beforefn<Data>(
+    ...arr: Parameters<RuleFun<Data>>
+): ReturnType<RuleFun<Data>> {
     const [value, name, , , lang] = arr;
     if (!isValidDate(value)) return handelMessage(NotValidDate[lang], ...arr);
     if (getTimeName(name) < getTime(value))
         return handelMessage(Before[lang], ...arr);
 }
-function equal<Input, Data>(
-    ...arr: Parameters<RuleFun<Input, Data>>
-): ReturnType<RuleFun<Input, Data>> {
+function equal<Data>(
+    ...arr: Parameters<RuleFun<Data>>
+): ReturnType<RuleFun<Data>> {
     const [value, name, , , lang] = arr;
     if (!isValidDate(value)) return handelMessage(NotValidDate[lang], ...arr);
     if (Math.abs(getTimeName(name).getTime() - getTime(value).getTime()) > 1000)

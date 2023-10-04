@@ -4,9 +4,9 @@ import compare from "@/utils/compare";
 import handelUndefined from "@/utils/handelUndefined";
 import handelUnError from "@/utils/handelUnError";
 import ValuesNotSame from "./Messages/ValuesNotSame";
-function different<Input, Data>(
-    ...[value, name, Validator, path, lang]: Parameters<RuleFun<Input, Data>>
-): StoredMessage<Input> | undefined {
+function different<Data>(
+    ...[value, name, Validator, path, lang]: Parameters<RuleFun<Data>>
+): StoredMessage | undefined {
     const allPaths = path.split(".");
     const different = name.split(":").slice(1).join(":");
     const differentPath =

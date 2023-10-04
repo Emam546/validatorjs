@@ -1,7 +1,7 @@
 import Rule, { MessagesStore } from "@/Rule";
 import handelMessage from "@/utils/handelMessage";
 import { isNumber } from "@/utils/types";
-export const Messages: MessagesStore<unknown> = {
+export const Messages: MessagesStore = {
     en: "the input value is not a number",
 };
 

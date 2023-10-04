@@ -1,11 +1,12 @@
 import LangType from "./types/lang";
 import { Validator } from "./index";
 import { isString } from "./utils/types";
+import { RulesGetter } from "./Rules";
 
-export type RuleFun<Data, T> = (
-    value: T,
+export type RuleFun<Data> = (
+    value: unknown,
     name: string,
-    validator: Validator<T, Data>,
+    validator: Validator<Data>,
     path: string,
     lang: LangType
 ) => string | undefined | Promise<string | undefined>;
@@ -13,30 +14,32 @@ export interface _Error {
     value: unknown;
     message: string;
 }
-export type GetMessageFun<T> = (
-    value: T,
+export type GetMessageFun = (
+    value: unknown,
     name: string,
     validator: Validator,
     path: string,
-    ...a: unknown[]
+    lang: LangType
 ) => string;
-export type StoredMessage<T> = string | GetMessageFun<T>;
-export type MessagesStore<T> = Record<LangType, StoredMessage<T>>;
-export type InitSubmitFun<Data, T> = (
+export type StoredMessage = string | GetMessageFun;
+export type MessagesStore = Partial<Record<LangType, StoredMessage>>;
+
+export type InitSubmitFun<Data> = (
     name: string,
-    validator: Validator<T, Data>,
+    validator: Validator<Data>,
     path: string,
     lang: LangType
 ) => Promise<Record<string, _Error[]>> | Record<string, _Error[]>;
-export default class Rule<Data, Input> {
-    private readonly name: RegExp | string;
-    private readonly fn: RuleFun<Data, Input>;
-    private readonly initFn?: InitSubmitFun<Data, Input>;
-    constructor(
-        name: RegExp | string,
-        fn: RuleFun<Data, Input>,
-        initFn?: InitSubmitFun<Data, Input>
-    ) {
+export type RuleResponseType<
+    T extends Rule<Data, Name>,
+    Data,
+    Name extends RegExp | string
+> = T extends Rule<Date, Name, infer Res> ? Res : never;
+export default class Rule<Data, Name extends RegExp | string, Res = unknown> {
+    private readonly name: Name;
+    private readonly fn: RuleFun<Data>;
+    private readonly initFn?: InitSubmitFun<Data>;
+    constructor(name: Name, fn: RuleFun<Data>, initFn?: InitSubmitFun<Data>) {
         this.name = name;
         this.fn = fn;
         this.initFn = initFn;
@@ -48,24 +51,24 @@ export default class Rule<Data, Input> {
         return false;
     }
     validate(
-        value: Input,
+        value: unknown,
         name: string,
-        validator: Validator<Input, Data>,
+        validator: Validator<Data>,
         path: string,
         lang: LangType
     ) {
         return this.fn(value, name, validator, path, lang);
     }
-
     async initSubmit(
-        validator: Validator<Input, Data>,
+        validator: Validator<Data>,
         lang: LangType
     ): Promise<Record<string, _Error[]>> {
         const { CRules: rules } = validator;
-        let returnedErrors: Record<string, _Error[]> = {};
         if (!this.initFn) return {};
+        let returnedErrors: Record<string, _Error[]> = {};
         for (const path in rules) {
-            const arr = rules[path];
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            const arr = (rules as any)[path] as RulesGetter;
             if (arr)
                 for (let i = 0; i < arr.length; i++) {
                     if (this.isequal(arr[i])) {

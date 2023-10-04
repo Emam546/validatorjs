@@ -9,6 +9,9 @@ export function isAny<T>(
 export function isString(value: unknown): value is string {
     return typeof value === "string" || value instanceof String;
 }
+export function isBool(value: unknown): value is boolean {
+    return typeof value === "boolean" || value instanceof Boolean;
+}
 export function isArray<T>(value: unknown): value is Array<T> {
     return (
         value instanceof Array ||

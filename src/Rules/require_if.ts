@@ -4,9 +4,9 @@ import compare from "@/utils/compare";
 import { getAllValues, getValue } from "@/utils/getValue";
 import { getValueMessage } from "./required";
 
-function _require_if<Input, Data>(
-    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Input, Data>>
-): ReturnType<InitSubmitFun<Input, Data>> {
+function _require_if<Data>(
+    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Data>>
+): ReturnType<InitSubmitFun<Data>> {
     const vpath = name.split(":")[1].split(",")[0];
     const value = JSON.parse(name.split(":")[1].split(",").slice(1).join(","));
     const ObjectPath = path.split(".").slice(0, -1).join(".");
@@ -35,9 +35,9 @@ function _require_if<Input, Data>(
         }
     return errors;
 }
-function _require_unless<Input, Data>(
-    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Input, Data>>
-): ReturnType<InitSubmitFun<unknown, unknown>> {
+function _require_unless<Data>(
+    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Data>>
+): ReturnType<InitSubmitFun<Data>> {
     const vpath = name.split(":")[1].split(",")[0];
     const value = JSON.parse(name.split(":")[1].split(",").slice(1).join(","));
     const ObjectPath = path.split(".").slice(0, -1).join(".");

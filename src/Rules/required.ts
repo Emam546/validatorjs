@@ -7,9 +7,9 @@ import handelMessage from "@/utils/handelMessage";
 import { isArray } from "@/utils/types";
 import ValueNotExist from "./Messages/valueNotExist";
 
-export function getValueMessage<Data, Input>(
+export function getValueMessage<Data>(
     orgPath: string,
-    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Data, Input>>
+    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Data>>
 ): Record<string, _Error[]> {
     const paths = orgPath.split(".");
     let currObj: any = inputs;
@@ -46,9 +46,9 @@ export function getValueMessage<Data, Input>(
     }
     return {};
 }
-function require_if<Data, Input>(
-    ...[inputs, , validator, path, lang]: Parameters<RuleFun<Data, Input>>
-): ReturnType<InitSubmitFun<Data, Input>> {
+function require_if<Data>(
+    ...[inputs, , validator, path, lang]: Parameters<RuleFun<Data>>
+): ReturnType<InitSubmitFun<Data>> {
     const ObjectPath = path.split(".").slice(0, -1).join(".");
     const allObjects = getAllValues(inputs, ObjectPath);
     const Ppath = path.split(".").at(-1);

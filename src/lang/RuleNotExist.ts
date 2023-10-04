@@ -1,9 +1,9 @@
 import { MessagesStore, RuleFun } from "@/Rule";
-export const message: MessagesStore<unknown> = {
+export const message: MessagesStore = {
     en: (a, name) => `THE RULE ${name} IS NOT EXIST`,
 };
-export default function RuleIsNotExist<Data, Input>(
-    ...arr: Parameters<RuleFun<Data, Input>>
+export default function RuleIsNotExist<Data>(
+    ...arr: Parameters<RuleFun<Data>>
 ): string {
     const [obj, , validator, ...arr2] = arr;
     const val = message[validator.lang];

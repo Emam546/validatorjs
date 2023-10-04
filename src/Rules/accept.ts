@@ -1,6 +1,6 @@
 import Rule, { MessagesStore } from "@/Rule";
 import handelMessage from "@/utils/handelMessage";
-export const Messages: MessagesStore<unknown> = {
+export const Messages: MessagesStore = {
     en: "THE VALUE is not accepted type",
 };
 
