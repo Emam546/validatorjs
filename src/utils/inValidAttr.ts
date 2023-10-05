@@ -5,7 +5,7 @@
 import { _Error } from "@/Rule";
 import constructObj from "./constructObj";
 import { isArray } from "./types";
-import { InputRules, Rules } from "@/parseRules";
+import { Rules } from "@/type";
 export type ReturnTypeUnMatch = Record<string, _Error> | null;
 export function unMatchedValues(
     input: any,

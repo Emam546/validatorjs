@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-empty-interface */
 /* eslint-disable @typescript-eslint/ban-types */
-import Rule, { _Error } from "@/Rule";
-import { AllRules } from "@/Rules";
+import type Rule from "@/Rule";
+import type { _Rules } from "@/Rules";
+import { _Error } from "@/Rule";
+import { Rules, ValidTypes } from "@/type";
 import { ValidatorOptions } from "@/main";
-import { Rules } from "@/parseRules";
 import LangTypes from "@/types/lang";
-type _Rules = typeof AllRules;
-
 declare global {
     interface Validator<T, Data> {
         reqData: Data;
@@ -18,11 +17,12 @@ declare global {
         inValidErrors: Record<string, _Error> | null;
         lang: LangTypes;
 
-        passes(): this is { inputs: any };
-        fails(): Promise<boolean>;
-        getErrors(): Promise<Record<string, _Error[]> | null>;
+        passes(): this is { inputs: ValidTypes<T> };
+        asyncpasses(): Promise<this & { inputs: ValidTypes<T> }>;
+        fails(): boolean;
+        getErrors(): Record<string, _Error[]> | null;
         inside(): boolean;
-        validAttr(): any;
+        validAttr(): ValidTypes<T>;
         getValue(path: string): unknown;
         getAllValues(path: string): Record<string, unknown>;
         setValue(path: string, value: unknown): boolean;
@@ -38,5 +38,6 @@ declare global {
                 ? Name
                 : unknown;
         }[keyof AvailableRules];
+        type RulesGetter = Validator.RulesNames[] | null;
     }
 }

@@ -1,51 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { InputRules, Rules } from "@/type";
 import arrayKind from "./utils/arrayKind";
 import { hasOwnProperty } from "./utils/compare";
-import { ValidArray, isValidInput, is_Rule } from "./utils/isRule";
+import { isValidInput, is_Rule } from "./utils/isRule";
 import { isArray } from "./utils/types";
-export type RulesGetter = string[] | null;
-export type InputRules =
-    | RulesGetter
-    | string
-    | {
-          [name: string]: InputRules;
-      }
-    | [InputRules]
-    | [InputRules, "object" | "array"]
-    | [InputRules, "object" | "array", RulesGetter];
-type SplitString<
-    S extends string,
-    Delimiter extends string
-> = S extends `${infer Left}${Delimiter}${infer Right}`
-    ? [Left, ...SplitString<Right, Delimiter>]
-    : [S];
-type ToPaths<T, P extends string = ""> = T extends Record<string, unknown>
-    ? {
-          [K in keyof T]: ToPaths<
-              T[K],
-              P extends "" ? `${K & string}` : `${P}.${K & string}`
-          >;
-      }[keyof T]
-    : T extends RulesGetter
-    ? { path: P extends `${infer P}` ? P : never; type: T }
-    : T extends ValidArray
-    ?
-          | ToPaths<T[0], `${P}.*:${T[1] extends undefined ? "array" : T[1]}`>
-          | {
-                path: P extends `${infer P}` ? P : never;
-                type: T[2] extends RulesGetter ? T[2] : null;
-            }
-    : T extends string
-    ? {
-          path: P extends `${infer P}` ? P : never;
-          type: SplitString<T, "|">;
-      }
-    : never;
 
-type FromPaths<T extends { path: string; type: unknown }> = {
-    [P in T["path"]]: Extract<T, { path: P }>["type"];
-};
-export type Rules<T> = FromPaths<ToPaths<T>>;
-export function parseRules<T extends InputRules>(input: T): Rules<T> {
+export function parseRules<T extends InputRules>(
+    input: T
+): T extends infer R ? Rules<R> : never {
     //just parse rules from the object
     //it must alway finishes with
     // - array of string  that describes rules
@@ -68,7 +30,7 @@ export function parseRules<T extends InputRules>(input: T): Rules<T> {
                     if (rules[2] && isArray(rules)) {
                         _get_rule(rules[2], property);
                     }
-                } else
+                } else if (isArray(rules))
                     throw new Error(
                         `${rules.toString()} is not a valid rule input`
                     );

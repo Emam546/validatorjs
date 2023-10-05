@@ -18,6 +18,9 @@ export function isArray<T>(value: unknown): value is Array<T> {
         Object.prototype.toString.call(value) === "[object Array]"
     );
 }
+export function isPromise<T>(value: unknown): value is Promise<T> {
+    return value instanceof Promise;
+}
 export function isNumber(value: unknown): value is number {
     return (
         (typeof value == "number" && !isNaN(value)) || value instanceof Number

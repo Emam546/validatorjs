@@ -1,6 +1,8 @@
-import { RulesGetter } from "./parseRules";
-import LangType from "./types/lang";
-import { isString } from "./utils/types";
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { RulesGetter } from "./type";
+import type LangType from "./types/lang";
+import { objectKeys } from "./utils";
+import { isPromise, isString } from "./utils/types";
 export type RuleFun<Data> = (
     value: unknown,
     name: string,
@@ -35,6 +37,12 @@ export type RuleResponseType<
     Data,
     Name extends string
 > = T extends Rule<Name, infer Res, Date> ? Res : never;
+function isNoPromises(
+    val: Array<Promise<Record<string, _Error[]>> | Record<string, _Error[]>>
+): val is Array<Record<string, _Error[]>> {
+    return !val.some((val) => isPromise(val));
+}
+
 export default class Rule<Name extends string, Res = unknown, Data = unknown> {
     private readonly name: Name | RegExp;
     private readonly fn: RuleFun<Data>;
@@ -63,30 +71,48 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
     ) {
         return this.fn(value, name, validator, path, lang);
     }
-    async initSubmit(
+    initSubmit<T>(
         validator: Validator<unknown, Data>,
         lang: LangType
-    ): Promise<Record<string, _Error[]>> {
+    ): Record<string, _Error[]> | Promise<Record<string, _Error[]>> {
         const { CRules: rules } = validator;
         if (!this.initFn) return {};
-        let returnedErrors: Record<string, _Error[]> = {};
-        for (const path in rules) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            const arr = (rules as any)[path] as RulesGetter;
-            if (arr)
-                for (let i = 0; i < arr.length; i++) {
-                    if (this.isequal(arr[i])) {
-                        const message = await this.initFn(
-                            arr[i],
-                            validator,
-                            path,
-                            lang
-                        );
-                        if (message != undefined)
-                            returnedErrors = { ...returnedErrors, ...message };
-                    }
+        const messages: Array<
+            Promise<Record<string, _Error[]>> | Record<string, _Error[]>
+        > = [];
+        objectKeys(rules).forEach((path) => {
+            const arr: RulesGetter = rules[path] as any;
+            if (arr == null) return;
+            if (!this.initFn) return {};
+
+            for (let i = 0; i < arr.length; i++) {
+                if (this.isequal(arr[i])) {
+                    const message = (this.initFn as any)(
+                        arr[i],
+                        validator,
+                        path,
+                        lang
+                    );
+
+                    if (message != undefined) messages.push(message);
                 }
-        }
-        return returnedErrors;
+            }
+        });
+        if (isNoPromises(messages))
+            return messages.reduce(
+                (acc, cur) => ({ ...acc, ...cur }),
+                {} as Record<string, _Error[]>
+            );
+        return new Promise((res) => {
+            Promise.all(messages.map(async (val) => await val)).then(
+                (messages) =>
+                    res(
+                        messages.reduce(
+                            (acc, cur) => ({ ...acc, ...cur }),
+                            {} as Record<string, _Error[]>
+                        )
+                    )
+            );
+        });
     }
 }

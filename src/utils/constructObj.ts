@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { InputRules, Rules } from "../parseRules";
+import { InputRules, Rules } from "@/type";
 import { hasOwnProperty } from "./compare";
 import { isArray } from "./types";
 
@@ -34,10 +34,8 @@ function constructRule(
     }
     return currObj;
 }
-export default function <T>(
-    rules:  Rules<T> 
-): Record<string, unknown> | null {
-    let newObj: Record<string, unknown> | null = {};
-    for (const rule in rules) newObj = constructRule(rule, newObj);
+export default function <T>(rules: Rules<T>): T | null {
+    let newObj: T | null = {} as T;
+    for (const rule in rules) newObj = constructRule(rule, newObj) as T;
     return newObj;
 }

@@ -1,4 +1,4 @@
-import { InputRules, Rules } from "../parseRules";
+import { Rules, ValidTypes } from "@/type";
 import constructObj from "./constructObj";
 import { isArray, isObject } from "./types";
 function matchObjs(input: unknown, matchObj: unknown): unknown {
@@ -29,10 +29,7 @@ function matchObjs(input: unknown, matchObj: unknown): unknown {
     }
 }
 
-export default function <T>(
-    input: unknown,
-    rules: Rules<T> 
-): unknown {
+export default function <T>(input: unknown, rules: Rules<T>): ValidTypes<T> {
     const RulesObj = constructObj(rules);
-    return matchObjs(input, RulesObj);
+    return matchObjs(input, RulesObj) as ValidTypes<T>;
 }

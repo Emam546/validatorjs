@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-types */
-import { isArray, isObject, isString } from "./utils/types";
+import { isArray, isObject, isPromise, isString } from "./utils/types";
 import Rule, { InitSubmitFun, RuleFun, _Error } from "./Rule";
 import LangTypes from "./types/lang";
 import UnMatchedType from "./lang/notMatch";
@@ -11,7 +11,8 @@ import compare from "./utils/compare";
 import inValidAttr from "./utils/inValidAttr";
 import isEmpty from "./utils/isEmpty";
 import { setAllValues, setValue } from "./utils/setValue";
-import { Rules, parseRules, RulesGetter, InputRules } from "./parseRules";
+import { Rules, RulesGetter } from "./type";
+import { parseRules } from "./parseRules";
 import { AllRules } from "./Rules";
 
 export const TYPE_ARRAY = ["object", "array"];
@@ -19,9 +20,7 @@ export type ValidatorOptions = {
     lang?: LangTypes;
 };
 
-export default class ValidatorClass<T, Data>
-    implements Validator<T, Data>
-{
+export default class ValidatorClass<T, Data> implements Validator<T, Data> {
     inputs: unknown;
     CRules: Rules<T>;
     reqData: Data;
@@ -46,16 +45,16 @@ export default class ValidatorClass<T, Data>
         this.empty = isEmpty(inputs);
         if (options) this.lang = options.lang || this.lang;
     }
-    async passes() {
+    passes() {
         //Just object of paths and there current objects
-        return (await this.getErrors()) === null;
+        return this.getErrors() === null;
     }
-    async getErrors(): Promise<Record<string, _Error[]> | null> {
+    getErrors(): Record<string, _Error[]> | null {
         //Just object of paths and Errors description
         let Errors: Record<string, _Error[]> = {};
 
         for (const path in this.CRules) {
-            const r = await this._get_errors(
+            const r = this._get_errors(
                 this.inputs,
                 path,
                 (this.CRules as any)[path]
@@ -68,31 +67,28 @@ export default class ValidatorClass<T, Data>
         if (Object.keys(Errors).length == 0) return null;
         return Errors;
     }
-    async fails() {
-        return !(await this.passes());
+    fails() {
+        return this.passes();
     }
-    async _getSubmitErrors(): Promise<Record<string, _Error[]>> {
-        let Result = {};
+    _getSubmitErrors(): Record<string, _Error[]> {
+        let Result: Record<string, _Error[]> = {};
         for (let i = 0; i < ValidatorClass.Rules.length; i++) {
-            const res = await ValidatorClass.Rules[i].initSubmit(
-                this,
-                this.lang
-            );
-            Result = { ...Result, ...res };
+            const res = ValidatorClass.Rules[i].initSubmit(this, this.lang);
+            if (!isPromise(res)) Result = { ...Result, ...res };
         }
         return Result;
     }
 
-    async _get_errors(
+    _get_errors(
         inputs: unknown,
         path: string,
         rule: RulesGetter,
         addedPath = ""
-    ): Promise<Record<string, _Error[]>> {
+    ): Record<string, _Error[]> {
         const paths = path.split(".");
         let currentObj = inputs;
         // let result: Record<string, any> = {};
-        let Errors: Record<string, _Error[]> = await this._getSubmitErrors();
+        let Errors: Record<string, _Error[]> = this._getSubmitErrors();
         const validations: Array<Promise<_Error | undefined> | _Error>[] = [];
         const addPaths: string[] = [];
         for (let i = 0; i < paths.length; i++) {
@@ -103,7 +99,7 @@ export default class ValidatorClass<T, Data>
                 const newPath = paths.slice(i + 1).join(".");
                 if (type_ == "array" && isArray(currentObj)) {
                     for (let i = 0; i < currentObj.length; i++) {
-                        const r = await this._get_errors(
+                        const r = this._get_errors(
                             currentObj[i],
                             newPath,
                             rule,
@@ -113,7 +109,7 @@ export default class ValidatorClass<T, Data>
                     }
                 } else if (type_ == "object" && isObject(currentObj)) {
                     for (const key in currentObj) {
-                        const r = await this._get_errors(
+                        const r = this._get_errors(
                             currentObj[key],
                             newPath,
                             rule,
@@ -163,19 +159,24 @@ export default class ValidatorClass<T, Data>
                 }
             }
         }
-        await Promise.all(
-            validations.map(async (val, i) => {
-                const path = addPaths[i];
-                const result = (await Promise.all(val)).filter(
-                    (res) => res != undefined
-                ) as _Error[];
-                if (result.length) {
-                    if (!Errors[addedPath + path])
-                        Errors[addedPath + path] = result;
-                    else Errors[addedPath + path].push(...result);
-                }
-            })
-        );
+
+        validations.map((val, i) => {
+            const path = addPaths[i];
+            const result = val.filter((res) => {
+                if (
+                    typeof res == "undefined" ||
+                    isPromise<_Error | undefined>(res)
+                )
+                    return false;
+                return true;
+            }) as _Error[];
+            if (result.length) {
+                if (!Errors[addedPath + path])
+                    Errors[addedPath + path] = result;
+                else Errors[addedPath + path].push(...result);
+            }
+        });
+
         return Errors;
     }
     getValue(path: string) {
@@ -191,7 +192,7 @@ export default class ValidatorClass<T, Data>
         return setAllValues(this.inputs, path, value);
     }
     static parseRules = parseRules;
-    validAttr(): unknown {
+    validAttr() {
         return validAttr(this.inputs, this.CRules);
     }
     inValidAttr() {
