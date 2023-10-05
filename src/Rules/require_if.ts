@@ -66,13 +66,13 @@ function _require_unless<Data>(
         }
     return errors;
 }
-export const require_if = new Rule(
+export const require_if = new Rule<`required_if:${string}`>(
     /(^required_if:).+,[^,]+/,
     () => undefined,
     (name, Validator, ...a) =>
         _require_if(Validator.inputs, name, Validator, ...a)
 );
-export const require_unless = new Rule(
+export const require_unless = new Rule<`required_unless:${string}`>(
     /(^required_unless:).+,[^,]+/,
     () => undefined,
     (name, Validator, ...a) =>

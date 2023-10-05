@@ -1,12 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import LangTypes from "@/types/lang";
-import { Validator } from "..";
 import { MessagesStore } from "@/Rule";
-export const message: MessagesStore = {
+export const message: MessagesStore<unknown> = {
     en: "the inserted data type is not matching with the object type",
 };
-export default function UnMatchedType<Data, Input>(
-    obj: Input,
-    validator: Validator<Data>,
+export default function UnMatchedType<Data>(
+    obj: unknown,
+    validator: Validator<unknown, Data>,
     path: string,
     lang: LangTypes
 ): string {

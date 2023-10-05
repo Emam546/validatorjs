@@ -5,7 +5,7 @@
 import { _Error } from "@/Rule";
 import constructObj from "./constructObj";
 import { isArray } from "./types";
-import { Rules } from "@/parseRules";
+import { InputRules, Rules } from "@/parseRules";
 export type ReturnTypeUnMatch = Record<string, _Error> | null;
 export function unMatchedValues(
     input: any,
@@ -49,7 +49,10 @@ export function unMatchedValues(
     if (Object.values(errors).length == 0) return null;
     return errors;
 }
-export default function <T>(input: unknown, rules: Rules<T>): ReturnTypeUnMatch {
+export default function <T>(
+    input: unknown,
+    rules: Rules<T>
+): ReturnTypeUnMatch {
     const RulesObj = constructObj(rules);
     return unMatchedValues(input, RulesObj);
 }

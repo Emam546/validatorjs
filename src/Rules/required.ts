@@ -73,7 +73,7 @@ function require_if<Data>(
         }
     return errors;
 }
-export default new Rule(
+export default new Rule<"required", Exclude<unknown, undefined>>(
     "required",
     () => undefined,
     (name, Validator, ...a) =>

@@ -7,7 +7,10 @@ import { MinError, MaXError } from "./Messages/minMax";
 import UnKnownInputValue from "./Messages/unKnownValue";
 import UnKnownRuleValue from "./Messages/UnknownRule";
 
-function getNumber<T>(value: T, lang: LangTypes): number | StoredMessage {
+function getNumber<T>(
+    value: T,
+    lang: LangTypes
+): number | StoredMessage<unknown> {
     if (isNumber(value)) return value;
     if (isArray(value) || isString(value)) return value.length;
     if (value instanceof Set || value instanceof Map) return value.size;
@@ -19,7 +22,7 @@ function minFun(
     value: number,
     min: number,
     lang: LangTypes
-): StoredMessage | undefined {
+): StoredMessage<unknown> | undefined {
     min = isNaN(min) ? 0 : min;
     if (value < min) return handelUndefined(MinError[lang]);
 }
@@ -27,13 +30,13 @@ function maxFun(
     value: number,
     max: number,
     lang: LangTypes
-): StoredMessage | undefined {
+): StoredMessage<unknown> | undefined {
     if (isNaN(max)) return handelUndefined(UnKnownRuleValue[lang]);
     if (value > max) return handelUndefined(MaXError[lang]);
 }
 function MinHandler<Data>(
     ...[value, name, , , lang]: Parameters<RuleFun<Data>>
-): StoredMessage | undefined {
+): StoredMessage<unknown> | undefined {
     const min = parseFloat(name.split(":")[1]) || 0;
     const val = getNumber(value, lang);
     if (isNumber(val) && typeof val == "number") return minFun(val, min, lang);
@@ -41,7 +44,7 @@ function MinHandler<Data>(
 }
 function MaxHandler<Data>(
     ...[value, name, , , lang]: Parameters<RuleFun<Data>>
-): StoredMessage | undefined {
+): StoredMessage<unknown> | undefined {
     const max = parseFloat(name.split(":")[1]);
     const val = getNumber(value, lang);
     if (isNumber(val) && typeof val == "number") return maxFun(val, max, lang);
@@ -49,7 +52,7 @@ function MaxHandler<Data>(
 }
 function limit<Data>(
     ...[value, name, , , lang]: Parameters<RuleFun<Data>>
-): StoredMessage | undefined {
+): StoredMessage<unknown> | undefined {
     const [, min, max] = name.split(":").map((e) => parseFloat(e));
     const val = getNumber(value, lang);
     if (typeof val == "number") {
@@ -62,13 +65,22 @@ function limit<Data>(
     } else return val;
 }
 
-export const min = new Rule(/^min(:-?\d+)?$/g, (...arr) => {
-    return handelUnError(MinHandler(...arr), ...arr);
-});
-export const max = new Rule(/^max:-?\d+$/g, (...arr) => {
-    return handelUnError(MaxHandler(...arr), ...arr);
-});
+export const min = new Rule<`min:${string}`>(
+    /^min(:-?\d+)?$/g,
+    (...arr) => {
+        return handelUnError(MinHandler(...arr), ...arr);
+    }
+);
+export const max = new Rule<`max:${string}`>(
+    /^max:-?\d+$/g,
+    (...arr) => {
+        return handelUnError(MaxHandler(...arr), ...arr);
+    }
+);
 
-export default new Rule(/^limit:-?\d+:-?\d+$/, (...arr) => {
-    return handelUnError(limit(...arr), ...arr);
-});
+export default new Rule<`limit:${string}`>(
+    /^limit:-?\d+:-?\d+$/,
+    (...arr) => {
+        return handelUnError(limit(...arr), ...arr);
+    }
+);

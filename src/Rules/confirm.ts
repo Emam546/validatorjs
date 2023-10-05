@@ -1,21 +1,18 @@
-import Rule, { RuleFun, StoredMessage } from "@/Rule";
+import Rule, { RuleFun } from "@/Rule";
 import compare from "@/utils/compare";
 import handelUndefined from "@/utils/handelUndefined";
 import handelUnError from "@/utils/handelUnError";
 import ValueNotExist from "./Messages/valueNotExist";
 import ValuesNotSame from "./Messages/ValuesNotSame";
 
-function Confirm<Data>(
-    ...[value, , validator, path, lang]: Parameters<RuleFun<Data>>
-): StoredMessage | undefined {
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+const Confirm: RuleFun<unknown> = function (...arr) {
+    const [value, _, validator, path, lang] = arr;
     const returnedValue = validator.getValue(path + "_confirmation");
-    if (returnedValue == undefined) return handelUndefined(ValueNotExist[lang]);
+    if (returnedValue == undefined)
+        return handelUnError(handelUndefined(ValueNotExist[lang]), ...arr);
     if (!compare(value, returnedValue))
-        return handelUndefined(ValuesNotSame[lang]);
+        return handelUnError(handelUndefined(ValuesNotSame[lang]), ...arr);
     return undefined;
-}
+};
 
-export default new Rule("confirm", (...arr) => {
-    return handelUnError(Confirm(...arr), ...arr);
-});
+export default new Rule("confirm", Confirm);

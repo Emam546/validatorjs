@@ -1,12 +1,10 @@
+import { RulesGetter } from "./parseRules";
 import LangType from "./types/lang";
-import { Validator } from "./index";
 import { isString } from "./utils/types";
-import { RulesGetter } from "./Rules";
-
 export type RuleFun<Data> = (
     value: unknown,
     name: string,
-    validator: Validator<Data>,
+    validator: Validator<unknown, Data>,
     path: string,
     lang: LangType
 ) => string | undefined | Promise<string | undefined>;
@@ -14,32 +12,38 @@ export interface _Error {
     value: unknown;
     message: string;
 }
-export type GetMessageFun = (
+export type GetMessageFun<Data> = (
     value: unknown,
     name: string,
-    validator: Validator,
+    validator: Validator<unknown, Data>,
     path: string,
     lang: LangType
 ) => string;
-export type StoredMessage = string | GetMessageFun;
-export type MessagesStore = Partial<Record<LangType, StoredMessage>>;
+export type StoredMessage<Data> = string | GetMessageFun<Data>;
+export type MessagesStore<Data> = Partial<
+    Record<LangType, StoredMessage<Data>>
+>;
 
 export type InitSubmitFun<Data> = (
     name: string,
-    validator: Validator<Data>,
+    validator: Validator<unknown, Data>,
     path: string,
     lang: LangType
 ) => Promise<Record<string, _Error[]>> | Record<string, _Error[]>;
 export type RuleResponseType<
-    T extends Rule<Data, Name>,
+    T extends Rule<Name, unknown, Data>,
     Data,
-    Name extends RegExp | string
-> = T extends Rule<Date, Name, infer Res> ? Res : never;
-export default class Rule<Data, Name extends RegExp | string, Res = unknown> {
-    private readonly name: Name;
+    Name extends string
+> = T extends Rule<Name, infer Res, Date> ? Res : never;
+export default class Rule<Name extends string, Res = unknown, Data = unknown> {
+    private readonly name: Name | RegExp;
     private readonly fn: RuleFun<Data>;
     private readonly initFn?: InitSubmitFun<Data>;
-    constructor(name: Name, fn: RuleFun<Data>, initFn?: InitSubmitFun<Data>) {
+    constructor(
+        name: Name | RegExp,
+        fn: RuleFun<Data>,
+        initFn?: InitSubmitFun<Data>
+    ) {
         this.name = name;
         this.fn = fn;
         this.initFn = initFn;
@@ -53,14 +57,14 @@ export default class Rule<Data, Name extends RegExp | string, Res = unknown> {
     validate(
         value: unknown,
         name: string,
-        validator: Validator<Data>,
+        validator: Validator<unknown, Data>,
         path: string,
         lang: LangType
     ) {
         return this.fn(value, name, validator, path, lang);
     }
     async initSubmit(
-        validator: Validator<Data>,
+        validator: Validator<unknown, Data>,
         lang: LangType
     ): Promise<Record<string, _Error[]>> {
         const { CRules: rules } = validator;

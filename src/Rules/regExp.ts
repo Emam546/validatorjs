@@ -14,4 +14,4 @@ function regExp<Data>(
     const res = new RegExp(regEx, iden).test(value);
     if (!res) return handelMessage(ValueNOTtheSame[lang], ...arr);
 }
-export default new Rule(_regExp, regExp);
+export default new Rule<`regExp:${string}`, string>(_regExp, regExp);

@@ -1,12 +1,11 @@
-import Rule, { RuleFun, StoredMessage } from "@/Rule";
+import Rule, { RuleFun } from "@/Rule";
 
 import compare from "@/utils/compare";
 import handelUndefined from "@/utils/handelUndefined";
 import handelUnError from "@/utils/handelUnError";
 import ValuesNotSame from "./Messages/ValuesNotSame";
-function different<Data>(
-    ...[value, name, Validator, path, lang]: Parameters<RuleFun<Data>>
-): StoredMessage | undefined {
+const different: RuleFun<unknown> = function (...arr) {
+    const [value, name, Validator, path, lang] = arr;
     const allPaths = path.split(".");
     const different = name.split(":").slice(1).join(":");
     const differentPath =
@@ -15,9 +14,9 @@ function different<Data>(
             : different;
     const differentValue = Validator.getValue(differentPath);
     if (differentValue != undefined && compare(value, differentValue))
-        return handelUndefined(ValuesNotSame[lang]);
-}
-const regEx = /^different:(.+)/gi;
-export default new Rule(regEx, (...arr) => {
-    return handelUnError(different(...arr), ...arr);
-});
+        return handelUnError(handelUndefined(ValuesNotSame[lang]), ...arr);
+};
+export default new Rule<`different:${string}`>(
+    /^different:(.+)/gi,
+    different
+);

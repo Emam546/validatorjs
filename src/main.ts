@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { isArray, isObject, isString } from "./utils/types";
 import Rule, { InitSubmitFun, RuleFun, _Error } from "./Rule";
-import * as r from "./Rules";
 import LangTypes from "./types/lang";
 import UnMatchedType from "./lang/notMatch";
 import { getValue, getAllValues } from "./utils/getValue";
@@ -12,35 +11,17 @@ import compare from "./utils/compare";
 import inValidAttr from "./utils/inValidAttr";
 import isEmpty from "./utils/isEmpty";
 import { setAllValues, setValue } from "./utils/setValue";
-import { Rules, parseRules } from "./parseRules";
-import { RulesGetter } from "./Rules";
+import { Rules, parseRules, RulesGetter, InputRules } from "./parseRules";
+import { AllRules } from "./Rules";
 
 export const TYPE_ARRAY = ["object", "array"];
 export type ValidatorOptions = {
     lang?: LangTypes;
 };
 
-export declare interface Validator<Data = unknown, T = {}> {
-    reqData: Data;
-    inputs: unknown;
-    CRules: Rules<T>;
-    options: ValidatorOptions;
-    errors: Record<string, _Error[]>;
-    inValidErrors: Record<string, _Error> | null;
-    lang: LangTypes;
-
-    passes(): this is { inputs: any };
-    fails(): Promise<boolean>;
-    getErrors(): Promise<Record<string, _Error[]> | null>;
-    inside(): boolean;
-    validAttr(): any;
-    getValue(path: string): unknown;
-    getAllValues(path: string): Record<string, unknown>;
-    setValue(path: string, value: unknown): boolean;
-    setAllValues(path: string, value: unknown): boolean[];
-}
-
-export class ValidatorClass<Data, T = {}> implements Validator<Data, T> {
+export default class ValidatorClass<T, Data>
+    implements Validator<T, Data>
+{
     inputs: unknown;
     CRules: Rules<T>;
     reqData: Data;
@@ -48,20 +29,20 @@ export class ValidatorClass<Data, T = {}> implements Validator<Data, T> {
     errors: Record<string, _Error[]> = {};
     inValidErrors: Record<string, _Error> | null = null;
     public lang: LangTypes = "en";
-    public static Rules: Rule<any, string | RegExp>[] = Object.values({
-        ...r,
+    public static Rules = Object.values({
+        ...AllRules,
     });
     public readonly empty: boolean;
     constructor(
         inputs: unknown,
         rules: Rules<T>,
-        reqData: Data,
+        reqData?: Data,
         options?: ValidatorOptions
     ) {
         this.inputs = inputs;
         this.CRules = rules;
         this.options = options || {};
-        this.reqData = reqData;
+        this.reqData = reqData as Data;
         this.empty = isEmpty(inputs);
         if (options) this.lang = options.lang || this.lang;
     }
@@ -72,6 +53,7 @@ export class ValidatorClass<Data, T = {}> implements Validator<Data, T> {
     async getErrors(): Promise<Record<string, _Error[]> | null> {
         //Just object of paths and Errors description
         let Errors: Record<string, _Error[]> = {};
+
         for (const path in this.CRules) {
             const r = await this._get_errors(
                 this.inputs,
@@ -142,7 +124,12 @@ export class ValidatorClass<Data, T = {}> implements Validator<Data, T> {
                 } else {
                     Errors[addedPath + paths.slice(0, i).join(".")] = [
                         {
-                            message: UnMatchedType(currentObj, this, currPath,this.lang),
+                            message: UnMatchedType(
+                                currentObj,
+                                this,
+                                currPath,
+                                this.lang
+                            ),
                             value: currentObj,
                         },
                     ];
@@ -257,23 +244,13 @@ export class ValidatorClass<Data, T = {}> implements Validator<Data, T> {
         if (!has) throw new Error(`THE RULE ${rule} IS NOT EXIST`);
         return arrMess;
     }
-    static register<Data, Name extends RegExp | string>(
-        name: Name,
+    static register<Name extends string, Data, Res = unknown>(
+        name: Name | RegExp,
         fun: RuleFun<Data>,
         initSubmit?: InitSubmitFun<Data>
-    ): Rule<Data, Name> {
-        const rule = new Rule<Data, Name>(name, fun, initSubmit);
-        ValidatorClass.Rules.push(rule as unknown as Rule<Data, Name>);
+    ): Rule<Name, Res, Data> {
+        const rule = new Rule<Name, Res, Data>(name, fun, initSubmit);
+        ValidatorClass.Rules.push(rule as any);
         return rule;
-    }
-}
-export default class S<Data = unknown, T = {}> extends ValidatorClass<Data, T> {
-    constructor(
-        inputs: unknown,
-        rules: Rules<T>,
-        reqData?: Data,
-        options?: ValidatorOptions
-    ) {
-        super(inputs, rules, reqData as Data, options);
     }
 }

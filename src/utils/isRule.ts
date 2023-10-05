@@ -1,4 +1,4 @@
-import { RulesGetter } from "@/Rules";
+import { RulesGetter } from "@/parseRules";
 import { isArray, isString } from "./types";
 export type ValidArray<T = unknown> =
     | [T]

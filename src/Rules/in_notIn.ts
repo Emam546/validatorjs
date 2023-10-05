@@ -1,10 +1,10 @@
 import Rule, { MessagesStore, RuleFun } from "@/Rule";
 import handelMessage from "@/utils/handelMessage";
 import { isString } from "@/utils/types";
-export const MessagesIn: MessagesStore = {
+export const MessagesIn: MessagesStore<unknown> = {
     en: "The value is not in the array",
 };
-export const MessagesNotIn: MessagesStore = {
+export const MessagesNotIn: MessagesStore<unknown> = {
     en: "The value is in the array",
 };
 function contains<Data>(...[value, name]: Parameters<RuleFun<Data>>) {
@@ -17,9 +17,9 @@ function contains<Data>(...[value, name]: Parameters<RuleFun<Data>>) {
     return values.includes(value);
 }
 
-export const _in = new Rule(/^in:\S+/, (...arr) =>
+export const _in = new Rule<`in:${string}`,string>(/^in:\S+/, (...arr) =>
     contains(...arr) ? undefined : handelMessage(MessagesIn[arr[4]], ...arr)
 );
-export const notIn = new Rule(/^not_in:\S+/, (...arr) =>
+export const notIn = new Rule<`not_in:${string}`,string>(/^not_in:\S+/, (...arr) =>
     !contains(...arr) ? undefined : handelMessage(MessagesNotIn[arr[4]], ...arr)
 );

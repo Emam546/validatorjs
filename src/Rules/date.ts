@@ -2,18 +2,18 @@ import Rule, { MessagesStore, RuleFun } from "@/Rule";
 import handelMessage from "@/utils/handelMessage";
 import isEmpty from "@/utils/isEmpty";
 import { isNumber, isString } from "@/utils/types";
-export const NotValidDate: MessagesStore = {
+export const NotValidDate: MessagesStore<unknown> = {
     en: "THE DATE IS NOT VALID",
 };
-export const After: MessagesStore = {
+export const After: MessagesStore<unknown> = {
     en: (_, name) =>
         `The Date is before ${getTimeName(name).toUTCString()} date`,
 };
-export const Before: MessagesStore = {
+export const Before: MessagesStore<unknown> = {
     en: (_, name) =>
         `The Date is after ${getTimeName(name).toUTCString()} date`,
 };
-export const Equal: MessagesStore = {
+export const Equal: MessagesStore<unknown> = {
     en: (_, name) =>
         `The Date is not equal ${getTimeName(name).toUTCString()} date`,
 };
@@ -87,6 +87,15 @@ function equal<Data>(
         return handelMessage(Before[lang], ...arr);
 }
 export const isDate = new Rule("isDate", isDateFn);
-export const date = new Rule(/(^date:)/, equal);
-export const after = new Rule(/(^after:)/, afterfn);
-export const before = new Rule(/(^before:)/, beforefn);
+export const date = new Rule<`date:${string}`, string | Date | number>(
+    /(^date:)/,
+    equal
+);
+export const after = new Rule<`after:${string}`, string | Date | number>(
+    /(^after:)/,
+    afterfn
+);
+export const before = new Rule<`before:${string}`, string | Date | number>(
+    /(^before:)/,
+    beforefn
+);

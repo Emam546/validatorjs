@@ -1,12 +1,8 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { RulesGetter } from "./Rules";
 import arrayKind from "./utils/arrayKind";
 import { hasOwnProperty } from "./utils/compare";
 import { ValidArray, isValidInput, is_Rule } from "./utils/isRule";
 import { isArray } from "./utils/types";
-// @ts-ignore
+export type RulesGetter = string[] | null;
 export type InputRules =
     | RulesGetter
     | string
@@ -48,10 +44,8 @@ type ToPaths<T, P extends string = ""> = T extends Record<string, unknown>
 type FromPaths<T extends { path: string; type: unknown }> = {
     [P in T["path"]]: Extract<T, { path: P }>["type"];
 };
-export type Rules<T = unknown> = FromPaths<ToPaths<T>>;
-export function parseRules<T extends InputRules>(
-    input: T
-): T extends infer R ? Rules<R> : never {
+export type Rules<T> = FromPaths<ToPaths<T>>;
+export function parseRules<T extends InputRules>(input: T): Rules<T> {
     //just parse rules from the object
     //it must alway finishes with
     // - array of string  that describes rules

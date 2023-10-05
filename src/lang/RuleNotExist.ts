@@ -1,5 +1,5 @@
 import { MessagesStore, RuleFun } from "@/Rule";
-export const message: MessagesStore = {
+export const message: MessagesStore<unknown> = {
     en: (a, name) => `THE RULE ${name} IS NOT EXIST`,
 };
 export default function RuleIsNotExist<Data>(
