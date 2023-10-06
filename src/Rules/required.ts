@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import Rule, { InitSubmitFun, RuleFun, _Error } from "@/Rule";
+import Rule, { InitSubmitFun, RuleFun, ErrorMessage } from "@/Rule";
 import { hasOwnProperty } from "@/utils/compare";
 import { getAllValues, getValue } from "@/utils/getValue";
 import handelMessage from "@/utils/handelMessage";
@@ -10,7 +10,7 @@ import ValueNotExist from "./Messages/valueNotExist";
 export function getValueMessage<Data>(
     orgPath: string,
     ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Data>>
-): Record<string, _Error[]> {
+): Record<string, ErrorMessage[]> {
     const paths = orgPath.split(".");
     let currObj: any = inputs;
     for (let i = 0; i < paths.length; i++) {
@@ -52,7 +52,7 @@ function require_if<Data>(
     const ObjectPath = path.split(".").slice(0, -1).join(".");
     const allObjects = getAllValues(inputs, ObjectPath);
     const Ppath = path.split(".").at(-1);
-    let errors: Record<string, _Error[]> = {};
+    let errors: Record<string, ErrorMessage[]> = {};
     if (Ppath)
         for (const objPath in allObjects) {
             const element = allObjects[objPath];

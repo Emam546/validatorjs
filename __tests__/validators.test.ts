@@ -1,6 +1,6 @@
 import Validator, { parseRules, Rules } from "@/index";
-import { string, int, min, limit, regExp } from "@/Rules";
-
+import { AllRules } from "@/Rules";
+const { string, int, min, limit, regExp } = AllRules;
 describe("test some validators", () => {
     test("test int method", async () => {
         const Rules = Validator.parseRules({

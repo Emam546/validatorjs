@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "resolveJsonModule": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "outDir": "dist",
     "sourceMap": true,
     "strict": true,

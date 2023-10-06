@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { InputRules, Rules } from "@/type";
+import { Rules } from "@/type";
 import { hasOwnProperty } from "./compare";
 import { isArray } from "./types";
 

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { RulesGetter } from "./type";
+import type { RulesGetter } from "./utils/isRule";
 import type LangType from "./types/lang";
 import { objectKeys } from "./utils";
 import { isPromise, isString } from "./utils/types";
@@ -10,7 +10,7 @@ export type RuleFun<Data> = (
     path: string,
     lang: LangType
 ) => string | undefined | Promise<string | undefined>;
-export interface _Error {
+export interface ErrorMessage {
     value: unknown;
     message: string;
 }
@@ -31,15 +31,17 @@ export type InitSubmitFun<Data> = (
     validator: Validator<unknown, Data>,
     path: string,
     lang: LangType
-) => Promise<Record<string, _Error[]>> | Record<string, _Error[]>;
+) => Promise<Record<string, ErrorMessage[]>> | Record<string, ErrorMessage[]>;
 export type RuleResponseType<
     T extends Rule<Name, unknown, Data>,
     Data,
     Name extends string
 > = T extends Rule<Name, infer Res, Date> ? Res : never;
 function isNoPromises(
-    val: Array<Promise<Record<string, _Error[]>> | Record<string, _Error[]>>
-): val is Array<Record<string, _Error[]>> {
+    val: Array<
+        Promise<Record<string, ErrorMessage[]>> | Record<string, ErrorMessage[]>
+    >
+): val is Array<Record<string, ErrorMessage[]>> {
     return !val.some((val) => isPromise(val));
 }
 
@@ -62,7 +64,7 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
             return value.match(this.name) != null;
         return false;
     }
-    validate(
+    validate<T>(
         value: unknown,
         name: string,
         validator: Validator<unknown, Data>,
@@ -74,11 +76,14 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
     initSubmit<T>(
         validator: Validator<unknown, Data>,
         lang: LangType
-    ): Record<string, _Error[]> | Promise<Record<string, _Error[]>> {
-        const { CRules: rules } = validator;
+    ):
+        | Record<string, ErrorMessage[]>
+        | Promise<Record<string, ErrorMessage[]>> {
+        const { CPaths: rules } = validator;
         if (!this.initFn) return {};
         const messages: Array<
-            Promise<Record<string, _Error[]>> | Record<string, _Error[]>
+            | Promise<Record<string, ErrorMessage[]>>
+            | Record<string, ErrorMessage[]>
         > = [];
         objectKeys(rules).forEach((path) => {
             const arr: RulesGetter = rules[path] as any;
@@ -101,7 +106,7 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
         if (isNoPromises(messages))
             return messages.reduce(
                 (acc, cur) => ({ ...acc, ...cur }),
-                {} as Record<string, _Error[]>
+                {} as Record<string, ErrorMessage[]>
             );
         return new Promise((res) => {
             Promise.all(messages.map(async (val) => await val)).then(
@@ -109,7 +114,7 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
                     res(
                         messages.reduce(
                             (acc, cur) => ({ ...acc, ...cur }),
-                            {} as Record<string, _Error[]>
+                            {} as Record<string, ErrorMessage[]>
                         )
                     )
             );

@@ -1,7 +1,7 @@
 import type Rule from "./Rule";
-import type { ValidArray } from "./utils/isRule";
+import type { ValidArray, RulesGetter } from "./utils/isRule";
+export type { ValidArray, RulesGetter } from "./utils/isRule";
 
-export type RulesGetter = Array<Validator.RulesNames> | null;
 export type InputRules =
     | RulesGetter
     | string

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Rule, { InitSubmitFun, RuleFun, _Error } from "@/Rule";
+import Rule, { InitSubmitFun, RuleFun, ErrorMessage } from "@/Rule";
 import { getAllValues, getValue } from "@/utils/getValue";
 import { getValueMessage } from "./required";
 
@@ -10,7 +10,7 @@ function _require_without<Data>(
     const ObjectPath = path.split(".").slice(0, -1).join(".");
     const allObjects = getAllValues(inputs, ObjectPath);
     const Ppath = path.split(".").at(-1);
-    let errors: Record<string, _Error[]> = {};
+    let errors: Record<string, ErrorMessage[]> = {};
 
     if (Ppath)
         for (const objPath in allObjects) {
@@ -42,7 +42,7 @@ function _require_withoutAll<Data>(
     const ObjectPath = path.split(".").slice(0, -1).join(".");
     const allObjects = getAllValues(inputs, ObjectPath);
     const Ppath = path.split(".").at(-1);
-    let errors: Record<string, _Error[]> = {};
+    let errors: Record<string, ErrorMessage[]> = {};
 
     if (Ppath)
         for (const objPath in allObjects) {

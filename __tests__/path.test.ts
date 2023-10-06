@@ -4,7 +4,7 @@ describe("Complex paths test", () => {
     test("test array of rules", () => {
         const Rules = Validator.parseRules({ name: ["string", "number"] });
         const data = {};
-        expect(new Validator(data, Rules, {}).CRules).toStrictEqual({
+        expect(new Validator(data, Rules, {}).CPaths).toStrictEqual({
             name: ["string", "number"],
         });
     });
@@ -13,7 +13,7 @@ describe("Complex paths test", () => {
             person: [{ name: ["string"], age: "integer" }],
         });
         const data = {};
-        expect(new Validator(data, Rules, {}).CRules).toStrictEqual({
+        expect(new Validator(data, Rules, {}).CPaths).toStrictEqual({
             "person.*:array.name": ["string"],
             "person.*:array.age": ["integer"],
         });
@@ -21,14 +21,14 @@ describe("Complex paths test", () => {
     test("array of objects", () => {
         const Rules = Validator.parseRules({ person: [["string"], "array"] });
         const data = {};
-        expect(new Validator(data, Rules, {}).CRules).toStrictEqual({
+        expect(new Validator(data, Rules, {}).CPaths).toStrictEqual({
             "person.*:array": ["string"],
         });
     });
     test("object of objects", () => {
         const Rules = Validator.parseRules({ person: [["string"], "object"] });
         const data = {};
-        expect(new Validator(data, Rules, {}).CRules).toStrictEqual({
+        expect(new Validator(data, Rules, {}).CPaths).toStrictEqual({
             "person.*:object": ["string"],
         });
     });

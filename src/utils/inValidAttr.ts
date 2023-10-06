@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-import { _Error } from "@/Rule";
+import { ErrorMessage } from "@/Rule";
 import constructObj from "./constructObj";
 import { isArray } from "./types";
 import { Rules } from "@/type";
-export type ReturnTypeUnMatch = Record<string, _Error> | null;
+export type ReturnTypeUnMatch = Record<string, ErrorMessage> | null;
 export function unMatchedValues(
     input: any,
     unMatchObj: any,
@@ -16,7 +16,7 @@ export function unMatchedValues(
     if (typeof unMatchObj == "undefined")
         return { [addedPath]: { message: "invalid path", value: input } };
     if (unMatchObj == null) return null;
-    let errors: Record<string, _Error> = {};
+    let errors: Record<string, ErrorMessage> = {};
     if (isArray<string>(unMatchObj)) {
         const [, _type] = unMatchObj;
         if (_type == "array" && !isArray(input))

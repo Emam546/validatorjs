@@ -20,7 +20,6 @@ import { require_if, require_unless } from "./require_if";
 import { require_without, require_withoutAll } from "./require_without";
 import regExp from "./regExp";
 
-
 export const AllRules = {
     accept,
     array,
@@ -53,4 +52,3 @@ export const AllRules = {
     regExp,
 };
 export type _Rules = typeof AllRules;
-

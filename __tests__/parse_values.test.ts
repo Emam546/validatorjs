@@ -11,7 +11,7 @@ describe("test validate", () => {
             name: 123,
         };
         let valid: any = new Validator(data, Rules);
-        expect(valid.CRules).toStrictEqual({ name: ["string"] });
+        expect(valid.CPaths).toStrictEqual({ name: ["string"] });
         expect(await valid.passes()).toBe(true);
         valid = new Validator(data2, Rules);
         expect(await valid.passes()).toBe(false);
