@@ -30,16 +30,18 @@ type ToPaths<T, P extends string = ""> = T extends Record<string, unknown>
     ?
           | ToPaths<T[0], `${P}.*:${T[1] extends undefined ? "array" : T[1]}`>
           | T[2] extends InputRules
-        ? ToPaths<T[0], P>
+        ? ToPaths<T[2], P>
         : {
               path: P extends `${infer P}` ? P : never;
               type: T[2] extends RulesGetter ? T[2] : null;
           }
     : T extends string
-    ? {
-          path: P extends `${infer P}` ? P : never;
-          type: SplitString<T, "|">;
-      }
+    ? SplitString<T, "|"> extends RulesGetter
+        ? {
+              path: P extends `${infer P}` ? P : never;
+              type: SplitString<T, "|">;
+          }
+        : never
     : never;
 
 type FromPaths<T extends { path: string; type: unknown }> = {

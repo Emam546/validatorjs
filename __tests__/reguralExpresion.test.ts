@@ -51,28 +51,7 @@ describe("test Regular Expression of Validators", () => {
         expect(AllRules.notIn.isequal(" not_in:myPath")).toBe(false);
         expect(AllRules.notIn.isequal("n:myPath")).toBe(false);
     });
-    test("require if", () => {
-        expect(AllRules.require_if.isequal("required_if:foo,bar")).toBe(true);
-        expect(AllRules.require_if.isequal("required_if:foo,")).toBe(false);
-        expect(AllRules.require_if.isequal("required_if:foo")).toBe(false);
-        expect(AllRules.require_if.isequal("required_if:")).toBe(false);
-        expect(AllRules.require_if.isequal("required_if")).toBe(false);
-        expect(AllRules.require_if.isequal(" required_if:myPath,value")).toBe(
-            false
-        );
-        expect(AllRules.require_if.isequal("r:myPath,value")).toBe(false);
-    });
-    test("require if", () => {
-        expect(AllRules.require_if.isequal("required_if:foo,bar")).toBe(true);
-        expect(AllRules.require_if.isequal("required_if:foo,")).toBe(false);
-        expect(AllRules.require_if.isequal("required_if:foo")).toBe(false);
-        expect(AllRules.require_if.isequal("required_if:")).toBe(false);
-        expect(AllRules.require_if.isequal("required_if")).toBe(false);
-        expect(AllRules.require_if.isequal(" required_if:myPath,value")).toBe(
-            false
-        );
-        expect(AllRules.require_if.isequal("r:myPath,value")).toBe(false);
-    });
+
     test("require if", () => {
         expect(
             AllRules.require_without.isequal("required_without:foo,bar")

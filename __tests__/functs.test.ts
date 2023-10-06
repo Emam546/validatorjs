@@ -320,6 +320,20 @@ describe("parseRules", () => {
                 "names.*:array": ["string"],
             });
             expect(
+                parseRules({
+                    names: [
+                        ["string"],
+                        "array",
+                        {
+                            0: ["string"],
+                        },
+                    ],
+                })
+            ).toStrictEqual({
+                "names.*:array": ["string"],
+                "names.0": ["string"],
+            });
+            expect(
                 parseRules({ names: [["string"], "array", ["required"]] })
             ).toStrictEqual({
                 "names.*:array": ["string"],
@@ -610,7 +624,6 @@ describe("test merge objs methods", () => {
         });
     });
 });
-
 describe("inValid attr", () => {
     test("main task", () => {
         const rules = parseRules({
