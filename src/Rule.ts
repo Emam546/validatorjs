@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import type { RulesGetter } from "./utils/isRule";
 import type LangType from "./types/lang";
 import { objectKeys } from "./utils";
 import { isPromise, isString } from "./utils/types";
+import { AllRules } from "@/Rules";
+
 export type RuleFun<Data> = (
     value: unknown,
     name: string,
@@ -49,6 +50,9 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
     private readonly name: Name | RegExp;
     private readonly fn: RuleFun<Data>;
     private readonly initFn?: InitSubmitFun<Data>;
+    public static Rules: Rule<string, unknown>[] = Object.values({
+        ...AllRules,
+    });
     constructor(
         name: Name | RegExp,
         fn: RuleFun<Data>,
@@ -64,7 +68,7 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
             return value.match(this.name) != null;
         return false;
     }
-    validate<T>(
+    validate(
         value: unknown,
         name: string,
         validator: Validator<unknown, Data>,
@@ -73,12 +77,13 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
     ) {
         return this.fn(value, name, validator, path, lang);
     }
-    initSubmit<T>(
+    initSubmit(
         validator: Validator<unknown, Data>,
         lang: LangType
     ):
         | Record<string, ErrorMessage[]>
         | Promise<Record<string, ErrorMessage[]>> {
+            
         const { CPaths: rules } = validator;
         if (!this.initFn) return {};
         const messages: Array<
@@ -86,7 +91,7 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
             | Record<string, ErrorMessage[]>
         > = [];
         objectKeys(rules).forEach((path) => {
-            const arr: RulesGetter = rules[path] as any;
+            const arr = rules[path] as any;
             if (arr == null) return;
             if (!this.initFn) return {};
 

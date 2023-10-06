@@ -1,32 +1,28 @@
-import Validator, { parseRules, Rules } from "@/index";
-import { AllRules } from "@/Rules";
-const { string, int, min, limit, regExp } = AllRules;
+import Validator, { parseRules, Rule } from "@/index";
 describe("test some validators", () => {
     test("test int method", () => {
         const Rules = Validator.parseRules({
             val: "integer",
         });
-        expect(new Validator({ val: +"10" }, Rules).getErrors()).toBeNull();
-        expect(
-            new Validator({ val: new Number(1234) }, Rules).getErrors()
-        ).toBeNull();
-        expect(new Validator({ val: NaN }, Rules).getErrors()).not.toBeNull();
-        expect(new Validator({ val: "10" }, Rules).getErrors()).not.toBeNull();
-        expect(new Validator({ val: null }, Rules).getErrors()).not.toBeNull();
+        expect(new Validator({ val: +"10" }, Rules).passes()).toBe(true);
+        expect(new Validator({ val: new Number(1234) }, Rules).passes()).toBe(
+            true
+        );
+        expect(new Validator({ val: NaN }, Rules).passes()).not.toBe(true);
+        expect(new Validator({ val: "10" }, Rules).passes()).not.toBe(true);
+        expect(new Validator({ val: null }, Rules).passes()).not.toBe(true);
     });
     test("test string method", () => {
         const Rules = Validator.parseRules({
             val: "string",
         });
+        expect(new Validator({ val: "my string" }, Rules).passes()).toBe(true);
         expect(
-            new Validator({ val: "my string" }, Rules).getErrors()
-        ).toBeNull();
-        expect(
-            new Validator({ val: new String("string") }, Rules).getErrors()
-        ).toBeNull();
-        expect(new Validator({ val: "1234" }, Rules).getErrors()).toBeNull();
-        expect(new Validator({ val: 1234 }, Rules).getErrors()).not.toBeNull();
-        expect(new Validator({ val: null }, Rules).getErrors()).not.toBeNull();
+            new Validator({ val: new String("string") }, Rules).passes()
+        ).toBe(true);
+        expect(new Validator({ val: "1234" }, Rules).passes()).toBe(true);
+        expect(new Validator({ val: 1234 }, Rules).passes()).not.toBe(true);
+        expect(new Validator({ val: null }, Rules).passes()).not.toBe(true);
     });
 });
 

@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-empty-interface */
 /* eslint-disable @typescript-eslint/ban-types */
-import type Rule from "@/Rule";
-import { ErrorMessage } from "@/Rule";
-import { ValidatorOptions } from "@/main";
-import { Rules, ValidTypes } from "@/type";
-import LangTypes from "@/types/lang";
+import type { _Rules } from "@/Rules";
+
+import type { ErrorMessage } from "@/Rule";
+import type { ValidatorOptions } from "@/main";
+import type { Rules, ValidTypes } from "@/type";
+import type LangTypes from "@/types/lang";
+
 declare global {
     interface Validator<T, Data> {
         reqData: Data;
@@ -30,15 +32,6 @@ declare global {
         setAllValues(path: string, value: unknown): boolean[];
     }
     namespace Validator {
-        interface AvailableRules {}
-        type ArrayRules = AvailableRules[keyof AvailableRules][];
-        type RulesNames = {
-            [K in keyof AvailableRules]: AvailableRules[K] extends Rule<
-                infer Name
-            >
-                ? Name
-                : unknown;
-        }[keyof AvailableRules];
-        type RulesGetter = Validator.RulesNames[] | null;
+        interface AvailableRules extends _Rules {}
     }
 }

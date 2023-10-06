@@ -1,4 +1,4 @@
-import Validator, { parseRules } from "@/index";
+import Validator, { parseRules,Rule } from "@/index";
 describe("test validate", () => {
     test("main", () => {
         const Rules = Validator.parseRules({
@@ -63,7 +63,7 @@ test("IF THE RULE EXIST", () => {
         name: "ali",
     };
     let valid = new Validator(data, Rules, {});
-    expect(Validator.Rules.length).toBeGreaterThan(0);
+    expect(Rule.length).toBeGreaterThan(0);
     expect(valid.validate("name", "string", "")).toStrictEqual([]);
     expect(valid.validate(1234, "string", "")).not.toStrictEqual([]);
 });

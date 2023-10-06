@@ -4,12 +4,10 @@ import arrayKind from "./utils/arrayKind";
 import { hasOwnProperty } from "./utils/compare";
 import { isValidInput, is_Rule } from "./utils/isRule";
 import { isArray } from "./utils/types";
-//
-export function parseRules<T>(
-    input: T
-): Rules<T> {
-    //just parse rules from the object
-    //it must alway finishes with
+
+export function parseRules<T>(input: T): Rules<T>  {
+    // just parse rules from the object
+    // it must alway finishes with
     // - array of string  that describes rules
     // - string that split with | sign
     const flattened: any = {};

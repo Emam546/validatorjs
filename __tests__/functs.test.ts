@@ -280,6 +280,9 @@ describe("parseRules", () => {
         expect(parseRules({ name: "string|integer" })).toStrictEqual({
             name: ["string", "integer"],
         });
+        const rules = parseRules({
+            name: "string|integer",
+        });
         expect(parseRules(["string", "integer"])).toStrictEqual({
             ".": ["string", "integer"],
         });

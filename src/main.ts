@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-types */
 import { isArray, isObject, isPromise, isString } from "@/utils/types";
-import Rule, { InitSubmitFun, RuleFun, ErrorMessage } from "@/Rule";
+import type { InitSubmitFun, RuleFun, ErrorMessage } from "@/Rule";
+import Rule from "@/Rule";
 import LangTypes from "@/types/lang";
 import UnMatchedType from "@/lang/notMatch";
 import { getValue, getAllValues } from "@/utils/getValue";
@@ -11,11 +12,10 @@ import compare from "@/utils/compare";
 import inValidAttr from "@/utils/inValidAttr";
 import isEmpty from "@/utils/isEmpty";
 import { setAllValues, setValue } from "@/utils/setValue";
-import type { Rules } from "@/type";
+import type { Rules, ValidTypes } from "@/type";
 import { parseRules } from "@/parseRules";
-import { AllRules } from "@/Rules";
 import { objectKeys } from "@/utils";
-import type { RulesGetter } from "@/utils/isRule";
+import { RulesGetter } from "@/type";
 
 export const TYPE_ARRAY = ["object", "array"];
 export type ValidatorOptions = {
@@ -30,9 +30,7 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
     errors: Record<string, ErrorMessage[]> = {};
     inValidErrors: Record<string, ErrorMessage> | null = null;
     public lang: LangTypes = "en";
-    public static Rules = Object.values({
-        ...AllRules,
-    });
+
     public readonly empty: boolean;
     constructor(
         inputs: unknown,
@@ -142,8 +140,8 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
             | Record<string, ErrorMessage[]>
             | Promise<Record<string, ErrorMessage[]>>
         > = [];
-        for (let i = 0; i < ValidatorClass.Rules.length; i++) {
-            const res = ValidatorClass.Rules[i].initSubmit(this, this.lang);
+        for (let i = 0; i < Rule.Rules.length; i++) {
+            const res = Rule.Rules[i].initSubmit(this, this.lang);
             Result = [...Result, res];
         }
         return Result;
@@ -251,7 +249,7 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
     setValue(path: string, value: unknown): boolean {
         return setValue(this.inputs, path, value);
     }
-    getAllValues(path: string) {
+    getAllValues(path: string): Record<string, unknown> {
         return getAllValues(this.inputs, path);
     }
     setAllValues(path: string, value: unknown): boolean[] {
@@ -276,8 +274,8 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
         let has = false;
         const arrMess: Array<Promise<ErrorMessage | undefined> | ErrorMessage> =
             [];
-        for (let i = 0; i < ValidatorClass.Rules.length; i++) {
-            const ele = ValidatorClass.Rules[i];
+        for (let i = 0; i < Rule.Rules.length; i++) {
+            const ele = Rule.Rules[i];
             if (
                 ele.isequal(rule) &&
                 !(expect && !expect.some((rul) => ele.isequal(rul)))
@@ -319,7 +317,7 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
         initSubmit?: InitSubmitFun<Data>
     ): Rule<Name, Res, Data> {
         const rule = new Rule<Name, Res, Data>(name, fun, initSubmit);
-        ValidatorClass.Rules.push(rule as any);
+        Rule.Rules.push(rule as any);
         return rule;
     }
 }
