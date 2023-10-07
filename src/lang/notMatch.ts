@@ -6,7 +6,7 @@ export const message: MessagesStore<unknown> = {
 };
 export default function UnMatchedType<Data>(
     obj: unknown,
-    validator: Validator<unknown, Data>,
+    validator: Validator<unknown, unknown>,
     path: string,
     lang: LangTypes
 ): string {

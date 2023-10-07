@@ -4,7 +4,7 @@ export const Messages: MessagesStore<unknown> = {
     en: "THE VALUE is not accepted type",
 };
 
-export default new Rule<"accepted", "on" | "true" | "yes" | 1 | "1" | true>(
+export default new Rule(
     "accepted",
     (value, ...arr) => {
         return value === "on" ||

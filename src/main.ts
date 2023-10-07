@@ -12,10 +12,11 @@ import compare from "@/utils/compare";
 import inValidAttr from "@/utils/inValidAttr";
 import isEmpty from "@/utils/isEmpty";
 import { setAllValues, setValue } from "@/utils/setValue";
-import type { Rules, ValidTypes } from "@/type";
+import type { Rules } from "@/type";
 import { parseRules } from "@/parseRules";
-import { objectKeys } from "@/utils";
+import { objectKeys, objectValues } from "@/utils";
 import { RulesGetter } from "@/type";
+import { AllRules } from "./Rules";
 
 export const TYPE_ARRAY = ["object", "array"];
 export type ValidatorOptions = {
@@ -30,6 +31,7 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
     errors: Record<string, ErrorMessage[]> = {};
     inValidErrors: Record<string, ErrorMessage> | null = null;
     public lang: LangTypes = "en";
+    public static Rules: Rule<string | RegExp, any>[] = objectValues(AllRules);
 
     public readonly empty: boolean;
     constructor(
@@ -140,8 +142,8 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
             | Record<string, ErrorMessage[]>
             | Promise<Record<string, ErrorMessage[]>>
         > = [];
-        for (let i = 0; i < Rule.Rules.length; i++) {
-            const res = Rule.Rules[i].initSubmit(this, this.lang);
+        for (let i = 0; i < ValidatorClass.Rules.length; i++) {
+            const res = ValidatorClass.Rules[i].initSubmit(this, this.lang);
             Result = [...Result, res];
         }
         return Result;
@@ -274,8 +276,8 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
         let has = false;
         const arrMess: Array<Promise<ErrorMessage | undefined> | ErrorMessage> =
             [];
-        for (let i = 0; i < Rule.Rules.length; i++) {
-            const ele = Rule.Rules[i];
+        for (let i = 0; i < ValidatorClass.Rules.length; i++) {
+            const ele = ValidatorClass.Rules[i];
             if (
                 ele.isequal(rule) &&
                 !(expect && !expect.some((rul) => ele.isequal(rul)))
@@ -311,13 +313,13 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
     }
     static parseRules = parseRules;
 
-    static register<Name extends string, Data, Res = unknown>(
-        name: Name | RegExp,
+    static register<Name extends string | RegExp, Data>(
+        name: Name,
         fun: RuleFun<Data>,
         initSubmit?: InitSubmitFun<Data>
-    ): Rule<Name, Res, Data> {
-        const rule = new Rule<Name, Res, Data>(name, fun, initSubmit);
-        Rule.Rules.push(rule as any);
+    ) {
+        const rule = new Rule<Name, Data>(name, fun, initSubmit);
+        ValidatorClass.Rules.push(rule as any);
         return rule;
     }
 }

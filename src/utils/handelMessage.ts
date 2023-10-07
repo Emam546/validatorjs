@@ -1,5 +1,5 @@
 import handelUndefined from "./handelUndefined";
-import { StoredMessage, GetMessageFun } from "@/Rule";
+import type { StoredMessage, GetMessageFun } from "@/Rule";
 
 export default function <Data>(
     mess: StoredMessage<Data> | undefined,

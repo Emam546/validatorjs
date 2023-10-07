@@ -87,15 +87,6 @@ function equal<Data>(
         return handelMessage(Before[lang], ...arr);
 }
 export const isDate = new Rule("isDate", isDateFn);
-export const date = new Rule<`date:${string}`, string | Date | number>(
-    /(^date:)/,
-    equal
-);
-export const after = new Rule<`after:${string}`, string | Date | number>(
-    /(^after:)/,
-    afterfn
-);
-export const before = new Rule<`before:${string}`, string | Date | number>(
-    /(^before:)/,
-    beforefn
-);
+export const date = new Rule(/(^date:)/, equal);
+export const after = new Rule(/(^after:)/, afterfn);
+export const before = new Rule(/(^before:)/, beforefn);

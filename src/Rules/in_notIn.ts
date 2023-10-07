@@ -17,9 +17,9 @@ function contains<Data>(...[value, name]: Parameters<RuleFun<Data>>) {
     return values.includes(value);
 }
 
-export const _in = new Rule<`in:${string}`,string>(/^in:\S+/, (...arr) =>
+export const _in = new Rule(/^in:\S+/, (...arr) =>
     contains(...arr) ? undefined : handelMessage(MessagesIn[arr[4]], ...arr)
 );
-export const notIn = new Rule<`not_in:${string}`,string>(/^not_in:\S+/, (...arr) =>
+export const notIn = new Rule(/^not_in:\S+/, (...arr) =>
     !contains(...arr) ? undefined : handelMessage(MessagesNotIn[arr[4]], ...arr)
 );

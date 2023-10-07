@@ -9,7 +9,7 @@ function isNumberOrStringOrBoolean(
 ): val is string | number | boolean {
     return isString(val) || isNumber(val) || isNumberOrStringOrBoolean(val);
 }
-export default new Rule<"numeric", string | number | boolean>(
+export default new Rule(
     "numeric",
     (value, ...arr) => {
         return isNumberOrStringOrBoolean(value) && isNumeric(value)

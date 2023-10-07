@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-empty-interface */
 /* eslint-disable @typescript-eslint/ban-types */
-import type { _Rules } from "@/Rules";
-
 import type { ErrorMessage } from "@/Rule";
 import type { ValidatorOptions } from "@/main";
 import type { Rules, ValidTypes } from "@/type";
@@ -32,6 +30,8 @@ declare global {
         setAllValues(path: string, value: unknown): boolean[];
     }
     namespace Validator {
-        interface AvailableRules extends _Rules {}
+        interface AvailableRules {
+            accept: true;
+        }
     }
 }

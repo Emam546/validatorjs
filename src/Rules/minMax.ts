@@ -65,20 +65,20 @@ function limit<Data>(
     } else return val;
 }
 
-export const min = new Rule<`min:${string}`>(
+export const min = new Rule(
     /^min(:-?\d+)?$/g,
     (...arr) => {
         return handelUnError(MinHandler(...arr), ...arr);
     }
 );
-export const max = new Rule<`max:${string}`>(
+export const max = new Rule(
     /^max:-?\d+$/g,
     (...arr) => {
         return handelUnError(MaxHandler(...arr), ...arr);
     }
 );
 
-export default new Rule<`limit:${string}`>(
+export default new Rule(
     /^limit:-?\d+:-?\d+$/,
     (...arr) => {
         return handelUnError(limit(...arr), ...arr);

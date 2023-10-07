@@ -5,7 +5,7 @@ export const Messages: MessagesStore<unknown> = {
     en: "the input value is not a number",
 };
 
-export default new Rule<"integer", number>("integer", (value, ...arr) => {
+export default new Rule("integer", (value, ...arr) => {
     return isNumber(value)
         ? undefined
         : handelMessage(Messages[arr[3]], value, ...arr);

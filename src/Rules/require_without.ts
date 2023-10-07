@@ -67,13 +67,13 @@ function _require_withoutAll<Data>(
         }
     return errors;
 }
-export const require_without = new Rule<`required_without:${string}`>(
+export const require_without = new Rule(
     /^required_without:(.+,)*[^,]+/,
     () => undefined,
     (name, Validator, ...a) =>
         _require_without(Validator.inputs, name, Validator, ...a)
 );
-export const require_withoutAll = new Rule<`required_withoutAll:${string}`>(
+export const require_withoutAll = new Rule(
     /^required_withoutAll:(.+,)*[^,]+/,
     () => undefined,
     (name, Validator, ...a) =>

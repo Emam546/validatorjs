@@ -1,4 +1,3 @@
-import type Rule from "./Rule";
 import type { ValidArray, RulesGetter, RulesNames } from "./utils/isRule";
 export * from "./utils/isRule";
 
@@ -11,7 +10,6 @@ export type InputRules =
     | [InputRules]
     | [InputRules, "object" | "array"]
     | [InputRules, "object" | "array", InputRules];
-type ArrayRules = Validator.AvailableRules[keyof Validator.AvailableRules][];
 
 type SplitString<
     S extends string,
@@ -47,20 +45,12 @@ type ToPaths<T, P extends string = ""> = T extends Record<
         : never
     : T extends string
     ? SplitString<T, "|"> extends RulesGetter
-        ? {
-              path: P;
-              type: SplitString<T, "|">;
-          }
+        ? ToPaths<SplitString<T, "|">, P>
         : never
     : never;
 
 type FromPaths<T extends { path: string; type: RulesGetter }> = {
     [P in T["path"]]: Extract<T, { path: P }>["type"];
-};
-type AllRulesMap = {
-    [K in ArrayRules[number] as K extends Rule<infer Name>
-        ? Name & RulesNames
-        : never]: K;
 };
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
@@ -74,12 +64,8 @@ export type ValidTypes<T> = T extends Record<string | number, InputRules>
           [K in keyof T]: ValidTypes<T[K]>;
       }
     : T extends RulesNames[]
-    ? T[number] extends keyof AllRulesMap
-        ? UnionToIntersection<
-              AllRulesMap[T[number]] extends Rule<string, infer VType>
-                  ? VType
-                  : unknown
-          >
+    ? T[number] extends keyof Validator.AvailableRules
+        ? UnionToIntersection<Validator.AvailableRules[T[number]]>
         : unknown
     : T extends ValidArray<InputRules>
     ? T[1] extends "object"
@@ -89,4 +75,3 @@ export type ValidTypes<T> = T extends Record<string | number, InputRules>
     ? ValidTypes<SplitString<T, "|">>
     : unknown;
 export type Rules<T> = FromPaths<ToPaths<T>>;
-export type G = Rules<unknown>;

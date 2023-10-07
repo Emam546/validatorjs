@@ -1,4 +1,4 @@
-import { Rules, ValidTypes } from "@/type";
+import type { Rules, ValidTypes } from "@/type";
 import constructObj from "./constructObj";
 import { isArray, isObject } from "./types";
 function matchObjs(input: unknown, matchObj: unknown): unknown {

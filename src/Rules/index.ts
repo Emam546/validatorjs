@@ -51,4 +51,5 @@ export const AllRules = {
     require_unless,
     regExp,
 };
+
 export type _Rules = typeof AllRules;

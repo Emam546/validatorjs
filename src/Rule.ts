@@ -2,7 +2,6 @@
 import type LangType from "./types/lang";
 import { objectKeys } from "./utils";
 import { isPromise, isString } from "./utils/types";
-import { AllRules } from "@/Rules";
 
 export type RuleFun<Data> = (
     value: unknown,
@@ -33,11 +32,7 @@ export type InitSubmitFun<Data> = (
     path: string,
     lang: LangType
 ) => Promise<Record<string, ErrorMessage[]>> | Record<string, ErrorMessage[]>;
-export type RuleResponseType<
-    T extends Rule<Name, unknown, Data>,
-    Data,
-    Name extends string
-> = T extends Rule<Name, infer Res, Date> ? Res : never;
+
 function isNoPromises(
     val: Array<
         Promise<Record<string, ErrorMessage[]>> | Record<string, ErrorMessage[]>
@@ -46,18 +41,11 @@ function isNoPromises(
     return !val.some((val) => isPromise(val));
 }
 
-export default class Rule<Name extends string, Res = unknown, Data = unknown> {
-    private readonly name: Name | RegExp;
+export default class Rule<Name extends string | RegExp, Data = unknown> {
+    private readonly name: Name;
     private readonly fn: RuleFun<Data>;
     private readonly initFn?: InitSubmitFun<Data>;
-    public static Rules: Rule<string, unknown>[] = Object.values({
-        ...AllRules,
-    });
-    constructor(
-        name: Name | RegExp,
-        fn: RuleFun<Data>,
-        initFn?: InitSubmitFun<Data>
-    ) {
+    constructor(name: Name, fn: RuleFun<Data>, initFn?: InitSubmitFun<Data>) {
         this.name = name;
         this.fn = fn;
         this.initFn = initFn;
@@ -77,13 +65,7 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
     ) {
         return this.fn(value, name, validator, path, lang);
     }
-    initSubmit(
-        validator: Validator<unknown, Data>,
-        lang: LangType
-    ):
-        | Record<string, ErrorMessage[]>
-        | Promise<Record<string, ErrorMessage[]>> {
-            
+    initSubmit(validator: Validator<unknown, Data>, lang: LangType) {
         const { CPaths: rules } = validator;
         if (!this.initFn) return {};
         const messages: Array<
@@ -113,15 +95,10 @@ export default class Rule<Name extends string, Res = unknown, Data = unknown> {
                 (acc, cur) => ({ ...acc, ...cur }),
                 {} as Record<string, ErrorMessage[]>
             );
-        return new Promise((res) => {
+        return new Promise<Record<string, ErrorMessage[]>>((res) => {
             Promise.all(messages.map(async (val) => await val)).then(
                 (messages) =>
-                    res(
-                        messages.reduce(
-                            (acc, cur) => ({ ...acc, ...cur }),
-                            {} as Record<string, ErrorMessage[]>
-                        )
-                    )
+                    res(messages.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
             );
         });
     }

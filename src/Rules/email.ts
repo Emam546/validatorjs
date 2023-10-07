@@ -5,7 +5,7 @@ import { isString } from "@/utils/types";
 export const Messages: MessagesStore<unknown> = {
     en: "THIS IS NOT A VALID EMAIL",
 };
-export default new Rule<"email", string>("email", (value, ...arr) => {
+export default new Rule("email", (value, ...arr) => {
     if (!isString(value)) return handelMessage(Messages[arr[3]], value, ...arr);
 
     let re =

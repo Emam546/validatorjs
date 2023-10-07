@@ -16,7 +16,4 @@ const different: RuleFun<unknown> = function (...arr) {
     if (differentValue != undefined && compare(value, differentValue))
         return handelUnError(handelUndefined(ValuesNotSame[lang]), ...arr);
 };
-export default new Rule<`different:${string}`>(
-    /^different:(.+)/gi,
-    different
-);
+export default new Rule(/^different:(.+)/gi, different);
