@@ -18,34 +18,31 @@ type SplitString<
     ? [Left, ...SplitString<Right, Delimiter>]
     : [S];
 
-type ToPaths<T, P extends string = ""> = T extends Record<
-    string | number,
-    unknown
->
-    ? {
-          [K in keyof T]: ToPaths<
-              T[K],
-              P extends ""
-                  ? `${K & (string | number)}`
-                  : `${P}.${K & (string | number)}`
-          >;
-      }[keyof T]
-    : T extends RulesGetter
-    ? { path: P extends "" ? "." : P; type: T }
-    : T extends ValidArray
-    ?
-          | ToPaths<
-                T[0],
-                `${P extends "" ? "" : `${P}.`}*:${T[1] extends undefined
-                    ? "array"
-                    : T[1]}`
-            >
-          | T[2] extends infer R
-        ? ToPaths<R, P>
-        : never
-    : T extends string
-    ? SplitString<T, "|"> extends RulesGetter
-        ? ToPaths<SplitString<T, "|">, P>
+type ToPaths<G, P extends string = ""> = G extends infer T
+    ? T extends Record<string | number, unknown>
+        ? {
+              [K in keyof T]: ToPaths<
+                  T[K],
+                  P extends ""
+                      ? `${K & (string | number)}`
+                      : `${P}.${K & (string | number)}`
+              >;
+          }[keyof T]
+        : T extends RulesGetter
+        ? { path: P extends "" ? "." : P; type: T }
+        : T extends ValidArray<InputRules>
+        ?
+              | ToPaths<
+                    T[0],
+                    `${P extends "" ? "" : `${P}.`}*:${T[1] extends undefined
+                        ? "array"
+                        : T[1]}`
+                >
+              | ToPaths<T[2], P>
+        : T extends string
+        ? SplitString<T, "|"> extends RulesGetter
+            ? ToPaths<SplitString<T, "|">, P>
+            : never
         : never
     : never;
 
@@ -74,4 +71,5 @@ export type ValidTypes<T> = T extends Record<string | number, InputRules>
     : T extends string
     ? ValidTypes<SplitString<T, "|">>
     : unknown;
+
 export type Rules<T> = FromPaths<ToPaths<T>>;

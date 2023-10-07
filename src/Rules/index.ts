@@ -7,7 +7,7 @@ import password from "./password";
 import string from "./string";
 import url from "./url";
 import int from "./int";
-import limit, { min, max } from "./minMax";
+import { min, max } from "./minMax";
 import alpha_dash from "./alpha-dash";
 import alpha_numeric from "./alpha-num";
 import alpha from "./alpha";
@@ -35,7 +35,6 @@ export const AllRules = {
     int,
     min,
     max,
-    limit,
     alpha_dash,
     alpha_numeric,
     alpha,

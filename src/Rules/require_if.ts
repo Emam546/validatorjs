@@ -1,80 +1,93 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Rule, { InitSubmitFun, RuleFun, ErrorMessage } from "@/Rule";
-import compare from "@/utils/compare";
+import Rule, { ErrorMessage } from "@/Rule";
+import compare, { hasOwnProperty } from "@/utils/compare";
 import { getAllValues, getValue } from "@/utils/getValue";
 import { getValueMessage } from "./required";
+import { isString } from "@/utils/types";
 
-function _require_if<Data>(
-    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Data>>
-): ReturnType<InitSubmitFun<Data>> {
-    const vpath = name.split(":")[1].split(",")[0];
-    const value = JSON.parse(name.split(":")[1].split(",").slice(1).join(","));
-    const ObjectPath = path.split(".").slice(0, -1).join(".");
-    const allObjects = getAllValues(inputs, ObjectPath);
-    const Ppath = path.split(".").at(-1);
-    let errors: Record<string, ErrorMessage[]> = {};
-
-    if (Ppath)
-        for (const objPath in allObjects) {
-            const element = allObjects[objPath];
-            const val = getValue(element, vpath);
-            const finalPath = objPath ? objPath + "." + Ppath : Ppath;
-            if (compare(val, value)) {
-                errors = {
-                    ...errors,
-                    ...getValueMessage(
-                        finalPath,
-                        inputs,
-                        "required",
-                        validator,
-                        Ppath,
-                        lang
-                    ),
-                };
-            }
-        }
-    return errors;
-}
-function _require_unless<Data>(
-    ...[inputs, name, validator, path, lang]: Parameters<RuleFun<Data>>
-): ReturnType<InitSubmitFun<Data>> {
-    const vpath = name.split(":")[1].split(",")[0];
-    const value = JSON.parse(name.split(":")[1].split(",").slice(1).join(","));
-    const ObjectPath = path.split(".").slice(0, -1).join(".");
-    const allObjects = getAllValues(inputs, ObjectPath);
-    const Ppath = path.split(".").at(-1);
-    let errors: Record<string, ErrorMessage[]> = {};
-
-    if (Ppath)
-        for (const objPath in allObjects) {
-            const element = allObjects[objPath];
-            const val = getValue(element, vpath);
-            const finalPath = objPath ? objPath + "." + Ppath : Ppath;
-            if (!compare(val, value)) {
-                errors = {
-                    ...errors,
-                    ...getValueMessage(
-                        finalPath,
-                        inputs,
-                        "required",
-                        validator,
-                        Ppath,
-                        lang
-                    ),
-                };
-            }
-        }
-    return errors;
-}
-export const require_if = new Rule(
-    /(^required_if:).+,[^,]+/,
+export const require_if = new Rule<{
+    required_if: { path: string; value: unknown };
+}>(
+    (
+        val: unknown
+    ): val is { required_if: { path: string; value: unknown } } => {
+        return (
+            hasOwnProperty(val, "required_if") &&
+            hasOwnProperty(val.required_if, "path") &&
+            hasOwnProperty(val.required_if, "value") &&
+            isString(val.required_if.path)
+        );
+    },
     () => undefined,
-    (name, Validator, ...a) =>
-        _require_if(Validator.inputs, name, Validator, ...a)
+    function _require_if(inputs, data, path, lang) {
+        const vpath = data.required_if.path;
+
+        const ObjectPath = path.split(".").slice(0, -1).join(".");
+        const allObjects = getAllValues(inputs, ObjectPath);
+        const Ppath = path.split(".").at(-1);
+        let errors: Record<string, ErrorMessage> = {};
+
+        if (Ppath)
+            for (const objPath in allObjects) {
+                const element = allObjects[objPath];
+                const val = getValue(element, vpath);
+                const finalPath = objPath ? objPath + "." + Ppath : Ppath;
+                if (compare(val, data.required_if.value)) {
+                    errors = {
+                        ...errors,
+                        ...getValueMessage(
+                            finalPath,
+                            inputs,
+                            data,
+                            Ppath,
+                            lang
+                        ),
+                    };
+                }
+            }
+        return errors;
+    }
 );
-export const require_unless = new Rule(
-    /(^required_unless:).+,[^,]+/,
+export const require_unless = new Rule<{
+    require_unless: { path: string; value: unknown };
+}>(
+    (
+        val: unknown
+    ): val is { require_unless: { path: string; value: unknown } } => {
+        return (
+            hasOwnProperty(val, "require_unless") &&
+            hasOwnProperty(val.require_unless, "path") &&
+            hasOwnProperty(val.require_unless, "value") &&
+            isString(val.require_unless.path)
+        );
+    },
     () => undefined,
-    (name, Validator, ...a) =>
-        _require_unless(Validator.inputs, name, Validator, ...a)
+    function _require_unless(inputs, data, path, lang) {
+        const vpath = data.require_unless.path;
+
+        const ObjectPath = path.split(".").slice(0, -1).join(".");
+        const allObjects = getAllValues(inputs, ObjectPath);
+        const Ppath = path.split(".").at(-1);
+        let errors: Record<string, ErrorMessage> = {};
+
+        if (Ppath)
+            for (const objPath in allObjects) {
+                const element = allObjects[objPath];
+                const val = getValue(element, vpath);
+                const finalPath = objPath ? objPath + "." + Ppath : Ppath;
+                if (!compare(val, data.require_unless.value)) {
+                    errors = {
+                        ...errors,
+                        ...getValueMessage(
+                            finalPath,
+                            inputs,
+                            data,
+                            Ppath,
+                            lang
+                        ),
+                    };
+                }
+            }
+        return errors;
+    }
 );

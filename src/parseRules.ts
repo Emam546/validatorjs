@@ -5,7 +5,7 @@ import { hasOwnProperty } from "./utils/compare";
 import { isValidInput, is_Rule } from "./utils/isRule";
 import { isArray } from "./utils/types";
 
-export function parseRules<T>(input: T): Rules<T>  {
+export function parseRules<T extends InputRules>(input: T): Rules<T> {
     // just parse rules from the object
     // it must alway finishes with
     // - array of string  that describes rules
@@ -57,4 +57,3 @@ export function parseRules<T>(input: T): Rules<T>  {
     _get_rule(input);
     return flattened;
 }
-parseRules({ name: "str" });

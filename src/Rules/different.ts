@@ -1,19 +1,42 @@
-import Rule, { RuleFun } from "@/Rule";
+import Rule, { ErrorMessage } from "@/Rule";
 
-import compare from "@/utils/compare";
+import compare, { hasOwnProperty } from "@/utils/compare";
 import handelUndefined from "@/utils/handelUndefined";
 import handelUnError from "@/utils/handelUnError";
 import ValuesNotSame from "./Messages/ValuesNotSame";
-const different: RuleFun<unknown> = function (...arr) {
-    const [value, name, Validator, path, lang] = arr;
-    const allPaths = path.split(".");
-    const different = name.split(":").slice(1).join(":");
-    const differentPath =
-        allPaths.length > 1
-            ? allPaths.slice(0, allPaths.length - 1).join(".") + "." + different
-            : different;
-    const differentValue = Validator.getValue(differentPath);
-    if (differentValue != undefined && compare(value, differentValue))
-        return handelUnError(handelUndefined(ValuesNotSame[lang]), ...arr);
-};
-export default new Rule(/^different:(.+)/gi, different);
+import { isString } from "@/utils/types";
+import { ObjectEntries } from "@/utils";
+import { getAllValues, getValue } from "@/utils/getValue";
+export default new Rule<{ different: string }>(
+    (val: unknown): val is { different: string } => {
+        return hasOwnProperty(val, "different") && isString(val.different);
+    },
+    () => undefined,
+    function (...arr) {
+        const [input, data, path, lang] = arr;
+        const allPaths = path.split(".");
+        const orgPath = allPaths[allPaths.length - 1];
+        const differentPath =
+            allPaths.length > 1
+                ? allPaths.slice(0, allPaths.length - 1).join(".")
+                : ".";
+        return ObjectEntries(getAllValues(input, differentPath)).reduce<
+            Record<string, ErrorMessage>
+        >((acc, [path, value]) => {
+            const differentValue = getValue(value, data.different);
+            const orgValue = getValue(value, orgPath);
+            if (
+                differentValue != undefined &&
+                compare(orgValue, differentValue)
+            )
+                acc[path + "." + orgPath] = {
+                    message: handelUnError(
+                        handelUndefined(ValuesNotSame[lang]),
+                        ...arr
+                    ) as string,
+                    value: orgValue,
+                };
+            return acc;
+        }, {});
+    }
+);

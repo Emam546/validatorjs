@@ -7,5 +7,5 @@ export const Messages: MessagesStore<unknown> = {
 export default new Rule("array", (value, ...arr) => {
     return isArray(value)
         ? undefined
-        : handelMessage(Messages[arr[3]], value, ...arr);
+        : handelMessage(Messages[arr[2]], value, ...arr);
 });

@@ -10,5 +10,5 @@ export default new Rule("url", (value, ...arr) => {
             value
         )
         ? undefined
-        : handelMessage(Messages[arr[3]], value, ...arr);
+        : handelMessage(Messages[arr[2]], value, ...arr);
 });

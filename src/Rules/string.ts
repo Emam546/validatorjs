@@ -8,5 +8,5 @@ export const Messages: MessagesStore<unknown> = {
 export default new Rule("string", (value, ...arr) => {
     return isString(value)
         ? undefined
-        : handelMessage(Messages[arr[3]], value, ...arr);
+        : handelMessage(Messages[arr[2]], value, ...arr);
 });

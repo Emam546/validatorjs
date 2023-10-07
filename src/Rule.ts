@@ -2,11 +2,10 @@
 import type LangType from "./types/lang";
 import { objectKeys } from "./utils";
 import { isPromise, isString } from "./utils/types";
-
+export type EqualFun<Data> = (val: unknown) => val is Data;
 export type RuleFun<Data> = (
     value: unknown,
-    name: string,
-    validator: Validator<unknown, Data>,
+    data: Data,
     path: string,
     lang: LangType
 ) => string | undefined | Promise<string | undefined>;
@@ -14,91 +13,96 @@ export interface ErrorMessage {
     value: unknown;
     message: string;
 }
-export type GetMessageFun<Data> = (
-    value: unknown,
-    name: string,
-    validator: Validator<unknown, Data>,
-    path: string,
-    lang: LangType
-) => string;
+export type GetMessageFun<Data> = (...arr: Parameters<RuleFun<Data>>) => string;
 export type StoredMessage<Data> = string | GetMessageFun<Data>;
 export type MessagesStore<Data> = Partial<
     Record<LangType, StoredMessage<Data>>
 >;
 
 export type InitSubmitFun<Data> = (
-    name: string,
-    validator: Validator<unknown, Data>,
+    input: unknown,
+    data: Data,
     path: string,
     lang: LangType
-) => Promise<Record<string, ErrorMessage[]>> | Record<string, ErrorMessage[]>;
+) => Promise<Record<string, ErrorMessage>> | Record<string, ErrorMessage>;
 
 function isNoPromises(
     val: Array<
-        Promise<Record<string, ErrorMessage[]>> | Record<string, ErrorMessage[]>
+        Promise<Record<string, ErrorMessage>> | Record<string, ErrorMessage>
     >
-): val is Array<Record<string, ErrorMessage[]>> {
+): val is Array<Record<string, ErrorMessage>> {
     return !val.some((val) => isPromise(val));
 }
 
-export default class Rule<Name extends string | RegExp, Data = unknown> {
-    private readonly name: Name;
+export default class Rule<Data> {
+    private readonly eq: Data extends string ? Data : EqualFun<Data>;
     private readonly fn: RuleFun<Data>;
     private readonly initFn?: InitSubmitFun<Data>;
-    constructor(name: Name, fn: RuleFun<Data>, initFn?: InitSubmitFun<Data>) {
-        this.name = name;
+    constructor(
+        eq: Data extends string ? Data : EqualFun<Data>,
+        fn: RuleFun<Data>,
+        initFn?: InitSubmitFun<Data>
+    ) {
+        this.eq = eq;
         this.fn = fn;
         this.initFn = initFn;
     }
-    isequal(value: string): boolean {
-        if (isString(this.name) && this.name == value) return true;
-        else if (this.name instanceof RegExp)
-            return value.match(this.name) != null;
-        return false;
+    isequal(value: unknown): value is Data {
+        if (isString(this.eq)) return value == this.eq;
+        return this.eq(value);
     }
-    validate(
-        value: unknown,
-        name: string,
-        validator: Validator<unknown, Data>,
-        path: string,
+    validate(...arr: Parameters<RuleFun<Data>>) {
+        return this.fn(...arr);
+    }
+    initSubmit(
+        rules: Record<string, unknown[]>,
+        input: unknown,
         lang: LangType
     ) {
-        return this.fn(value, name, validator, path, lang);
-    }
-    initSubmit(validator: Validator<unknown, Data>, lang: LangType) {
-        const { CPaths: rules } = validator;
         if (!this.initFn) return {};
         const messages: Array<
-            | Promise<Record<string, ErrorMessage[]>>
-            | Record<string, ErrorMessage[]>
+            Promise<Record<string, ErrorMessage>> | Record<string, ErrorMessage>
         > = [];
         objectKeys(rules).forEach((path) => {
-            const arr = rules[path] as any;
+            const arr = rules[path];
             if (arr == null) return;
             if (!this.initFn) return {};
 
             for (let i = 0; i < arr.length; i++) {
-                if (this.isequal(arr[i])) {
-                    const message = (this.initFn as any)(
-                        arr[i],
-                        validator,
-                        path,
-                        lang
-                    );
-
+                const val = arr[i];
+                if (this.isequal(val)) {
+                    const message = this.initFn(input, val, path, lang);
                     if (message != undefined) messages.push(message);
                 }
             }
         });
         if (isNoPromises(messages))
-            return messages.reduce(
-                (acc, cur) => ({ ...acc, ...cur }),
-                {} as Record<string, ErrorMessage[]>
+            return messages.reduce<Record<string, ErrorMessage[]>>(
+                (acc, cur) => {
+                    objectKeys(cur).forEach((key) => {
+                        if (acc[key]) return acc[key].push(cur[key]);
+                        else acc[key] = [cur[key]];
+                    });
+                    return acc;
+                },
+                {}
             );
         return new Promise<Record<string, ErrorMessage[]>>((res) => {
             Promise.all(messages.map(async (val) => await val)).then(
                 (messages) =>
-                    res(messages.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
+                    res(
+                        messages.reduce<Record<string, ErrorMessage[]>>(
+                            (acc, cur) => {
+                                objectKeys(cur).forEach((key) => {
+                                    if (acc[key])
+                                        return acc[key].push(cur[key]);
+                                    else acc[key] = [cur[key]];
+                                });
+                                return acc;
+                            },
+                            {}
+                        )
+                    )
             );
         });
     }

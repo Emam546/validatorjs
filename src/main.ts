@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-types */
 import { isArray, isObject, isPromise, isString } from "@/utils/types";
-import type { InitSubmitFun, RuleFun, ErrorMessage } from "@/Rule";
+import type { InitSubmitFun, RuleFun, ErrorMessage, EqualFun } from "@/Rule";
 import Rule from "@/Rule";
 import LangTypes from "@/types/lang";
 import UnMatchedType from "@/lang/notMatch";
@@ -31,7 +31,7 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
     errors: Record<string, ErrorMessage[]> = {};
     inValidErrors: Record<string, ErrorMessage> | null = null;
     public lang: LangTypes = "en";
-    public static Rules: Rule<string | RegExp, any>[] = objectValues(AllRules);
+    public static Rules: Rule<any>[] = objectValues(AllRules);
 
     public readonly empty: boolean;
     constructor(
@@ -143,7 +143,11 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
             | Promise<Record<string, ErrorMessage[]>>
         > = [];
         for (let i = 0; i < ValidatorClass.Rules.length; i++) {
-            const res = ValidatorClass.Rules[i].initSubmit(this, this.lang);
+            const res = ValidatorClass.Rules[i].initSubmit(
+                this.CPaths,
+                this.inputs,
+                this.lang
+            );
             Result = [...Result, res];
         }
         return Result;
@@ -197,7 +201,6 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
                         {
                             message: UnMatchedType(
                                 currentObj,
-                                this,
                                 currPath,
                                 this.lang
                             ),
@@ -283,13 +286,7 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
                 !(expect && !expect.some((rul) => ele.isequal(rul)))
             ) {
                 has = true;
-                const message = ele.validate(
-                    value,
-                    rule,
-                    this,
-                    path,
-                    this.lang
-                );
+                const message = ele.validate(value, rule, path, this.lang);
                 if (message instanceof Promise) {
                     arrMess.push(
                         new Promise<ErrorMessage | undefined>((res, rej) => {
@@ -313,12 +310,12 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
     }
     static parseRules = parseRules;
 
-    static register<Name extends string | RegExp, Data>(
-        name: Name,
+    static register<Data>(
+        name: Data extends string ? Data : EqualFun<Data>,
         fun: RuleFun<Data>,
         initSubmit?: InitSubmitFun<Data>
     ) {
-        const rule = new Rule<Name, Data>(name, fun, initSubmit);
+        const rule = new Rule<Data>(name, fun, initSubmit);
         ValidatorClass.Rules.push(rule as any);
         return rule;
     }

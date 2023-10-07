@@ -9,5 +9,5 @@ export default new Rule("password", (value, ...arr) => {
     return isString(value) &&
         /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/.test(value)
         ? undefined
-        : handelMessage(Messages[arr[3]], value, ...arr);
+        : handelMessage(Messages[arr[2]], value, ...arr);
 });

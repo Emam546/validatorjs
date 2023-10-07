@@ -4,15 +4,14 @@ import { MessagesStore } from "@/Rule";
 export const message: MessagesStore<unknown> = {
     en: "the inserted data type is not matching with the object type",
 };
-export default function UnMatchedType<Data>(
+export default function UnMatchedType(
     obj: unknown,
-    validator: Validator<unknown, unknown>,
     path: string,
     lang: LangTypes
 ): string {
-    const val = message[validator.lang];
+    const val = message[lang];
     if (val)
         if (typeof val == "string") return val;
-        else val(obj, "Not matched error", validator, path, lang);
+        else val(obj, "Not matched error", path, lang);
     throw new Error("this language is not in not matching messages");
 }

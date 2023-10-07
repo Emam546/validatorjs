@@ -6,11 +6,12 @@ import { isArray, isNumber, isObject, isString } from "@/utils/types";
 import { MinError, MaXError } from "./Messages/minMax";
 import UnKnownInputValue from "./Messages/unKnownValue";
 import UnKnownRuleValue from "./Messages/UnknownRule";
+import { hasOwnProperty } from "@/utils/compare";
 
-function getNumber<T>(
-    value: T,
+function getNumber<Data>(
+    value: unknown,
     lang: LangTypes
-): number | StoredMessage<unknown> {
+): number | StoredMessage<Data> {
     if (isNumber(value)) return value;
     if (isArray(value) || isString(value)) return value.length;
     if (value instanceof Set || value instanceof Map) return value.size;
@@ -34,53 +35,36 @@ function maxFun(
     if (isNaN(max)) return handelUndefined(UnKnownRuleValue[lang]);
     if (value > max) return handelUndefined(MaXError[lang]);
 }
-function MinHandler<Data>(
-    ...[value, name, , , lang]: Parameters<RuleFun<Data>>
-): StoredMessage<unknown> | undefined {
-    const min = parseFloat(name.split(":")[1]) || 0;
-    const val = getNumber(value, lang);
-    if (isNumber(val) && typeof val == "number") return minFun(val, min, lang);
-    if (typeof val != "number") return val;
-}
-function MaxHandler<Data>(
-    ...[value, name, , , lang]: Parameters<RuleFun<Data>>
-): StoredMessage<unknown> | undefined {
-    const max = parseFloat(name.split(":")[1]);
-    const val = getNumber(value, lang);
-    if (isNumber(val) && typeof val == "number") return maxFun(val, max, lang);
-    if (typeof val != "number") return val;
-}
-function limit<Data>(
-    ...[value, name, , , lang]: Parameters<RuleFun<Data>>
-): StoredMessage<unknown> | undefined {
-    const [, min, max] = name.split(":").map((e) => parseFloat(e));
-    const val = getNumber(value, lang);
-    if (typeof val == "number") {
-        const minMess = minFun(val, min, lang);
-        if (minMess == undefined) {
-            const maxMess = maxFun(val, max, lang);
-            if (maxMess != undefined) return maxMess;
-        }
-        return minMess;
-    } else return val;
-}
 
-export const min = new Rule(
-    /^min(:-?\d+)?$/g,
-    (...arr) => {
-        return handelUnError(MinHandler(...arr), ...arr);
+export const min = new Rule<{ min: number }>(
+    (val: unknown): val is { min: number } => {
+        return hasOwnProperty(val, "min");
+    },
+    function MinHandler(...arr) {
+        const [value, data, , lang] = arr;
+        const min = data.min;
+        const val = getNumber<{ min: number }>(value, lang);
+        if (isNumber(val))
+            return handelUnError(
+                handelUndefined(minFun(val, min, lang)),
+                ...arr
+            );
+        else return handelUnError(val, ...arr);
     }
 );
-export const max = new Rule(
-    /^max:-?\d+$/g,
-    (...arr) => {
-        return handelUnError(MaxHandler(...arr), ...arr);
-    }
-);
-
-export default new Rule(
-    /^limit:-?\d+:-?\d+$/,
-    (...arr) => {
-        return handelUnError(limit(...arr), ...arr);
+export const max = new Rule<{ max: number }>(
+    (val: unknown): val is { max: number } => {
+        return hasOwnProperty(val, "max");
+    },
+    function MaxHandler(...arr) {
+        const [value, data, , lang] = arr;
+        const min = data.max;
+        const val = getNumber<{ max: number }>(value, lang);
+        if (isNumber(val))
+            return handelUnError(
+                handelUndefined(maxFun(val, min, lang)),
+                ...arr
+            );
+        else return handelUnError(val, ...arr);
     }
 );

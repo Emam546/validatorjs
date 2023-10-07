@@ -14,6 +14,6 @@ export default new Rule(
     (value, ...arr) => {
         return isNumberOrStringOrBoolean(value) && isNumeric(value)
             ? undefined
-            : handelMessage(Messages[arr[3]], value, ...arr);
+            : handelMessage(Messages[arr[2]], value, ...arr);
     }
 );

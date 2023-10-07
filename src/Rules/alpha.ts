@@ -7,5 +7,5 @@ export const Messages: MessagesStore<unknown> = {
 export default new Rule("alpha", (value, ...arr) => {
     return isString(value) && /^[a-zA-Z]+$/.test(value)
         ? undefined
-        : handelMessage(Messages[arr[3]], value, ...arr);
+        : handelMessage(Messages[arr[2]], value, ...arr);
 });

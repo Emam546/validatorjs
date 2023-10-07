@@ -1,14 +1,16 @@
 import { MessagesStore, RuleFun } from "@/Rule";
+import LangTypes from "@/types/lang";
 export const message: MessagesStore<unknown> = {
-    en: (a, name) => `THE RULE ${name} IS NOT EXIST`,
+    en: (val) => `THE RULE ${val as string} IS NOT EXIST`,
 };
-export default function RuleIsNotExist<Data>(
-    ...arr: Parameters<RuleFun<Data>>
+export default function RuleIsNotExist(
+    rule: string,
+    path: string,
+    lang: LangTypes
 ): string {
-    const [obj, , validator, ...arr2] = arr;
-    const val = message[validator.lang];
+    const val = message[lang];
     if (val)
         if (typeof val == "string") return val;
-        else val(obj, "Not matched error", validator, ...arr2);
+        else val(rule, "Not matched error", path, lang);
     throw new Error("this language is not in not matching messages");
 }
