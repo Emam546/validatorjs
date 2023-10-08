@@ -12,13 +12,11 @@ import compare from "@/utils/compare";
 import inValidAttr from "@/utils/inValidAttr";
 import isEmpty from "@/utils/isEmpty";
 import { setAllValues, setValue } from "@/utils/setValue";
-import type { Rules } from "@/type";
+import type { Rules, RulesNames, ValidTypes, RulesGetter } from "@/type";
 import { parseRules } from "@/parseRules";
-import { objectKeys, objectValues } from "@/utils";
-import { RulesGetter } from "@/type";
+import { ObjectEntries, objectKeys, objectValues } from "@/utils";
 import { AllRules } from "./Rules";
 
-export const TYPE_ARRAY = ["object", "array"];
 export type ValidatorOptions = {
     lang?: LangTypes;
 };
@@ -61,10 +59,15 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
     getErrors(): Record<string, ErrorMessage[]> | null {
         //Just object of paths and Errors description
         let Errors: Record<string, ErrorMessage[]> = this._getSubmitErrors()
-            .filter((val) => !isPromise(val))
-            .reduce((cur: Record<string, ErrorMessage[]>, val) => {
-                if (!isPromise(val)) return { ...cur, ...val };
-                return cur;
+            .filter<Record<string, ErrorMessage>>(
+                (val): val is Record<string, ErrorMessage> => !isPromise(val)
+            )
+            .reduce<Record<string, ErrorMessage[]>>((acc, val) => {
+                ObjectEntries(val).forEach(([key, val]) => {
+                    if (acc[key]) acc[key].push(val);
+                    else acc[key] = [val];
+                });
+                return acc;
             }, {});
 
         for (const path in this.CPaths) {
@@ -94,9 +97,13 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
                     return await val;
                 })
             )
-        ).reduce((cur, val) => {
-            return { ...cur, ...val };
-        }, {} as Record<string, ErrorMessage[]>);
+        ).reduce<Record<string, ErrorMessage[]>>((acc, val) => {
+            ObjectEntries(val).forEach(([key, val]) => {
+                if (acc[key]) acc[key].push(val);
+                else acc[key] = [val];
+            });
+            return acc;
+        }, {});
 
         for (const path in this.CPaths) {
             const r = this._get_errors(
@@ -136,11 +143,10 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
     }
 
     _getSubmitErrors(): Array<
-        Record<string, ErrorMessage[]> | Promise<Record<string, ErrorMessage[]>>
+        Record<string, ErrorMessage> | Promise<Record<string, ErrorMessage>>
     > {
         let Result: Array<
-            | Record<string, ErrorMessage[]>
-            | Promise<Record<string, ErrorMessage[]>>
+            Record<string, ErrorMessage> | Promise<Record<string, ErrorMessage>>
         > = [];
         for (let i = 0; i < ValidatorClass.Rules.length; i++) {
             const res = ValidatorClass.Rules[i].initSubmit(
@@ -254,8 +260,13 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
     setValue(path: string, value: unknown): boolean {
         return setValue(this.inputs, path, value);
     }
-    getAllValues(path: string): Record<string, unknown> {
-        return getAllValues(this.inputs, path);
+    getAllValues<P extends keyof Rules<T>>(
+        path: P
+    ): Record<string, ValidTypes<Rules<T>[P]>> {
+        return getAllValues(this.inputs, path) as Record<
+            string,
+            ValidTypes<Rules<T>[P]>
+        >;
     }
     setAllValues(path: string, value: unknown): boolean[] {
         return setAllValues(this.inputs, path, value);
@@ -272,7 +283,7 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
 
     validate(
         value: unknown,
-        rule: string,
+        rule: RulesNames,
         path: string,
         expect?: [string]
     ): Array<Promise<ErrorMessage | undefined> | ErrorMessage> {
@@ -305,7 +316,8 @@ export default class ValidatorClass<T, Data> implements Validator<T, Data> {
                     });
             }
         }
-        if (!has) throw new Error(`THE RULE ${rule} IS NOT EXIST`);
+        if (!has)
+            throw new Error(`THE RULE ${JSON.stringify(rule)} IS NOT EXIST`);
         return arrMess;
     }
     static parseRules = parseRules;

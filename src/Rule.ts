@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { RulesGetter } from "./type";
 import type LangType from "./types/lang";
 import { objectKeys } from "./utils";
 import { isPromise, isString } from "./utils/types";
@@ -48,55 +49,51 @@ export default class Rule<Data> {
         this.initFn = initFn;
     }
     isequal(value: unknown): value is Data {
-        if (isString(this.eq)) return value == this.eq;
+        if (isString(this.eq)) return value === this.eq;
         return this.eq(value);
     }
     validate(...arr: Parameters<RuleFun<Data>>) {
         return this.fn(...arr);
     }
     initSubmit(
-        rules: Record<string, unknown[]>,
+        rules: Record<string, RulesGetter>,
         input: unknown,
         lang: LangType
     ) {
-        if (!this.initFn) return {};
-        const messages: Array<
-            Promise<Record<string, ErrorMessage>> | Record<string, ErrorMessage>
-        > = [];
-        objectKeys(rules).forEach((path) => {
+        if (typeof this.initFn == "undefined") return {};
+        const messages = objectKeys(rules).reduce<
+            Array<
+                | Promise<Record<string, ErrorMessage>>
+                | Record<string, ErrorMessage>
+            >
+        >((cur, path) => {
             const arr = rules[path];
-            if (arr == null) return;
-            if (!this.initFn) return {};
-
+            if (arr == null) return cur;
+            if (typeof this.initFn == "undefined") return cur;
             for (let i = 0; i < arr.length; i++) {
                 const val = arr[i];
                 if (this.isequal(val)) {
                     const message = this.initFn(input, val, path, lang);
-                    if (message != undefined) messages.push(message);
+                    cur.push(message);
                 }
             }
-        });
+            return cur;
+        }, []);
         if (isNoPromises(messages))
-            return messages.reduce<Record<string, ErrorMessage[]>>(
-                (acc, cur) => {
-                    objectKeys(cur).forEach((key) => {
-                        if (acc[key]) return acc[key].push(cur[key]);
-                        else acc[key] = [cur[key]];
-                    });
-                    return acc;
-                },
-                {}
-            );
-        return new Promise<Record<string, ErrorMessage[]>>((res) => {
+            return messages.reduce<Record<string, ErrorMessage>>((acc, cur) => {
+                objectKeys(cur).forEach((key) => {
+                    acc[key] = cur[key];
+                });
+                return acc;
+            }, {});
+        return new Promise<Record<string, ErrorMessage>>((res) => {
             Promise.all(messages.map(async (val) => await val)).then(
                 (messages) =>
                     res(
-                        messages.reduce<Record<string, ErrorMessage[]>>(
+                        messages.reduce<Record<string, ErrorMessage>>(
                             (acc, cur) => {
                                 objectKeys(cur).forEach((key) => {
-                                    if (acc[key])
-                                        return acc[key].push(cur[key]);
-                                    else acc[key] = [cur[key]];
+                                    acc[key] = cur[key];
                                 });
                                 return acc;
                             },

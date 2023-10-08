@@ -1,5 +1,5 @@
-import type { ValidArray, RulesGetter, RulesNames } from "./utils/isRule";
-export * from "./utils/isRule";
+import type { ValidArray, RulesGetter, RulesNames } from "@/utils/isRule";
+export * from "@/utils/isRule";
 
 export type InputRules =
     | RulesGetter
@@ -55,15 +55,20 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
 ) => void
     ? I
     : never;
-
+type ValidG = Validator.AvailableRules[keyof Validator.AvailableRules];
 export type ValidTypes<T> = T extends Record<string | number, InputRules>
     ? {
           [K in keyof T]: ValidTypes<T[K]>;
       }
     : T extends RulesNames[]
-    ? T[number] extends keyof Validator.AvailableRules
-        ? UnionToIntersection<Validator.AvailableRules[T[number]]>
-        : unknown
+    ? UnionToIntersection<
+          {
+              [P in T[number] as T[number] & string]: Extract<
+                  ValidG,
+                  { path: P }
+              >["type"];
+          }[T[number] & string]
+      >
     : T extends ValidArray<InputRules>
     ? T[1] extends "object"
         ? Record<string, ValidTypes<T[0]>> & ValidTypes<T[2]>
@@ -72,4 +77,4 @@ export type ValidTypes<T> = T extends Record<string | number, InputRules>
     ? ValidTypes<SplitString<T, "|">>
     : unknown;
 
-export type Rules<T> = FromPaths<ToPaths<T>>;
+export type Rules<T, P extends string = ""> = FromPaths<ToPaths<T, P>>;

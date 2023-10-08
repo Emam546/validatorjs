@@ -20,15 +20,13 @@ export default new Rule<{ different: string }>(
             allPaths.length > 1
                 ? allPaths.slice(0, allPaths.length - 1).join(".")
                 : ".";
+                
         return ObjectEntries(getAllValues(input, differentPath)).reduce<
             Record<string, ErrorMessage>
         >((acc, [path, value]) => {
             const differentValue = getValue(value, data.different);
             const orgValue = getValue(value, orgPath);
-            if (
-                differentValue != undefined &&
-                compare(orgValue, differentValue)
-            )
+            if (compare(orgValue, differentValue))
                 acc[path + "." + orgPath] = {
                     message: handelUnError(
                         handelUndefined(ValuesNotSame[lang]),

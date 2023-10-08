@@ -1,59 +1,39 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { InputRules, Rules } from "@/type";
-import arrayKind from "./utils/arrayKind";
-import { hasOwnProperty } from "./utils/compare";
 import { isValidInput, is_Rule } from "./utils/isRule";
-import { isArray } from "./utils/types";
+import { isString } from "./utils/types";
+import { ObjectEntries } from "./utils";
 
-export function parseRules<T extends InputRules>(input: T): Rules<T> {
-    // just parse rules from the object
-    // it must alway finishes with
-    // - array of string  that describes rules
-    // - string that split with | sign
-    const flattened: any = {};
-    const _get_rule = (rules: unknown, property?: string) => {
-        if (isArray(rules)) {
-            // if there is added property before add .
-            const p = property ? property + ".*" : "*";
-            if (rules.length) {
-                //get the type of the array
-                // - array of rules
-                // - array that describes a rules of the object or array
-                if (is_Rule(rules))
-                    //check if it is array that describes some rule
-                    flattened[property || "."] = rules;
-                else if (isValidInput(rules)) {
-                    //get array rules and continue in parsing object
-                    _get_rule(rules[0], p + arrayKind(rules));
-                    if (rules[2] && isArray(rules)) {
-                        _get_rule(rules[2], property);
-                    }
-                } else if (isArray(rules))
-                    throw new Error(
-                        `${rules.toString()} is not a valid rule input`
-                    );
-            } else flattened[p] = null;
-        } else if (rules != undefined) {
-            for (const prop in rules) {
-                if (!hasOwnProperty(rules, prop)) continue;
-                const rule = rules[prop];
-                let p;
-                if (prop == ".") p = property ? property : prop;
-                else p = property ? property + "." + prop : prop;
-
-                switch (typeof rule) {
-                    case "string": {
-                        const res = rule.split("|");
-                        if (is_Rule(res)) flattened[p] = res;
-                        break;
-                    }
-                    case "object":
-                        if (rule === null) flattened[p] = rule;
-                        else _get_rule(rule, p);
-                }
-            }
+export function parseRules<T extends InputRules, G extends string = "">(
+    input: T,
+    pre?: G
+): T extends infer R ? Rules<R, G> : never {
+    const _parseRules: any = parseRules;
+    return ((input: any, pre?: string): any => {
+        if (is_Rule(input)) return { [pre ? pre : "."]: input };
+        if (isValidInput(input)) {
+            const t = input[1] || "array";
+            return {
+                ..._parseRules(input[0], pre ? `${pre}.*:${t}` : `*:${t}`),
+                ...(input[2] != undefined
+                    ? _parseRules(input[2], pre ? pre : ".")
+                    : {}),
+            };
         }
-    };
-    _get_rule(input);
-    return flattened;
+        if (isString(input)) {
+            const arr = input.split("|");
+            if (is_Rule(arr)) return { [pre ? pre : "."]: arr };
+            throw new Error("unrecognized string");
+        }
+        return ObjectEntries(input).reduce(
+            (acc, [path, val]) => ({
+                ...acc,
+                ..._parseRules(
+                    val,
+                    pre ? (path == "." ? pre : `${pre}.${path}`) : path
+                ),
+            }),
+            {}
+        );
+    })(input, pre);
 }
