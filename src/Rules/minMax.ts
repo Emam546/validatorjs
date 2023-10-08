@@ -1,4 +1,4 @@
-import Rule, { RuleFun, StoredMessage } from "@/Rule";
+import Rule, { StoredMessage } from "@/Rule";
 import LangTypes from "../types/lang";
 import handelUndefined from "@/utils/handelUndefined";
 import handelUnError from "@/utils/handelUnError";
@@ -38,7 +38,7 @@ function maxFun(
 
 export const min = new Rule<{ min: number }>(
     (val: unknown): val is { min: number } => {
-        return hasOwnProperty(val, "min");
+        return hasOwnProperty(val, "min") && isNumber(val.min);
     },
     function MinHandler(...arr) {
         const [value, data, , lang] = arr;
@@ -54,7 +54,7 @@ export const min = new Rule<{ min: number }>(
 );
 export const max = new Rule<{ max: number }>(
     (val: unknown): val is { max: number } => {
-        return hasOwnProperty(val, "max");
+        return hasOwnProperty(val, "max") && isNumber(val.max);
     },
     function MaxHandler(...arr) {
         const [value, data, , lang] = arr;

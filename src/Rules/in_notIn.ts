@@ -23,7 +23,7 @@ export const _in = new Rule<{ in: (string | number)[] }>(
 );
 export const notIn = new Rule<{ not_in: (string | number)[] }>(
     (val: unknown): val is { not_in: (string | number)[] } => {
-        return hasOwnProperty(val, "in") && isArray(val.in);
+        return hasOwnProperty(val, "not_in") && isArray(val.not_in);
     },
     (...arr) =>
         !contains(arr[0], arr[1].not_in)
