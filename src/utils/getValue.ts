@@ -1,50 +1,80 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { isArray } from "./types";
+import { ObjectEntries } from ".";
+import { hasOwnProperty } from "./compare";
+import { isArray, isObject } from "./types";
 
 export function getAllValues(
     inputs: unknown,
     path: string,
-    addedPath = ""
+    addedPath?: string
 ): Record<string, unknown> {
-    if (!path.length) return { [addedPath.slice(0, -1)]: inputs };
     const paths = path.split(".");
-    let currObj: any = inputs;
-    for (let i = 0; i < paths.length; i++) {
-        const key = paths[i];
-        if (key.startsWith("*")) {
-            const oldPath = paths.slice(0, i).join(".");
-            const returnedPath = paths.slice(i + 1).join(".");
-            let allValues: Record<string, unknown> = {};
-            const semi = isArray(currObj) ? "*" : "";
-            for (const key in currObj)
-                allValues = {
-                    ...allValues,
-                    ...getAllValues(
-                        currObj[key],
-                        returnedPath,
-                        `${addedPath}${oldPath}.${semi}${key}.`
+    const key = paths[0];
+    const restPath = path.split(".").slice(1).join(".");
+
+    if (key == "") {
+        if (path == "" || path == ".") return { [addedPath || "."]: inputs };
+        return getAllValues(inputs, restPath);
+    }
+
+    if (key.startsWith("*")) {
+        if (isObject(inputs)) {
+            return ObjectEntries(inputs).reduce<Record<string, unknown>>(
+                (acc, [i, val]) => {
+                    return {
+                        ...acc,
+                        ...ObjectEntries(
+                            getAllValues(
+                                val,
+                                restPath,
+                                addedPath ? `${addedPath}.${i}` : key
+                            )
+                        ).reduce<Record<string, unknown>>(
+                            (acc, [key, val]) => ({ ...acc, [key]: val }),
+                            {}
+                        ),
+                    };
+                },
+                {}
+            );
+        } else if (isArray(inputs))
+            return inputs.reduce<Record<string, unknown>>((acc, val, i) => {
+                return {
+                    ...acc,
+                    ...ObjectEntries(
+                        getAllValues(
+                            val,
+                            restPath,
+                            addedPath ? `${addedPath}.*${i}` : key
+                        )
+                    ).reduce<Record<string, unknown>>(
+                        (acc, [key, val]) => ({ ...acc, [key]: val }),
+                        {}
                     ),
                 };
+            }, {});
+    }
+    const newAdd = addedPath ? `${addedPath}.${key}` : key;
 
-            return allValues;
-        } else currObj = currObj[key];
-        if (currObj === undefined) return {};
-    }
-    return { [`${addedPath}${path}`]: currObj };
+    return hasOwnProperty(inputs, key)
+        ? getAllValues(inputs[key], restPath, newAdd)
+        : {};
 }
-export function getValue(inputs: unknown, path: string) {
-    const keys = path.split(".");
-    let currObj: any = inputs;
-    for (let i = 0; i < keys.length && currObj != undefined; i++) {
-        const key = keys[i];
-        if (key.startsWith("*")) {
-            const index = parseInt(key.slice(1));
-            if (!isNaN(index)) {
-                currObj = currObj[index];
-                if (currObj != undefined) continue;
-            }
-        } else currObj = currObj[key];
+export function getValue(inputs: unknown, path: string): unknown {
+    const paths = path.split(".");
+    const key = paths[0];
+    const restPath = path.split(".").slice(1).join(".");
+    if (key == "") {
+        if (path == "" || path == ".") return inputs;
+        return getValue(inputs, restPath);
     }
-    return currObj as unknown;
+    if (key.startsWith("*")) {
+        const index = parseInt(key.slice(1));
+        if (!isNaN(index) && hasOwnProperty(inputs, index)) {
+            return getValue(inputs[index], restPath);
+        }
+        return undefined;
+    }
+    return hasOwnProperty(inputs, key)
+        ? getValue(inputs[key], restPath)
+        : undefined;
 }
