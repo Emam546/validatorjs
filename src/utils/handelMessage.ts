@@ -1,8 +1,8 @@
 import handelUndefined from "./handelUndefined";
 import type { StoredMessage, GetMessageFun } from "@/Rule";
 
-export default function <Data>(
-    mess: StoredMessage<Data> | undefined,
+export default function <Data, G extends StoredMessage<Data> | undefined>(
+    mess: G,
     ...arr: Parameters<GetMessageFun<Data>>
 ): string {
     const g = handelUndefined(mess);

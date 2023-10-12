@@ -1,41 +1,51 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Rules } from "@/type";
-import { hasOwnProperty } from "./compare";
-import { isArray } from "./types";
+import {
+    InputRules,
+    RulesGetter,
+    ValidArray,
+    isValidInput,
+    is_Rule,
+} from "@/type";
+import { ObjectEntries } from "@/utils";
+import { isString } from "./types";
+export type ExtractedRules<T> = T extends Record<string | number, InputRules>
+    ? {
+          [K in keyof T]: ExtractedRules<T[K]>;
+      }
+    : T extends RulesGetter
+    ? null
+    : T extends string
+    ? null
+    : T extends ValidArray<InputRules>
+    ? [ExtractedRules<T[0]>, T[1], ExtractedRules<T[2]>]
+    : null;
+type ExtractedInputRules =
+    | null
+    | {
+          [name: string]: ExtractedInputRules;
+      }
+    | [ExtractedInputRules]
+    | [ExtractedInputRules, "object" | "array"]
+    | [ExtractedInputRules, "object" | "array", ExtractedInputRules];
+function constructRule(rules: InputRules): ExtractedInputRules {
+    if (is_Rule(rules) || isString(rules)) return null;
 
-function constructRule(
-    rule: string,
-    input?: unknown
-): Record<string, unknown> | null {
-    if (!rule) return null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let currObj: any = input || {};
-    const paths = rule.split(".");
-    const path = paths[0] || ".";
-    const lastPath = paths.slice(1).join(".");
-    if (path.startsWith("*")) {
-        const [, _type]: Array<string> = path.split(":");
-        if (hasOwnProperty(currObj, 0))
-            currObj = [constructRule(lastPath, currObj[0]), _type];
-        else if (isArray(currObj))
-            currObj = [constructRule(lastPath, currObj[0]), _type];
-        else currObj = [constructRule(lastPath, undefined), _type];
-    } else {
-        if (currObj instanceof Array) currObj = { "*:array": currObj };
-        if (hasOwnProperty(currObj, path)) {
-            const arr = currObj[path];
-            if (isArray(arr) && !lastPath)
-                arr.push(constructRule(lastPath, currObj[path]));
-            else if (lastPath)
-                currObj[path] = constructRule(lastPath, currObj[path]);
-            // eslint-disable-next-line  @typescript-eslint/no-unsafe-member-access
-        } else currObj[path] = constructRule(lastPath, currObj[path]);
+    if (isValidInput(rules)) {
+        const [rule1, _type, rule2] = rules;
+        return [
+            constructRule(rule1),
+            _type || "array",
+            rule2 ? constructRule(rule2) : null,
+        ];
     }
-    return currObj;
+
+    return ObjectEntries(rules).reduce((acc, [key, val]) => {
+        if (key == ".") return acc;
+        return {
+            ...acc,
+            [key]: constructRule(val),
+        };
+    }, {});
 }
-export default function <T>(rules: Rules<T>): T | null {
-    let newObj: T | null = {} as T;
-    for (const rule in rules) newObj = constructRule(rule, newObj) as T;
-    return newObj;
+export default function <T extends InputRules>(rules: T): ExtractedRules<T> {
+    return constructRule(rules) as ExtractedRules<T>;
 }

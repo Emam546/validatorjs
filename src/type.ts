@@ -4,12 +4,21 @@ export * from "@/utils/isRule";
 export type InputRules =
     | RulesGetter
     | string
-    | {
+    | ({
           [name: string]: InputRules;
-      }
+      } & { "."?: RulesGetter })
     | [InputRules]
     | [InputRules, "object" | "array"]
-    | [InputRules, "object" | "array", InputRules];
+    | [
+          InputRules,
+          "object" | "array",
+          (
+              | {
+                    [name: string]: InputRules;
+                }
+              | RulesGetter
+          )
+      ];
 
 type SplitString<
     S extends string,
@@ -77,4 +86,4 @@ export type ValidTypes<T> = T extends Record<string | number, InputRules>
     ? ValidTypes<SplitString<T, "|">>
     : unknown;
 
-export type Rules<T, P extends string = ""> = FromPaths<ToPaths<T, P>>;
+export type PathRules<T, P extends string = ""> = FromPaths<ToPaths<T, P>>;

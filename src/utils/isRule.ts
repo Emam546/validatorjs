@@ -4,8 +4,17 @@ import Validator from "@/main";
 export type ValidArray<T = unknown> =
     | [T]
     | [T, "object" | "array"]
-    | [T, "object" | "array", T];
-export function isValidInput(array: unknown): array is ValidArray {
+    | [
+          T,
+          "object" | "array",
+          (
+              | {
+                    [name: string]: T;
+                }
+              | RulesGetter
+          )
+      ];
+export function isValidInput<T>(array: unknown): array is ValidArray<T> {
     return (
         isArray(array) &&
         array.length > 0 &&

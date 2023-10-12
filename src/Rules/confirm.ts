@@ -1,11 +1,13 @@
 import Rule, { ErrorMessage } from "@/Rule";
 import compare from "@/utils/compare";
-import handelUndefined from "@/utils/handelUndefined";
-import handelUnError from "@/utils/handelUnError";
 import ValueNotExist from "./Messages/valueNotExist";
 import ValuesNotSame from "./Messages/ValuesNotSame";
 import { getAllValues, getValue } from "@/utils/getValue";
 import { ObjectEntries } from "@/utils";
+import handelMessage from "@/utils/handelMessage";
+
+export { default as ValueNotExist } from "./Messages/valueNotExist";
+export { default as ValuesNotSame } from "./Messages/ValuesNotSame";
 
 export default new Rule(
     "confirm",
@@ -19,19 +21,13 @@ export default new Rule(
                 if (returnedValue == undefined)
                     return [
                         path,
-                        handelUnError(
-                            handelUndefined(ValueNotExist[lang]),
-                            ...arr
-                        ) as string,
+                        handelMessage(ValueNotExist[lang], ...arr),
                         value,
                     ];
                 if (!compare(value, returnedValue))
                     return [
                         path,
-                        handelUnError(
-                            handelUndefined(ValuesNotSame[lang]),
-                            ...arr
-                        ) as string,
+                        handelMessage(ValuesNotSame[lang], ...arr),
                         value,
                     ];
                 return undefined;

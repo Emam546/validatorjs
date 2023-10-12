@@ -3,33 +3,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import type { ErrorMessage } from "@/Rule";
 import type { ValidatorOptions } from "@/main";
-import type { Rules, ValidTypes } from "@/type";
+import type { PathRules, ValidTypes } from "@/type";
 import type LangTypes from "@/types/lang";
 declare global {
-    interface Validator<T, Data> {
-        reqData: Data;
-        inputs: unknown;
-        CPaths: Rules<T>;
-        options: ValidatorOptions;
-        errors: Record<string, ErrorMessage[]>;
-        inValidErrors: Record<string, ErrorMessage> | null;
-        lang: LangTypes;
-
-        passes(): this is { inputs: ValidTypes<T> };
-        asyncPasses(): boolean;
-        fails(): boolean;
-        asyncFails(): Promise<boolean>;
-        getErrors(): Record<string, ErrorMessage[]> | null;
-        asyncGetErrors(): Promise<Record<string, ErrorMessage[]> | null>;
-        inside(): boolean;
-        validAttr(): ValidTypes<T>;
-        getValue(path: string): unknown;
-        getAllValues<P extends keyof Rules<T>>(
-            path: P
-        ): Record<string, ValidTypes<Rules<T>[P]>>;
-        setValue(path: string, value: unknown): boolean;
-        setAllValues(path: string, value: unknown): boolean[];
-    }
+    interface Validator<T> {}
     namespace Validator {
         interface AvailableRules {
             array: {
@@ -124,12 +101,12 @@ declare global {
                 path: { require_if: { path: string; value: string } };
                 type: never;
             };
-            require_without: {
-                path: { require_without: Array<string> };
+            required_without: {
+                path: { required_without: Array<string> };
                 type: never;
             };
-            require_withoutAll: {
-                path: { require_withoutAll: Array<string> };
+            required_withoutAll: {
+                path: { required_withoutAll: Array<string> };
                 type: never;
             };
             require_unless: {

@@ -1,12 +1,11 @@
 import Rule, { ErrorMessage } from "@/Rule";
 
 import compare, { hasOwnProperty } from "@/utils/compare";
-import handelUndefined from "@/utils/handelUndefined";
-import handelUnError from "@/utils/handelUnError";
 import ValuesNotSame from "./Messages/ValuesNotSame";
 import { isString } from "@/utils/types";
 import { ObjectEntries } from "@/utils";
 import { getAllValues, getValue } from "@/utils/getValue";
+import handelMessage from "@/utils/handelMessage";
 export default new Rule<{ different: string }>(
     (val: unknown): val is { different: string } => {
         return hasOwnProperty(val, "different") && isString(val.different);
@@ -20,18 +19,15 @@ export default new Rule<{ different: string }>(
             allPaths.length > 1
                 ? allPaths.slice(0, allPaths.length - 1).join(".")
                 : ".";
-                
+
         return ObjectEntries(getAllValues(input, differentPath)).reduce<
             Record<string, ErrorMessage>
         >((acc, [path, value]) => {
             const differentValue = getValue(value, data.different);
             const orgValue = getValue(value, orgPath);
             if (compare(orgValue, differentValue))
-                acc[path + "." + orgPath] = {
-                    message: handelUnError(
-                        handelUndefined(ValuesNotSame[lang]),
-                        ...arr
-                    ) as string,
+                acc[path && path != "." ? path + "." + orgPath : orgPath] = {
+                    message: handelMessage(ValuesNotSame[lang], ...arr),
                     value: orgValue,
                 };
             return acc;

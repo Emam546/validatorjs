@@ -27,24 +27,20 @@ export const require_if = new Rule<{
         const Ppath = path.split(".").at(-1);
         let errors: Record<string, ErrorMessage> = {};
 
-        if (Ppath)
-            for (const objPath in allObjects) {
-                const element = allObjects[objPath];
-                const val = getValue(element, vpath);
-                const finalPath = objPath ? objPath + "." + Ppath : Ppath;
-                if (compare(val, data.required_if.value)) {
-                    errors = {
-                        ...errors,
-                        ...getValueMessage(
-                            finalPath,
-                            inputs,
-                            data,
-                            Ppath,
-                            lang
-                        ),
-                    };
-                }
+        if (!Ppath) return {};
+        for (const objPath in allObjects) {
+            const element = allObjects[objPath];
+            const val = getValue(element, vpath);
+            const curVal = getValue(element, Ppath);
+            const finalPath =
+                objPath && objPath != "." ? objPath + "." + Ppath : Ppath;
+            if (compare(val, data.required_if.value) && curVal == undefined) {
+                errors = {
+                    ...errors,
+                    ...getValueMessage(finalPath, inputs, data, Ppath, lang),
+                };
             }
+        }
         return errors;
     }
 );

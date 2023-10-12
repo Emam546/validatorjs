@@ -1,58 +1,123 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
-import { ErrorMessage } from "@/Rule";
-import constructObj from "./constructObj";
-import { isArray } from "./types";
-import { Rules } from "@/type";
-export type ReturnTypeUnMatch = Record<string, ErrorMessage> | null;
-export function unMatchedValues(
-    input: any,
-    unMatchObj: any,
+import { ErrorMessage, GetMessageFun, MessagesStore } from "@/Rule";
+import constructObj, { ExtractedRules } from "./constructObj";
+import { isArray, isObject } from "./types";
+import { InputRules, PathRules, isValidInput } from "@/type";
+import LangTypes from "@/types/lang";
+import handelMessage from "./handelMessage";
+import { ObjectEntries } from ".";
+import { hasOwnProperty } from "./compare";
+export const InvalidPath: MessagesStore<{ obj: unknown }> = {
+    en: "invalid path",
+};
+export const UnMatchedType: MessagesStore<{ obj: unknown }> = {
+    en: "Unmatched type value",
+};
+export function unMatchedValues<T>(
+    input: unknown,
+    unMatchObj: ExtractedRules<T>,
+    lang: LangTypes,
     addedPath = ""
-): ReturnTypeUnMatch {
-    if (input == undefined) return null;
-    if (typeof unMatchObj == "undefined")
-        return { [addedPath]: { message: "invalid path", value: input } };
-    if (unMatchObj == null) return null;
-    let errors: Record<string, ErrorMessage> = {};
-    if (isArray<string>(unMatchObj)) {
-        const [, _type] = unMatchObj;
-        if (_type == "array" && !isArray(input))
-            return {
-                [addedPath]: { message: "Unmatched type value", value: input },
-            };
+): Record<string, ErrorMessage> {
+    const arr: Parameters<GetMessageFun<{ obj: unknown }>> = [
+        input,
+        {
+            obj: unMatchObj,
+        },
+        addedPath,
+        lang,
+    ];
+    if (unMatchObj == null) return {};
 
-        if (unMatchObj[0])
-            for (const key in input)
-                errors = {
-                    ...errors,
+    if (isArray(unMatchObj)) {
+        const [rule, _type, rules2] = unMatchObj;
+        const ExcludedName: (string | number)[] = [];
+        let InitErrors: Record<string, ErrorMessage> = {};
+        if (rules2 && isObject(rules2)) {
+            InitErrors = ObjectEntries(rules2).reduce<
+                Record<string, ErrorMessage>
+            >((acc, [key, extraRule]) => {
+                ExcludedName.push(key as string);
+                if (!hasOwnProperty(input, key)) return acc;
+                return {
+                    ...acc,
                     ...unMatchedValues(
                         input[key],
-                        unMatchObj[0],
-                        `${addedPath}*${key}.`
+                        extraRule as any,
+                        lang,
+                        `${addedPath}*${key as string}.`
                     ),
                 };
-    } else {
-        for (const key in input)
-            errors = {
-                ...errors,
+            }, {});
+        }
+        if (_type == "object") {
+            if (!isObject(input))
+                return {
+                    [addedPath]: {
+                        message: handelMessage(UnMatchedType[lang], ...arr),
+                        value: input,
+                    },
+                };
+
+            return ObjectEntries(input)
+                .filter(([key]) => !ExcludedName.includes(key))
+                .reduce<Record<string, ErrorMessage>>(
+                    (acc, [key, val]) => ({
+                        ...acc,
+                        ...unMatchedValues(
+                            val,
+                            rule,
+                            lang,
+                            `${addedPath}*${key}.`
+                        ),
+                    }),
+                    InitErrors
+                );
+        }
+        if (!isArray(input))
+            return {
+                [addedPath]: {
+                    message: handelMessage(UnMatchedType[lang], ...arr),
+                    value: input,
+                },
+            };
+        return input.reduce<Record<string, ErrorMessage>>(
+            (acc, val, key) => ({
+                ...acc,
+                ...(!ExcludedName.includes(key)
+                    ? unMatchedValues(val, rule, lang, `${addedPath}${key}.`)
+                    : {}),
+            }),
+            InitErrors
+        );
+    }
+
+    return ObjectEntries(input as Record<string, unknown>).reduce(
+        (acc, [key, val]) => {
+            if (!hasOwnProperty(unMatchObj, key))
+                return {
+                    [`${addedPath}${key}`]: {
+                        message: handelMessage(InvalidPath[lang], ...arr),
+                        value: val,
+                    },
+                };
+            return {
+                ...acc,
                 ...unMatchedValues(
-                    input[key],
+                    val,
                     unMatchObj[key],
+                    lang,
                     `${addedPath}${key}.`
                 ),
             };
-    }
-
-    if (Object.values(errors).length == 0) return null;
-    return errors;
+        },
+        {}
+    );
 }
-export default function <T>(
+export default function <T extends InputRules>(
     input: unknown,
-    rules: Rules<T>
-): ReturnTypeUnMatch {
+    rules: T,
+    lang: LangTypes
+): Record<string, ErrorMessage> {
     const RulesObj = constructObj(rules);
-    return unMatchedValues(input, RulesObj);
+    return unMatchedValues(input, RulesObj, lang);
 }

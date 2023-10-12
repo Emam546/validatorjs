@@ -1,11 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Rule, { ErrorMessage } from "@/Rule";
 import { getAllValues, getValue } from "@/utils/getValue";
 import { getValueMessage } from "./required";
 import { isArray } from "@/utils/types";
 import { hasOwnProperty } from "@/utils/compare";
 
-export const require_without = new Rule<{ required_without: Array<string> }>(
+export const require_without = new Rule<
+    Validator.AvailableRules["required_without"]["path"]
+>(
     (val: unknown): val is { required_without: Array<string> } => {
         return (
             hasOwnProperty(val, "required_without") &&
@@ -18,37 +19,29 @@ export const require_without = new Rule<{ required_without: Array<string> }>(
         const vpaths = data.required_without;
         const ObjectPath = path.split(".").slice(0, -1).join(".");
         const allObjects = getAllValues(inputs, ObjectPath);
-        const Ppath = path.split(".").at(-1);
+        const Ppath = path.split(".").at(-1) as string;
         let errors: Record<string, ErrorMessage> = {};
 
-        if (Ppath)
-            for (const objPath in allObjects) {
-                const element = allObjects[objPath];
-                const finalPath = objPath ? objPath + "." + Ppath : Ppath;
-
-                if (
-                    vpaths.some(
-                        (vpath) => getValue(element, vpath) === undefined
-                    )
-                ) {
-                    errors = {
-                        ...errors,
-                        ...getValueMessage(
-                            finalPath,
-                            inputs,
-                            data,
-                            Ppath,
-                            lang
-                        ),
-                    };
-                }
+        for (const objPath in allObjects) {
+            const element = allObjects[objPath];
+            const finalPath = objPath ? objPath + "." + Ppath : Ppath;
+            const curVal = getValue(element, Ppath);
+            if (
+                curVal == undefined &&
+                vpaths.some((vpath) => getValue(element, vpath) === undefined)
+            ) {
+                errors = {
+                    ...errors,
+                    ...getValueMessage(finalPath, inputs, data, Ppath, lang),
+                };
             }
+        }
         return errors;
     }
 );
-export const require_withoutAll = new Rule<{
-    required_withoutAll: Array<string>;
-}>(
+export const require_withoutAll = new Rule<
+    Validator.AvailableRules["required_withoutAll"]["path"]
+>(
     (val: unknown): val is { required_withoutAll: Array<string> } => {
         return (
             hasOwnProperty(val, "required_withoutAll") &&
@@ -60,31 +53,23 @@ export const require_withoutAll = new Rule<{
         const vpaths = data.required_withoutAll;
         const ObjectPath = path.split(".").slice(0, -1).join(".");
         const allObjects = getAllValues(inputs, ObjectPath);
-        const Ppath = path.split(".").at(-1);
+        const Ppath = path.split(".").at(-1) as string;
         let errors: Record<string, ErrorMessage> = {};
 
-        if (Ppath)
-            for (const objPath in allObjects) {
-                const element = allObjects[objPath];
-                const finalPath = objPath ? objPath + "." + Ppath : Ppath;
-
-                if (
-                    vpaths.every(
-                        (vpath) => getValue(element, vpath) === undefined
-                    )
-                ) {
-                    errors = {
-                        ...errors,
-                        ...getValueMessage(
-                            finalPath,
-                            inputs,
-                            data,
-                            Ppath,
-                            lang
-                        ),
-                    };
-                }
+        for (const objPath in allObjects) {
+            const element = allObjects[objPath];
+            const finalPath = objPath ? objPath + "." + Ppath : Ppath;
+            const curVal = getValue(element, Ppath);
+            if (
+                curVal == undefined &&
+                vpaths.every((vpath) => getValue(element, vpath) === undefined)
+            ) {
+                errors = {
+                    ...errors,
+                    ...getValueMessage(finalPath, inputs, data, Ppath, lang),
+                };
             }
+        }
         return errors;
     }
 );
