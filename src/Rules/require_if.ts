@@ -1,10 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import Rule, { ErrorMessage } from "@/Rule";
+import Rule, { MessagesStore } from "@/Rule";
 import compare, { hasOwnProperty } from "@/utils/compare";
 import { getAllValues, getValue } from "@/utils/getValue";
-import { getValueMessage } from "./required";
 import { isString } from "@/utils/types";
+import { objectKeys } from "@/utils";
+import handelMessage from "@/utils/handelMessage";
 
+const ValueNOTtheSame: MessagesStore<unknown> = {
+    en: "the input value is not equal the another value",
+};
+export const Messages: MessagesStore<{
+    required_if: { path: string; value: unknown };
+}> = {
+    en: "the input value is not equal the another value",
+};
 export const require_if = new Rule<{
     required_if: { path: string; value: unknown };
 }>(
@@ -24,24 +33,31 @@ export const require_if = new Rule<{
 
         const ObjectPath = path.split(".").slice(0, -1).join(".");
         const allObjects = getAllValues(inputs, ObjectPath);
-        const Ppath = path.split(".").at(-1);
-        let errors: Record<string, ErrorMessage> = {};
+        const Ppath = path.split(".").at(-1) as string;
 
-        if (!Ppath) return {};
-        for (const objPath in allObjects) {
+        return objectKeys(allObjects).reduce((acc, objPath) => {
             const element = allObjects[objPath];
             const val = getValue(element, vpath);
             const curVal = getValue(element, Ppath);
             const finalPath =
                 objPath && objPath != "." ? objPath + "." + Ppath : Ppath;
             if (compare(val, data.required_if.value) && curVal == undefined) {
-                errors = {
-                    ...errors,
-                    ...getValueMessage(finalPath, inputs, data, Ppath, lang),
+                return {
+                    ...acc,
+                    [finalPath]: {
+                        message: handelMessage(
+                            ValueNOTtheSame[lang],
+                            curVal,
+                            data,
+                            finalPath,
+                            lang
+                        ),
+                        value: curVal,
+                    },
                 };
             }
-        }
-        return errors;
+            return acc;
+        }, {});
     }
 );
 export const require_unless = new Rule<{
@@ -63,27 +79,33 @@ export const require_unless = new Rule<{
 
         const ObjectPath = path.split(".").slice(0, -1).join(".");
         const allObjects = getAllValues(inputs, ObjectPath);
-        const Ppath = path.split(".").at(-1);
-        let errors: Record<string, ErrorMessage> = {};
+        const Ppath = path.split(".").at(-1) as string;
+        return objectKeys(allObjects).reduce((acc, objPath) => {
+            const element = allObjects[objPath];
+            const val = getValue(element, vpath);
+            const curVal = getValue(element, Ppath);
 
-        if (Ppath)
-            for (const objPath in allObjects) {
-                const element = allObjects[objPath];
-                const val = getValue(element, vpath);
-                const finalPath = objPath ? objPath + "." + Ppath : Ppath;
-                if (!compare(val, data.require_unless.value)) {
-                    errors = {
-                        ...errors,
-                        ...getValueMessage(
-                            finalPath,
-                            inputs,
+            const finalPath =
+                objPath && objPath != "." ? objPath + "." + Ppath : Ppath;
+            if (
+                !compare(val, data.require_unless.value) &&
+                curVal == undefined
+            ) {
+                return {
+                    ...acc,
+                    [finalPath]: {
+                        message: handelMessage(
+                            ValueNOTtheSame[lang],
+                            curVal,
                             data,
-                            Ppath,
+                            finalPath,
                             lang
                         ),
-                    };
-                }
+                        value: curVal,
+                    },
+                };
             }
-        return errors;
+            return acc;
+        }, {});
     }
 );

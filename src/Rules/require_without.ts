@@ -1,8 +1,11 @@
 import Rule, { ErrorMessage } from "@/Rule";
 import { getAllValues, getValue } from "@/utils/getValue";
-import { getValueMessage } from "./required";
+import { ValueNotExist } from "./required";
+export { ValueNotExist as Messages } from "./required";
 import { isArray } from "@/utils/types";
 import { hasOwnProperty } from "@/utils/compare";
+import { objectKeys } from "@/utils";
+import handelMessage from "@/utils/handelMessage";
 
 export const require_without = new Rule<
     Validator.AvailableRules["required_without"]["path"]
@@ -24,7 +27,8 @@ export const require_without = new Rule<
 
         for (const objPath in allObjects) {
             const element = allObjects[objPath];
-            const finalPath = objPath ? objPath + "." + Ppath : Ppath;
+            const finalPath =
+                objPath && objPath != "." ? objPath + "." + Ppath : Ppath;
             const curVal = getValue(element, Ppath);
             if (
                 curVal == undefined &&
@@ -32,7 +36,16 @@ export const require_without = new Rule<
             ) {
                 errors = {
                     ...errors,
-                    ...getValueMessage(finalPath, inputs, data, Ppath, lang),
+                    [finalPath]: {
+                        message: handelMessage(
+                            ValueNotExist[lang],
+                            curVal,
+                            data,
+                            finalPath,
+                            lang
+                        ),
+                        value: curVal,
+                    },
                 };
             }
         }
@@ -54,22 +67,30 @@ export const require_withoutAll = new Rule<
         const ObjectPath = path.split(".").slice(0, -1).join(".");
         const allObjects = getAllValues(inputs, ObjectPath);
         const Ppath = path.split(".").at(-1) as string;
-        let errors: Record<string, ErrorMessage> = {};
-
-        for (const objPath in allObjects) {
+        return objectKeys(allObjects).reduce((acc, objPath) => {
             const element = allObjects[objPath];
-            const finalPath = objPath ? objPath + "." + Ppath : Ppath;
+            const finalPath =
+                objPath && objPath != "." ? objPath + "." + Ppath : Ppath;
             const curVal = getValue(element, Ppath);
             if (
                 curVal == undefined &&
                 vpaths.every((vpath) => getValue(element, vpath) === undefined)
             ) {
-                errors = {
-                    ...errors,
-                    ...getValueMessage(finalPath, inputs, data, Ppath, lang),
+                return {
+                    ...acc,
+                    [finalPath]: {
+                        message: handelMessage(
+                            ValueNotExist[lang],
+                            curVal,
+                            data,
+                            finalPath,
+                            lang
+                        ),
+                        value: curVal,
+                    },
                 };
             }
-        }
-        return errors;
+            return acc;
+        }, {});
     }
 );

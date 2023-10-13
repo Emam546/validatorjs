@@ -1,6 +1,7 @@
-import Rule, { RuleFun } from "@/Rule";
+import Rule from "@/Rule";
 import handelMessage from "@/utils/handelMessage";
 import ValueNOTtheSame from "./Messages/ValuesNotSame";
+export { default as ValueNOTtheSame } from "./Messages/ValuesNotSame";
 import { isString } from "@/utils/types";
 import { hasOwnProperty } from "@/utils/compare";
 

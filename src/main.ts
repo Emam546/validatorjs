@@ -10,6 +10,7 @@ import validAttr from "@/utils/validAttr";
 import compare, { hasOwnProperty } from "@/utils/compare";
 import handelMessage from "@/utils/handelMessage";
 import { InvalidPath, UnMatchedType } from "@/utils/inValidAttr";
+export { InvalidPath, UnMatchedType } from "@/utils/inValidAttr";
 import {
     isValidInput,
     InputRules,

@@ -2,6 +2,7 @@ import Rule, { ErrorMessage } from "@/Rule";
 
 import compare, { hasOwnProperty } from "@/utils/compare";
 import ValuesNotSame from "./Messages/ValuesNotSame";
+export { default as ValuesNotSame } from "./Messages/ValuesNotSame";
 import { isString } from "@/utils/types";
 import { ObjectEntries } from "@/utils";
 import { getAllValues, getValue } from "@/utils/getValue";
