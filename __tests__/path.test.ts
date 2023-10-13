@@ -2,33 +2,37 @@ import Validator from "@/index";
 
 describe("Complex paths test", () => {
     test("test array of rules", () => {
-        const Rules = Validator.parseRules({ name: ["string", "number"] });
-        const data = {};
-        expect(new Validator(data, Rules, {}).CPaths).toStrictEqual({
-            name: ["string", "number"],
+        const Rules = Validator.extractRulesPaths({
+            name: ["string", "integer"],
+        });
+        expect(Rules).toStrictEqual({
+            name: ["string", "integer"],
         });
     });
-    test("array of objects", () => {
-        const Rules = Validator.parseRules({
+    test("normal array", () => {
+        const Rules = Validator.extractRulesPaths({
             person: [{ name: ["string"], age: "integer" }],
         });
-        const data = {};
-        expect(new Validator(data, Rules, {}).CPaths).toStrictEqual({
+        expect(Rules).toStrictEqual({
             "person.*:array.name": ["string"],
             "person.*:array.age": ["integer"],
         });
     });
     test("array of objects", () => {
-        const Rules = Validator.parseRules({ person: [["string"], "array"] });
-        const data = {};
-        expect(new Validator(data, Rules, {}).CPaths).toStrictEqual({
-            "person.*:array": ["string"],
+        const Rules = Validator.extractRulesPaths({
+            person: [["string"], "object"],
+        });
+
+        expect(Rules).toStrictEqual({
+            "person.*:object": ["string"],
         });
     });
     test("object of objects", () => {
-        const Rules = Validator.parseRules({ person: [["string"], "object"] });
-        const data = {};
-        expect(new Validator(data, Rules, {}).CPaths).toStrictEqual({
+        const Rules = Validator.extractRulesPaths({
+            person: [["string"], "object"],
+        });
+
+        expect(Rules).toStrictEqual({
             "person.*:object": ["string"],
         });
     });

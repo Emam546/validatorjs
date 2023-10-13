@@ -1,20 +1,19 @@
-import Validator, { parseRules } from "@/index";
-import { Rules, ValidTypes, RulesGetter } from "@/type";
+import { PathRules, ValidTypes } from "@/type";
 type Expect<T extends true> = T;
 type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y
     ? 1
     : 2
     ? true
     : false;
-describe("Test Rules", () => {
+describe("Test PathRules", () => {
     test("empty rule", () => {
-        type TestType = Expect<Equal<Rules<{}>, {}>>;
-        type TestType2 = Expect<Equal<Rules<[]>, { ".": [] }>>;
+        type TestType = Expect<Equal<PathRules<{}>, {}>>;
+        type TestType2 = Expect<Equal<PathRules<[]>, { ".": [] }>>;
     });
     test("normal rules", () => {
         type TestType = Expect<
             Equal<
-                Rules<{
+                PathRules<{
                     name: ["string"];
                 }>,
                 { name: ["string"] }
@@ -22,18 +21,21 @@ describe("Test Rules", () => {
         >;
         type TestType1 = Expect<
             Equal<
-                Rules<{
+                PathRules<{
                     name: "string|integer";
                 }>,
                 { name: ["string", "integer"] }
             >
         >;
         type TestType3 = Expect<
-            Equal<Rules<["string", "integer"]>, { ".": ["string", "integer"] }>
+            Equal<
+                PathRules<["string", "integer"]>,
+                { ".": ["string", "integer"] }
+            >
         >;
         type TestType4 = Expect<
             Equal<
-                Rules<[{ name: "string"; age: "integer" }]>,
+                PathRules<[{ name: "string"; age: "integer" }]>,
                 {
                     "*:array.name": ["string"];
                     "*:array.age": ["integer"];
@@ -42,7 +44,7 @@ describe("Test Rules", () => {
         >;
         type TestType5 = Expect<
             Equal<
-                Rules<[{ name: "string"; age: "integer" }, "object"]>,
+                PathRules<[{ name: "string"; age: "integer" }, "object"]>,
                 {
                     "*:object.name": ["string"];
                     "*:object.age": ["integer"];
@@ -51,7 +53,7 @@ describe("Test Rules", () => {
         >;
         type TestType6 = Expect<
             Equal<
-                Rules<
+                PathRules<
                     [{ name: "string"; age: "integer" }, "object", ["string"]]
                 >,
                 {
@@ -63,7 +65,7 @@ describe("Test Rules", () => {
         >;
         type TestType7 = Expect<
             Equal<
-                Rules<[{ name: "string"; age: "integer" }, "object", {}]>,
+                PathRules<[{ name: "string"; age: "integer" }, "object", {}]>,
                 {
                     "*:object.name": ["string"];
                     "*:object.age": ["integer"];
@@ -72,7 +74,7 @@ describe("Test Rules", () => {
         >;
         type TestType8 = Expect<
             Equal<
-                Rules<[{ name: "string"; age: "integer" }, "object", []]>,
+                PathRules<[{ name: "string"; age: "integer" }, "object", []]>,
                 {
                     "*:object.name": ["string"];
                     "*:object.age": ["integer"];
@@ -82,7 +84,7 @@ describe("Test Rules", () => {
         >;
         type TestType9 = Expect<
             Equal<
-                Rules<[[{ name: "string"; age: "integer" }]]>,
+                PathRules<[[{ name: "string"; age: "integer" }]]>,
                 {
                     "*:array.*:array.name": ["string"];
                     "*:array.*:array.age": ["integer"];
@@ -91,7 +93,7 @@ describe("Test Rules", () => {
         >;
         type TestType10 = Expect<
             Equal<
-                Rules<[[{ name: [["string"]]; age: "integer" }]]>,
+                PathRules<[[{ name: [["string"]]; age: "integer" }]]>,
                 {
                     "*:array.*:array.name.*:array": ["string"];
                     "*:array.*:array.age": ["integer"];
@@ -100,7 +102,7 @@ describe("Test Rules", () => {
         >;
         type TestType11 = Expect<
             Equal<
-                Rules<[[{ name: [["string"]]; age: "integer" }]]>,
+                PathRules<[[{ name: [["string"]]; age: "integer" }]]>,
                 {
                     "*:array.*:array.name.*:array": ["string"];
                     "*:array.*:array.age": ["integer"];
@@ -110,7 +112,7 @@ describe("Test Rules", () => {
 
         type TestType12 = Expect<
             Equal<
-                Rules<{
+                PathRules<{
                     names: [
                         ["string"],
                         "array",
@@ -127,11 +129,21 @@ describe("Test Rules", () => {
         >;
         type TestType13 = Expect<
             Equal<
-                Rules<[[{ name: "string"; age: "integer" }]]>,
+                PathRules<[[{ name: "string"; age: "integer" }]]>,
                 {
                     "*:array.*:array.name": ["string"];
                     "*:array.*:array.age": ["integer"];
                 }
+            >
+        >;
+    });
+    test("complex rules", () => {
+        type TestType = Expect<
+            Equal<
+                PathRules<{
+                    name: [{ require_if: { path: string; value: string } }];
+                }>,
+                { name: [{ require_if: { path: string; value: string } }] }
             >
         >;
     });
@@ -150,6 +162,7 @@ describe("Test ValidTypes", () => {
                 { name: string }
             >
         >;
+
         type TestType1 = Expect<
             Equal<
                 ValidTypes<{
@@ -261,15 +274,25 @@ describe("Test ValidTypes", () => {
             >
         >;
     });
-});
-describe("Validator ValidTypes", () => {
-    test("empty rule", () => {
-        const rules = parseRules({
-            name: ["string"],
-        });
-        const input: unknown = { name: "name" };
-        const validator = new Validator(input, rules);
-        if (validator.passes()) {
-        }
+    test("complex rules", () => {
+        type TestType = Expect<
+            Equal<
+                ValidTypes<{
+                    name: [{ after: Date }];
+                }>,
+                { name: Date & string & number }
+            >
+        >;
+        type G = ValidTypes<{
+            name: [{ different: string }];
+        }>;
+        type TestType2 = Expect<
+            Equal<
+                ValidTypes<{
+                    name: ["string", { different: string }];
+                }>,
+                { name: string }
+            >
+        >;
     });
 });

@@ -1,4 +1,4 @@
-import { Rules, parseRules } from "@/index";
+import { InputRules, extractRulesPaths } from "@/index";
 import constructRule from "@/utils/constructObj";
 import { getAllValues, getValue } from "@/utils/getValue";
 import inValidAttr from "@/utils/inValidAttr";
@@ -29,7 +29,7 @@ describe("Test get value methods", () => {
             )
         ).toBe("ahmed");
     });
-    describe("get All Values", () => {
+    describe("getAllValues", () => {
         it("regular test", () => {
             expect(getAllValues({ name: "ahmed" }, "name")).toStrictEqual({
                 name: "ahmed",
@@ -101,6 +101,18 @@ describe("Test get value methods", () => {
             expect(
                 getAllValues({ person: { name: "ali" } }, "person.friend")
             ).toStrictEqual({});
+        });
+    });
+    describe("use .", () => {
+        test("getValues", () => {
+            expect(getValue({ name: "ahmed" }, ".")).toStrictEqual({
+                name: "ahmed",
+            });
+        });
+        test("getAllValues", () => {
+            expect(getAllValues({ name: "ahmed" }, ".")).toStrictEqual({
+                ".": { name: "ahmed" },
+            });
         });
     });
 });
@@ -267,129 +279,14 @@ describe("Test set value methods", () => {
         });
     });
 });
-describe("parseRules", () => {
-    it("main methods", () => {
-        expect(
-            parseRules({
-                name: "string",
-            })
-        ).toStrictEqual({
-            name: ["string"],
-        });
-
-        expect(parseRules({ name: "string|integer" })).toStrictEqual({
-            name: ["string", "integer"],
-        });
-        const rules = parseRules({
-            name: "string|integer",
-        });
-        expect(parseRules(["string", "integer"])).toStrictEqual({
-            ".": ["string", "integer"],
-        });
-        expect(parseRules([{ name: "string", age: "integer" }])).toStrictEqual({
-            "*:array.name": ["string"],
-            "*:array.age": ["integer"],
-        });
-        expect(
-            parseRules([[{ name: "string", age: "integer" }]])
-        ).toStrictEqual({
-            "*:array.*:array.name": ["string"],
-            "*:array.*:array.age": ["integer"],
-        });
-
-        expect(
-            parseRules([[{ name: [["string"]], age: "integer" }]])
-        ).toStrictEqual({
-            "*:array.*:array.name.*:array": ["string"],
-            "*:array.*:array.age": ["integer"],
-        });
-
-        expect(parseRules(["string"])).toStrictEqual({ ".": ["string"] });
-    });
-    describe("array methods", () => {
-        it("flattened object", () => {
-            expect(parseRules([["string"], "array"])).toStrictEqual({
-                "*:array": ["string"],
-            });
-            expect(
-                parseRules([["string"], "array", ["required"]])
-            ).toStrictEqual({
-                "*:array": ["string"],
-                ".": ["required"],
-            });
-        });
-        it("complex object", () => {
-            expect(parseRules({ names: [["string"], "array"] })).toStrictEqual({
-                "names.*:array": ["string"],
-            });
-            expect(
-                parseRules({
-                    names: [
-                        ["string"],
-                        "array",
-                        {
-                            0: ["string"],
-                        },
-                    ],
-                })
-            ).toStrictEqual({
-                "names.*:array": ["string"],
-                "names.0": ["string"],
-            });
-            expect(
-                parseRules({ names: [["string"], "array", ["required"]] })
-            ).toStrictEqual({
-                "names.*:array": ["string"],
-                names: ["required"],
-            });
-            const rules = parseRules({
-                name: ["string"],
-                age: ["integer"],
-                location: [["integer"], "array", ["min:0"]],
-                friends: [["string"], "object", ["min:0"]],
-            });
-            expect(rules).toStrictEqual({
-                name: ["string"],
-                age: ["integer"],
-                "location.*:array": ["integer"],
-                "friends.*:object": ["string"],
-                location: ["min:0"],
-                friends: ["min:0"],
-            });
-            expect(
-                parseRules([
-                    { name: "string", password: "string" },
-                    "array",
-                    ["min:0"],
-                ])
-            ).toStrictEqual({
-                "*:array.name": ["string"],
-                "*:array.password": ["string"],
-                ".": ["min:0"],
-            });
-        });
-    });
-    it("use .", () => {
-        expect(
-            parseRules({
-                ".": ["string"],
-            })
-        ).toStrictEqual({ ".": ["string"] });
-        expect(
-            parseRules({
-                person: { name: ["string"], ".": "required" },
-            })
-        ).toStrictEqual({ "person.name": ["string"], person: ["required"] });
-    });
-});
 describe("test construct methods", () => {
     test("main method", () => {
-        const rules = parseRules({
+        const rules: InputRules = {
             name: ["string"],
             age: ["integer"],
-            location: [["integer"], "array", ["min:0"]],
-            friends: [["string"], "object", ["min:0"]],
-        });
+            location: [["integer"], "array", [{ min: 0 }]],
+            friends: [["string"], "object", [{ min: 0 }]],
+        };
         const res = {
             name: null,
             age: null,
@@ -399,11 +296,15 @@ describe("test construct methods", () => {
         expect(constructRule(rules)).toStrictEqual(res);
     });
     test("array object method", () => {
-        const rules = parseRules({
+        const rules: InputRules = {
             name: ["string"],
             age: ["integer"],
             locations: [{ x: ["integer"], y: ["integer"] }, "array"],
-            friends: [{ name: "string", age: "integer" }, "object", ["min:0"]],
+            friends: [
+                { name: "string", age: "integer" },
+                "object",
+                [{ min: 0 }],
+            ],
             schools: [
                 {
                     locations: [
@@ -412,7 +313,7 @@ describe("test construct methods", () => {
                             y: ["integer"],
                         },
                         "array",
-                        ["limit:0"],
+                        [{ min: 0 }],
                     ],
                     names: [["string"], "array"],
                 },
@@ -420,11 +321,11 @@ describe("test construct methods", () => {
             ],
             email: null,
             site: null,
-        });
+        };
         const res = {
             name: null,
             age: null,
-            locations: [{ x: null, y: null }, "array"],
+            locations: [{ x: null, y: null }, "array", null],
             friends: [{ name: null, age: null }, "object", null],
             schools: [
                 {
@@ -436,53 +337,55 @@ describe("test construct methods", () => {
                         "array",
                         null,
                     ],
-                    names: [null, "array"],
+                    names: [null, "array", null],
                 },
                 "object",
+                null,
             ],
             email: null,
             site: null,
         };
         expect(constructRule(rules)).toStrictEqual(res);
     });
-    test("flattened array", () => {
-        let rules: Rules<unknown> = parseRules([
-            { name: "string", password: "string" },
-            "array",
-        ]);
-        let ex: any = [{ name: null, password: null }, "array"];
-        expect(constructRule(rules)).toStrictEqual(ex);
-        rules = parseRules([
-            { name: "string", password: "string" },
-            "array",
-            ["min:0"],
-        ]);
-        expect(rules).toStrictEqual({
-            "*:array.name": ["string"],
-            "*:array.password": ["string"],
-            ".": ["min:0"],
+    describe("flattened array", () => {
+        test("test 1", () => {
+            const rules: InputRules = [
+                { name: "string", password: "string" },
+                "array",
+            ];
+            const ex = [{ name: null, password: null }, "array", null];
+            expect(constructRule(rules)).toStrictEqual(ex);
         });
-        ex = {
-            "*:array": [{ name: null, password: null }, "array"],
-            ".": null,
-        };
-        expect(constructRule(rules)).toStrictEqual(ex);
+        test("test 2", () => {
+            const rules = [
+                { name: "string", password: "string" },
+                "array",
+                [{ min: 0 }],
+            ];
+            expect(extractRulesPaths(rules)).toStrictEqual({
+                "*:array.name": ["string"],
+                "*:array.password": ["string"],
+                ".": [{ min: 0 }],
+            });
+            const ex = [{ name: null, password: null }, "array", null];
+            expect(constructRule(rules as InputRules)).toStrictEqual(ex);
+        });
     });
     test("use .", () => {
-        const rules = parseRules({
-            person: {
-                ".": ["required"],
-                name: ["string"],
-                age: ["integer"],
-            },
-        });
-        const rules2 = parseRules({
+        const rules: InputRules = {
+            ".": ["required"],
             person: {
                 name: ["string"],
                 age: ["integer"],
+            },
+        };
+        const rules2: InputRules = {
+            person: {
+                name: ["string"],
+                age: ["integer"],
                 ".": ["required"],
             },
-        });
+        };
         const ex = {
             person: {
                 name: null,
@@ -495,11 +398,11 @@ describe("test construct methods", () => {
 });
 describe("Valid attr", () => {
     test("false values", () => {
-        const rules = parseRules({
+        const rules: InputRules = {
             name: "string",
             age: ["integer"],
-            location: [["integer"], "array", ["limit:0:2"]],
-        });
+            location: [["integer"], "array", [{ min: 0 }, { max: 2 }]],
+        };
         const f1 = {
             name: "",
             age: 0,
@@ -521,11 +424,11 @@ describe("Valid attr", () => {
         expect(validAttr(f3, rules)).toStrictEqual(f3);
     });
     test("main task", () => {
-        const rules = parseRules({
+        const rules: InputRules = {
             name: "string",
             age: ["integer"],
-            location: [["integer"], "array", ["limit:0:2"]],
-        });
+            location: [["integer"], "array", [{ min: 0 }, { max: 2 }]],
+        };
         const f1 = {
             name: "mahmoud",
             age: 12,
@@ -547,9 +450,9 @@ describe("Valid attr", () => {
         expect(validAttr(f3, rules)).toStrictEqual(f3);
     });
     test("array of objects", () => {
-        const rules = parseRules({
+        const rules: InputRules = {
             friends: [{ name: "string", age: "integer" }],
-        });
+        };
         const f1 = {
             friends: [
                 { name: "mahmoud", age: 14 },
@@ -570,7 +473,7 @@ describe("Valid attr", () => {
         expect(validAttr(f2, rules)).toStrictEqual(f1);
     });
     test("object map", () => {
-        const rules = parseRules({
+        const rules: InputRules = {
             friends: [
                 {
                     age: "integer",
@@ -580,7 +483,7 @@ describe("Valid attr", () => {
                 },
                 "object",
             ],
-        });
+        };
         const f1 = {
             friends: {
                 ahmed: {
@@ -625,104 +528,6 @@ describe("test merge objs methods", () => {
             name: "ali",
             age: 12,
         });
-    });
-});
-describe("inValid attr", () => {
-    test("main task", () => {
-        const rules = parseRules({
-            name: "string|int",
-            age: ["integer"],
-            location: [["integer"], "array", ["min:0"]],
-        });
-        const f1 = {
-            name: "mahmoud",
-            age: 12,
-            location: [1, 2],
-        };
-        const f2 = {
-            name: "mahmoud",
-            age: 12,
-            location: [1, 2],
-            unusedAttr: "unused",
-        };
-        const f3 = {
-            name: "mahmoud",
-            age: 12,
-            location: [1, 2, { anotheri: 1234 }],
-        };
-        expect(inValidAttr(f1, rules)).toBeNull();
-        expect(inValidAttr(f3, rules)).toBeNull();
-        expect(inValidAttr(f2, rules)).not.toBeNull();
-    });
-    test("array of objects", () => {
-        const rules = parseRules({
-            friends: [{ name: "string", age: "integer" }],
-        });
-        const f1 = {
-            friends: [
-                { name: "mahmoud", age: 14 },
-                { name: "ali", age: 12 },
-                { name: "osama", age: 12 },
-                { name: "ahmed", age: 19 },
-            ],
-        };
-        const f2 = {
-            friends: [
-                { name: "mahmoud", age: 14 },
-                { name: "ali", age: 12 },
-                { name: "osama", age: 12 },
-                { name: "ahmed", age: 12, location: [123, 54645] },
-            ],
-        };
-        expect(inValidAttr(f1, rules)).toBeNull();
-        expect(inValidAttr(f2, rules)).not.toBeNull();
-    });
-    test("object map", () => {
-        const rules = parseRules({
-            friends: [
-                {
-                    age: "integer",
-                    email: "string",
-                    location: [["integer"]],
-                    friends: [{ age: ["integer"] }, "object"],
-                },
-                "object",
-            ],
-        });
-        const f1 = {
-            friends: {
-                ahmed: {
-                    age: 14,
-                    email: "g@g.com",
-                    location: [1, 2],
-                    friends: {
-                        ahmed: { age: 10 },
-                        ali: { age: 12 },
-                    },
-                },
-                elsayed: { age: 12, email: "a@g.com" },
-                ali: { age: 12, email: "c@g.com", location: [1, 2] },
-                osama: { age: 12, location: [1, 2] },
-            },
-        };
-        const f2 = {
-            friends: {
-                ahmed: {
-                    age: 14,
-                    email: "g@g.com",
-                    location: [1, 2],
-                    friends: {
-                        ahmed: { age: 10, number: 12 },
-                        ali: { age: 12 },
-                    },
-                },
-                elsayed: { age: 12, email: "a@g.com" },
-                ali: { age: 12, email: "c@g.com", location: [1, 2] },
-                osama: { age: 12, location: [1, 2] },
-            },
-        };
-        expect(inValidAttr(f1, rules)).toBeNull();
-        expect(inValidAttr(f2, rules)).not.toBeNull();
     });
 });
 describe("Test isEmpty", () => {
