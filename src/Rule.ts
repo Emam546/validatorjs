@@ -4,27 +4,39 @@ import type LangType from "./types/lang";
 import { objectKeys } from "./utils";
 import { isPromise, isString } from "./utils/types";
 export type EqualFun<Data> = (val: unknown) => val is Data;
-export type RuleFun<Data> = (
+export type ErrorsType<Data> =
+    | { [name: string]: ErrorsType<Data> }
+    | MessagesStore<Data>;
+export type RuleFun<Data, Errors extends ErrorsType<Data>> = (
     value: unknown,
     data: Data,
     path: string,
-    lang: LangType
+    input: unknown,
+    lang: LangType,
+    errors: Errors
 ) => string | undefined | Promise<string | undefined>;
 export interface ErrorMessage {
     value: unknown;
     message: string;
 }
-export type GetMessageFun<Data> = (...arr: Parameters<RuleFun<Data>>) => string;
+export type GetMessageFun<Data> = (
+    value: unknown,
+    data: Data,
+    path: string,
+    input: unknown,
+    lang: LangType
+) => string;
 export type StoredMessage<Data> = string | GetMessageFun<Data>;
 export type MessagesStore<Data> = Partial<
     Record<LangType, StoredMessage<Data>>
 >;
 
-export type InitSubmitFun<Data> = (
+export type InitSubmitFun<Data, Errors extends ErrorsType<Data>> = (
     input: unknown,
     data: Data,
     path: string,
-    lang: LangType
+    lang: LangType,
+    errors: Errors
 ) => Promise<Record<string, ErrorMessage>> | Record<string, ErrorMessage>;
 
 function isNoPromises(
@@ -35,29 +47,36 @@ function isNoPromises(
     return !val.some((val) => isPromise(val));
 }
 
-export default class Rule<Data> {
+export default class Rule<
+    Data,
+    Errors extends ErrorsType<Data> = MessagesStore<Data>
+> {
+    readonly errors: Errors;
     private readonly eq: Data extends string ? Data : EqualFun<Data>;
-    private readonly fn: RuleFun<Data>;
-    private readonly initFn?: InitSubmitFun<Data>;
+    private readonly fn: RuleFun<Data, Errors>;
+    private readonly initFn?: InitSubmitFun<Data, Errors>;
     constructor(
         eq: Data extends string ? Data : EqualFun<Data>,
-        fn: RuleFun<Data>,
-        initFn?: InitSubmitFun<Data>
+        fn: RuleFun<Data, Errors>,
+        errors: Errors,
+        initFn?: InitSubmitFun<Data, Errors>
     ) {
         this.eq = eq;
         this.fn = fn;
         this.initFn = initFn;
+        this.errors = errors;
     }
     isequal(value: unknown): value is Data {
         if (isString(this.eq)) return value === this.eq;
         return this.eq(value);
     }
-    validate(...arr: Parameters<RuleFun<Data>>) {
+    validate(...arr: Parameters<RuleFun<Data, Errors>>) {
         return this.fn(...arr);
     }
     initSubmit(
         rules: Record<string, RulesGetter>,
         input: unknown,
+        errors: Errors,
         lang: LangType
     ) {
         if (typeof this.initFn == "undefined") return {};
@@ -73,7 +92,7 @@ export default class Rule<Data> {
             for (let i = 0; i < arr.length; i++) {
                 const val = arr[i];
                 if (this.isequal(val)) {
-                    const message = this.initFn(input, val, path, lang);
+                    const message = this.initFn(input, val, path, lang, errors);
                     cur.push(message);
                 }
             }

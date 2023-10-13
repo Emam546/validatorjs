@@ -6,7 +6,7 @@ export const Messages: MessagesStore<unknown> = {
 
 export default new Rule(
     "accepted",
-    (value, ...arr) => {
+    (value, data, path, input, lang, errors) => {
         return value === "on" ||
             value === "true" ||
             value === "yes" ||
@@ -14,6 +14,7 @@ export default new Rule(
             value === "1" ||
             value === true
             ? undefined
-            : handelMessage(Messages[arr[2]], value, ...arr);
-    }
+            : handelMessage(errors[lang], value, data, path, input, lang);
+    },
+    Messages
 );

@@ -12,22 +12,38 @@ export { default as ValuesNotSame } from "./Messages/ValuesNotSame";
 export default new Rule(
     "confirm",
     () => undefined,
-    function (...arr) {
-        const [input, , path, lang] = arr;
-
+    {
+        notExist: ValueNotExist,
+        notSame: ValuesNotSame,
+    },
+    function (input, data, path, lang, errors) {
         return ObjectEntries(getAllValues(input, path))
             .map<[string, string, unknown] | undefined>(([path, value]) => {
                 const returnedValue = getValue(input, path + "_confirmation");
                 if (returnedValue == undefined)
                     return [
                         path,
-                        handelMessage(ValueNotExist[lang], ...arr),
+                        handelMessage(
+                            errors.notExist[lang],
+                            value,
+                            data,
+                            path,
+                            input,
+                            lang
+                        ),
                         value,
                     ];
                 if (!compare(value, returnedValue))
                     return [
                         path,
-                        handelMessage(ValuesNotSame[lang], ...arr),
+                        handelMessage(
+                            errors.notSame[lang],
+                            value,
+                            data,
+                            path,
+                            input,
+                            lang
+                        ),
                         value,
                     ];
                 return undefined;

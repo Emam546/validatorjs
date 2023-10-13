@@ -11,9 +11,10 @@ function isNumberOrStringOrBoolean(
 }
 export default new Rule(
     "numeric",
-    (value, ...arr) => {
+    (value, data, path, input, lang, errors) => {
         return isNumberOrStringOrBoolean(value) && isNumeric(value)
             ? undefined
-            : handelMessage(Messages[arr[2]], value, ...arr);
-    }
+            : handelMessage(errors[lang], value, data, path, input, lang);
+    },
+    Messages
 );

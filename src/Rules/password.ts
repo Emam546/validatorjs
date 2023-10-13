@@ -5,9 +5,13 @@ export const Messages: MessagesStore<unknown> = {
     en: "THE PASSWORD IS NOT VALID",
 };
 
-export default new Rule("password", (value, ...arr) => {
-    return isString(value) &&
-        /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/.test(value)
-        ? undefined
-        : handelMessage(Messages[arr[2]], value, ...arr);
-});
+export default new Rule(
+    "password",
+    (value, data, path, input, lang, errors) => {
+        return isString(value) &&
+            /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/.test(value)
+            ? undefined
+            : handelMessage(errors[lang], value, data, path, input, lang);
+    },
+    Messages
+);

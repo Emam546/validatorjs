@@ -19,52 +19,75 @@ export const MaXError: MessagesStore<unknown> = {
 };
 function getNumber<Data>(
     value: unknown,
-    lang: LangTypes
+    lang: LangTypes,
+    errors: MessagesStore<unknown>
 ): number | StoredMessage<Data> | undefined {
     if (isNumber(value)) return value;
     if (isArray(value) || isString(value)) return value.length;
     if (value instanceof Set || value instanceof Map) return value.size;
     if (isObject(value)) return Object.keys(value).length;
-    return UnKnownInputValue[lang];
+    return errors[lang];
 }
 function minFun(
     value: number,
     min: number,
-    lang: LangTypes
+    lang: LangTypes,
+    errors: MessagesStore<{ min: number }>
 ): string | undefined {
     min = isNaN(min) ? 0 : min;
-    if (value < min) return handelUndefined(MinError[lang]) as string;
+    if (value < min) return handelUndefined(errors[lang]) as string;
 }
 function maxFun(
     value: number,
     max: number,
-    lang: LangTypes
+    lang: LangTypes,
+    errors: MessagesStore<{ max: number }>
 ): string | undefined {
     if (isNaN(max)) return handelUndefined(UnKnownRuleValue[lang]) as string;
-    if (value > max) return handelUndefined(MaXError[lang]) as string;
+    if (value > max) return handelUndefined(errors[lang]) as string;
 }
 
-export const min = new Rule<{ min: number }>(
+export const min = new Rule<
+    { min: number },
+    {
+        unknownError: MessagesStore<unknown>;
+        errors: MessagesStore<{ min: number }>;
+    }
+>(
     (val: unknown): val is { min: number } => {
         return hasOwnProperty(val, "min") && isNumber(val.min);
     },
-    function MinHandler(...arr) {
-        const [value, data, , lang] = arr;
+    function MinHandler(value, data, path, input, lang, errors) {
         const min = data.min;
-        const val = getNumber<{ min: number }>(value, lang);
-        if (isNumber(val)) return minFun(val, min, lang);
-        else return handelMessage(val, ...arr);
-    }
+        const val = getNumber<{ min: number }>(
+            value,
+            lang,
+            errors.unknownError
+        );
+        if (isNumber(val)) return minFun(val, min, lang, errors.errors);
+        else return handelMessage(val, value, data, path, input, lang);
+    },
+    { unknownError: UnKnownInputValue, errors: MinError }
 );
-export const max = new Rule<{ max: number }>(
+export const max = new Rule<
+    { max: number },
+    {
+        unknownError: MessagesStore<unknown>;
+        errors: MessagesStore<{ max: number }>;
+    }
+>(
     (val: unknown): val is { max: number } => {
         return hasOwnProperty(val, "max") && isNumber(val.max);
     },
-    function MaxHandler(...arr) {
-        const [value, data, , lang] = arr;
+    function MaxHandler(value, data, path, input, lang, errors) {
         const min = data.max;
-        const val = getNumber<{ max: number }>(value, lang);
-        if (isNumber(val)) return maxFun(val, min, lang);
-        else return handelUnError(val, ...arr);
-    }
+        const val = getNumber<{ max: number }>(
+            value,
+            lang,
+            errors.unknownError
+        );
+        if (isNumber(val)) return maxFun(val, min, lang, errors.errors);
+        else return handelUnError(val, value, data, path, input, lang);
+    },
+    { unknownError: UnKnownInputValue, errors: MaXError }
 );

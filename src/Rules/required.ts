@@ -3,14 +3,15 @@
 import Rule from "@/Rule";
 import { getAllValues, getValue } from "@/utils/getValue";
 import handelMessage from "@/utils/handelMessage";
-import ValueNotExist from "./Messages/valueNotExist";
+import Messages from "./Messages/valueNotExist";
 import { objectKeys } from "@/utils";
 export { default as ValueNotExist } from "./Messages/valueNotExist";
 
 export default new Rule(
     "required",
     () => undefined,
-    function required(inputs, data, path, lang) {
+    Messages,
+    function required(inputs, data, path, lang, errors) {
         const ObjectPath = path.split(".").slice(0, -1).join(".");
         const allObjects = getAllValues(inputs, ObjectPath);
         const Ppath = path.split(".").at(-1);
@@ -25,10 +26,11 @@ export default new Rule(
                     ...acc,
                     [finalPath]: {
                         message: handelMessage(
-                            ValueNotExist[lang],
+                            errors[lang],
                             curVal,
                             data,
                             finalPath,
+                            inputs,
                             lang
                         ),
                         value: curVal,

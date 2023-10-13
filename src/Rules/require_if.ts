@@ -6,12 +6,7 @@ import { isString } from "@/utils/types";
 import { objectKeys } from "@/utils";
 import handelMessage from "@/utils/handelMessage";
 
-const ValueNOTtheSame: MessagesStore<unknown> = {
-    en: "the input value is not equal the another value",
-};
-export const Messages: MessagesStore<{
-    required_if: { path: string; value: unknown };
-}> = {
+export const Messages: MessagesStore<unknown> = {
     en: "the input value is not equal the another value",
 };
 export const require_if = new Rule<{
@@ -28,11 +23,12 @@ export const require_if = new Rule<{
         );
     },
     () => undefined,
-    function _require_if(inputs, data, path, lang) {
+    Messages,
+    function _require_if(input, data, path, lang, errors) {
         const vpath = data.required_if.path;
 
         const ObjectPath = path.split(".").slice(0, -1).join(".");
-        const allObjects = getAllValues(inputs, ObjectPath);
+        const allObjects = getAllValues(input, ObjectPath);
         const Ppath = path.split(".").at(-1) as string;
 
         return objectKeys(allObjects).reduce((acc, objPath) => {
@@ -46,10 +42,11 @@ export const require_if = new Rule<{
                     ...acc,
                     [finalPath]: {
                         message: handelMessage(
-                            ValueNOTtheSame[lang],
+                            errors[lang],
                             curVal,
                             data,
                             finalPath,
+                            input,
                             lang
                         ),
                         value: curVal,
@@ -74,11 +71,12 @@ export const require_unless = new Rule<{
         );
     },
     () => undefined,
-    function _require_unless(inputs, data, path, lang) {
+    Messages,
+    function _require_unless(input, data, path, lang, errors) {
         const vpath = data.require_unless.path;
 
         const ObjectPath = path.split(".").slice(0, -1).join(".");
-        const allObjects = getAllValues(inputs, ObjectPath);
+        const allObjects = getAllValues(input, ObjectPath);
         const Ppath = path.split(".").at(-1) as string;
         return objectKeys(allObjects).reduce((acc, objPath) => {
             const element = allObjects[objPath];
@@ -95,10 +93,11 @@ export const require_unless = new Rule<{
                     ...acc,
                     [finalPath]: {
                         message: handelMessage(
-                            ValueNOTtheSame[lang],
+                            errors[lang],
                             curVal,
                             data,
                             finalPath,
+                            input,
                             lang
                         ),
                         value: curVal,

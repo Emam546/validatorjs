@@ -1,6 +1,6 @@
 import Rule, { ErrorMessage } from "@/Rule";
 import { getAllValues, getValue } from "@/utils/getValue";
-import { ValueNotExist } from "./required";
+import { ValueNotExist as Messages } from "./required";
 export { ValueNotExist as Messages } from "./required";
 import { isArray } from "@/utils/types";
 import { hasOwnProperty } from "@/utils/compare";
@@ -18,14 +18,13 @@ export const require_without = new Rule<
     },
 
     () => undefined,
-    function _require_without(inputs, data, path, lang) {
+    Messages,
+    function require_without(inputs, data, path, lang, errors) {
         const vpaths = data.required_without;
         const ObjectPath = path.split(".").slice(0, -1).join(".");
         const allObjects = getAllValues(inputs, ObjectPath);
         const Ppath = path.split(".").at(-1) as string;
-        let errors: Record<string, ErrorMessage> = {};
-
-        for (const objPath in allObjects) {
+        return objectKeys(allObjects).reduce((acc, objPath) => {
             const element = allObjects[objPath];
             const finalPath =
                 objPath && objPath != "." ? objPath + "." + Ppath : Ppath;
@@ -34,22 +33,23 @@ export const require_without = new Rule<
                 curVal == undefined &&
                 vpaths.some((vpath) => getValue(element, vpath) === undefined)
             ) {
-                errors = {
-                    ...errors,
+                return {
+                    ...acc,
                     [finalPath]: {
                         message: handelMessage(
-                            ValueNotExist[lang],
+                            errors[lang],
                             curVal,
                             data,
                             finalPath,
+                            inputs,
                             lang
                         ),
                         value: curVal,
                     },
                 };
             }
-        }
-        return errors;
+            return acc;
+        }, {});
     }
 );
 export const require_withoutAll = new Rule<
@@ -62,10 +62,11 @@ export const require_withoutAll = new Rule<
         );
     },
     () => undefined,
-    function _require_withoutAll(inputs, data, path, lang) {
+    Messages,
+    function _require_withoutAll(input, data, path, lang, errors) {
         const vpaths = data.required_withoutAll;
         const ObjectPath = path.split(".").slice(0, -1).join(".");
-        const allObjects = getAllValues(inputs, ObjectPath);
+        const allObjects = getAllValues(input, ObjectPath);
         const Ppath = path.split(".").at(-1) as string;
         return objectKeys(allObjects).reduce((acc, objPath) => {
             const element = allObjects[objPath];
@@ -80,10 +81,11 @@ export const require_withoutAll = new Rule<
                     ...acc,
                     [finalPath]: {
                         message: handelMessage(
-                            ValueNotExist[lang],
+                            errors[lang],
                             curVal,
                             data,
                             finalPath,
+                            input,
                             lang
                         ),
                         value: curVal,

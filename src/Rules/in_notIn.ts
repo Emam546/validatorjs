@@ -16,17 +16,19 @@ export const _in = new Rule<{ in: (string | number)[] }>(
     (val: unknown): val is { in: (string | number)[] } => {
         return hasOwnProperty(val, "in") && isArray(val.in);
     },
-    (...arr) =>
-        contains(arr[0], arr[1].in)
+    (value, data, path, input, lang, errors) =>
+        contains(value, data.in)
             ? undefined
-            : handelMessage(MessagesIn[arr[3]], ...arr)
+            : handelMessage(errors[lang], value, data, path, input, lang),
+    MessagesIn
 );
 export const notIn = new Rule<{ not_in: (string | number)[] }>(
     (val: unknown): val is { not_in: (string | number)[] } => {
         return hasOwnProperty(val, "not_in") && isArray(val.not_in);
     },
-    (...arr) =>
-        !contains(arr[0], arr[1].not_in)
+    (value, data, path, input, lang, errors) =>
+        !contains(value, data.not_in)
             ? undefined
-            : handelMessage(MessagesNotIn[arr[3]], ...arr)
+            : handelMessage(errors[lang], value, data, path, input, lang),
+    MessagesIn
 );

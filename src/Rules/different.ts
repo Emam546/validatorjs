@@ -1,4 +1,4 @@
-import Rule, { ErrorMessage } from "@/Rule";
+import Rule, { ErrorMessage, MessagesStore } from "@/Rule";
 
 import compare, { hasOwnProperty } from "@/utils/compare";
 import ValuesNotSame from "./Messages/ValuesNotSame";
@@ -7,13 +7,16 @@ import { isString } from "@/utils/types";
 import { ObjectEntries } from "@/utils";
 import { getAllValues, getValue } from "@/utils/getValue";
 import handelMessage from "@/utils/handelMessage";
-export default new Rule<{ different: string }>(
+export default new Rule<
+    { different: string },
+    MessagesStore<{ different: string }>
+>(
     (val: unknown): val is { different: string } => {
         return hasOwnProperty(val, "different") && isString(val.different);
     },
     () => undefined,
-    function (...arr) {
-        const [input, data, path, lang] = arr;
+    ValuesNotSame,
+    function (input, data, path, lang, errors) {
         const allPaths = path.split(".");
         const orgPath = allPaths[allPaths.length - 1];
         const differentPath =
@@ -28,7 +31,14 @@ export default new Rule<{ different: string }>(
             const orgValue = getValue(value, orgPath);
             if (compare(orgValue, differentValue))
                 acc[path && path != "." ? path + "." + orgPath : orgPath] = {
-                    message: handelMessage(ValuesNotSame[lang], ...arr),
+                    message: handelMessage(
+                        errors[lang],
+                        orgValue,
+                        data,
+                        path,
+                        input,
+                        lang
+                    ),
                     value: orgValue,
                 };
             return acc;

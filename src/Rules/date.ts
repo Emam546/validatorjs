@@ -33,47 +33,111 @@ function getTime(dateString: unknown): Date {
     } else if (isNumber(dateString)) return new Date(dateString);
     throw new Error("undefined type");
 }
-export const isDate = new Rule("isDate", function isDateFn(...arr) {
-    const [value, , , lang] = arr;
-    if (!isValidDate(value)) return handelMessage(NotValidDate[lang], ...arr);
-});
+export const isDate = new Rule(
+    "isDate",
+    function isDateFn(value, data, path, input, lang, errors) {
+        if (!isValidDate(value))
+            return handelMessage(errors[lang], value, data, path, input, lang);
+    },
+    NotValidDate
+);
 
-export const date = new Rule<{ date: Date; diff?: number }>(
+export const date = new Rule<
+    { date: Date; diff?: number },
+    {
+        errors: MessagesStore<{ date: Date; diff?: number }>;
+        notValidate: MessagesStore<{ date: Date; diff?: number }>;
+    }
+>(
     (val): val is { date: Date; diff?: number } => {
         return hasOwnProperty(val, "date") && val["date"] instanceof Date;
     },
-    function equal(...arr) {
-        const [value, data, , lang] = arr;
+    function equal(value, data, path, input, lang, errors) {
         if (!isValidDate(value))
-            return handelMessage(NotValidDate[lang], ...arr);
+            return handelMessage(
+                errors.notValidate[lang],
+                value,
+                data,
+                path,
+                input,
+                lang
+            );
         if (
             Math.abs(data.date.getTime() - getTime(value).getTime()) >
             (data.diff || 1000)
         )
-            return handelMessage(Equal[lang], ...arr);
-    }
+            return handelMessage(
+                errors.errors[lang],
+                value,
+                data,
+                path,
+                input,
+                lang
+            );
+    },
+    { notValidate: NotValidDate, errors: Equal }
 );
-export const after = new Rule<{ after: Date }>(
+export const after = new Rule<
+    { after: Date },
+    {
+        errors: MessagesStore<{ after: Date }>;
+        notValidate: MessagesStore<{ after: Date }>;
+    }
+>(
     (val): val is { after: Date } => {
         return hasOwnProperty(val, "after") && val["after"] instanceof Date;
     },
-    function afterfn(...arr) {
-        const [value, data, , lang] = arr;
+    function afterfn(value, data, path, input, lang, errors) {
         if (!isValidDate(value))
-            return handelMessage(NotValidDate[lang], ...arr);
+            return handelMessage(
+                errors.notValidate[lang],
+                value,
+                data,
+                path,
+                input,
+                lang
+            );
         if (data.after > getTime(value))
-            return handelMessage(After[lang], ...arr);
-    }
+            return handelMessage(
+                errors.errors[lang],
+                value,
+                data,
+                path,
+                input,
+                lang
+            );
+    },
+    { notValidate: NotValidDate, errors: After }
 );
-export const before = new Rule<{ before: Date }>(
+export const before = new Rule<
+    { before: Date },
+    {
+        errors: MessagesStore<{ before: Date }>;
+        notValidate: MessagesStore<{ before: Date }>;
+    }
+>(
     (val: unknown): val is { before: Date } => {
         return hasOwnProperty(val, "before") && val["before"] instanceof Date;
     },
-    function beforefn(...arr) {
-        const [value, data, , lang] = arr;
+    function beforefn(value, data, path, input, lang, errors) {
         if (!isValidDate(value))
-            return handelMessage(NotValidDate[lang], ...arr);
+            return handelMessage(
+                errors.notValidate[lang],
+                value,
+                data,
+                path,
+                input,
+                lang
+            );
         if (data.before < getTime(value))
-            return handelMessage(Before[lang], ...arr);
-    }
+            return handelMessage(
+                errors.errors[lang],
+                value,
+                data,
+                path,
+                input,
+                lang
+            );
+    },
+    { notValidate: NotValidDate, errors: Before }
 );

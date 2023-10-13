@@ -5,8 +5,12 @@ export const Messages: MessagesStore<unknown> = {
     en: "THE TYPE OF INPUT IS NOT STRING",
 };
 
-export default new Rule("string", (value, ...arr) => {
-    return isString(value)
-        ? undefined
-        : handelMessage(Messages[arr[2]], value, ...arr);
-});
+export default new Rule(
+    "string",
+    (value, data, path, input, lang, errors) => {
+        return isString(value)
+            ? undefined
+            : handelMessage(errors[lang], value, data, path, input, lang);
+    },
+    Messages
+);

@@ -5,8 +5,12 @@ export const Messages: MessagesStore<unknown> = {
     en: "the input value is not a number",
 };
 
-export default new Rule("integer", (value, ...arr) => {
-    return isNumber(value)
-        ? undefined
-        : handelMessage(Messages[arr[2]], value, ...arr);
-});
+export default new Rule(
+    "integer",
+    (value, data, path, input, lang, errors) => {
+        return isNumber(value)
+            ? undefined
+            : handelMessage(errors[lang], value, data, path, input, lang);
+    },
+    Messages
+);
