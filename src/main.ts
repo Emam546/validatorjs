@@ -48,6 +48,7 @@ export default class ValidatorClass<T extends InputRules> {
                 "The rules is not extended from the INput Rules type"
             );
         this.rules = rules;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         this.CPaths = (extractRulesPaths as any)(rules);
         this.defaultoptions = options || { lang: "en" };
     }
