@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import { isArray, isString } from "./types";
 import Validator from "@/main";
 export type ValidArray<T = unknown> =
