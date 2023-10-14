@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { RulesGetter } from "./type";
 import type LangType from "./types/lang";
 import { objectKeys } from "./utils";
@@ -105,7 +104,7 @@ export default class Rule<
                 });
                 return acc;
             }, {});
-        return new Promise<Record<string, ErrorMessage>>((res) => {
+        return new Promise<Record<string, ErrorMessage>>((res,rej) => {
             Promise.all(messages.map(async (val) => await val)).then(
                 (messages) =>
                     res(
@@ -119,7 +118,7 @@ export default class Rule<
                             {}
                         )
                     )
-            );
+            ).catch(rej);
         });
     }
 }
