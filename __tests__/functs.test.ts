@@ -1,7 +1,6 @@
 import { InputRules, extractRulesPaths } from "@/index";
 import constructRule from "@/utils/constructObj";
 import { getAllValues, getValue } from "@/utils/getValue";
-import inValidAttr from "@/utils/inValidAttr";
 import isEmpty from "@/utils/isEmpty";
 import mergeObjects from "@/utils/merge";
 import { setAllValues, setValue } from "@/utils/setValue";
@@ -521,12 +520,150 @@ describe("Valid attr", () => {
     });
 });
 describe("test merge objs methods", () => {
-    test("main way", () => {
-        const obj1 = { name: "ali" };
-        const obj2 = { age: 12 };
-        expect(mergeObjects(obj1, obj2)).toStrictEqual({
-            name: "ali",
-            age: 12,
+    describe("main way", () => {
+        test("simple objects", () => {
+            const obj1 = { name: "ali" };
+            const obj2 = { age: 12 };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: "ali",
+                age: 12,
+            });
+        });
+        test("has the same keys", () => {
+            const obj1 = { name: "ali" };
+            const obj2 = { age: 12 };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: "ali",
+                age: 12,
+            });
+        });
+    });
+    describe("complex objects", () => {
+        test("with the same name", () => {
+            const obj1 = { name: "ali" };
+            const obj2 = { name: { firstName: "ali" } };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: { firstName: "ali" },
+            });
+        });
+        test("the first object is bigger an has more keys", () => {
+            const obj1 = { en: "ali", fr: "ahmed", ar: "ahmed" };
+            const obj2 = { name: { en: "ali" } };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: { en: "ali" },
+                en: "ali",
+                fr: "ahmed",
+                ar: "ahmed",
+            });
+        });
+        test("the first object is bigger an has more keys and different types", () => {
+            const obj1 = { en: "ali", fr: "ahmed", ar: "ahmed", name: "ali" };
+            const obj2 = { name: { en: "ali" } };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: { en: "ali" },
+                en: "ali",
+                fr: "ahmed",
+                ar: "ahmed",
+            });
+        });
+
+        test("with the same name and the same value", () => {
+            const obj1 = { name: { lastName: "ahmed" } };
+            const obj2 = { name: { firstName: "ali" } };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: { firstName: "ali", lastName: "ahmed" },
+            });
+        });
+        test("with the more than one key", () => {
+            const obj1 = { name: { lastName: "ahmed" } };
+            const obj2 = { name: { firstName: "ali", anotherName: "sayed" } };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: {
+                    firstName: "ali",
+                    lastName: "ahmed",
+                    anotherName: "sayed",
+                },
+            });
+        });
+        test("same key inside the object", () => {
+            const obj1 = { name: { lastName: "ahmed", firstName: "ali" } };
+            const obj2 = { name: { firstName: "ahmed", anotherName: "sayed" } };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: {
+                    firstName: "ahmed",
+                    lastName: "ahmed",
+                    anotherName: "sayed",
+                },
+            });
+        });
+        test("same key inside the object but an array", () => {
+            const obj1 = {
+                name: { lastName: "ahmed", firstName: ["a", "l", "i"] },
+            };
+            const obj2 = { name: { firstName: "ahmed", anotherName: "sayed" } };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: {
+                    firstName: ["a", "l", "i"],
+                    lastName: "ahmed",
+                    anotherName: "sayed",
+                },
+            });
+        });
+    });
+    describe("complex arrays", () => {
+        test("with the same name", () => {
+            const obj1 = { name: "ali" };
+            const obj2 = { name: [{ firstName: "ali" }] };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: [{ firstName: "ali" }],
+            });
+        });
+        test("with the same name and the same value", () => {
+            const obj1 = { name: [{ lastName: "ahmed" }] };
+            const obj2 = { name: [{ firstName: "ali" }] };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: [{ firstName: "ali", lastName: "ahmed" }],
+            });
+        });
+        test("with the same name and the same value but with more than one key", () => {
+            const obj1 = { name: [{ lastName: "ahmed" }] };
+            const obj2 = { name: [{ firstName: "ali", nickName: "bob" }] };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: [
+                    { firstName: "ali", lastName: "ahmed", nickName: "bob" },
+                ],
+            });
+        });
+        test("with the same name and the same value but different types", () => {
+            const obj1 = { name: [{ lastName: "ahmed" }] };
+            const obj2 = { name: ["string"] };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: [{ lastName: "ahmed" }],
+            });
+        });
+        test("with the same name and the same value but with different indexes", () => {
+            const obj1 = { name: [{ lastName: "ahmed" }] };
+            const obj2 = {
+                name: [{ lastName: "sayed" }, { firstName: "ali" }],
+            };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: [{ lastName: "sayed" }, { firstName: "ali" }],
+            });
+        });
+        test("with the same name and the same value but with different indexes and values", () => {
+            const obj1 = { name: [{ lastName: "ahmed" }] };
+            const obj2 = {
+                name: [
+                    { lastName: "sayed" },
+                    { firstName: "ahmed", lastName: "sayed" },
+                ],
+            };
+            expect(mergeObjects(obj1, obj2)).toStrictEqual({
+                name: [
+                    { lastName: "sayed" },
+                    { firstName: "ahmed", lastName: "sayed" },
+                ],
+            });
         });
     });
 });

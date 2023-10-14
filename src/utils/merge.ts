@@ -1,43 +1,25 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+import { ObjectEntries } from ".";
 import { hasOwnProperty } from "./compare";
-import { isArray, isNumber, isString } from "./types";
-function filterObj(obj: unknown): obj is Record<string, unknown> {
-    return (
-        !(
-            isString(obj) &&
-            isNumber(obj) &&
-            typeof obj == "boolean" &&
-            typeof obj == "undefined"
-        ) && obj instanceof Object
-    );
+import { isArray } from "./types";
+function isObject<T>(
+    value: unknown
+): value is Record<string | number, T> | Array<T> {
+    return typeof value === "object" && value !== null;
 }
-export default function mergeObjects(...objs: any[]) {
-    objs = objs.filter((obj) => obj != undefined);
-    if (!objs.length) return;
-    const newObjs = objs.filter(filterObj);
-    if (!newObjs.length) return objs.at(-1);
-    objs = newObjs;
-    if (objs.length == 1) return objs[0];
-    const allKeys = objs.reduce((acc, cObj) => {
-        return { ...acc, ...cObj };
-    }, {});
-    for (const objKey in allKeys) {
-        if (hasOwnProperty(allKeys, objKey)) {
-            const element = allKeys[objKey];
-            if (isArray(element) && isArray<unknown[]>(objs)) {
-                const maxLength = objs.reduce<number>(
-                    (acc, v) => acc + v.length,
-                    0
-                );
-                for (let i = 0; i < maxLength; i++)
-                    element[i] = mergeObjects(...objs.map((obj) => obj[i]));
-            } else
-                allKeys[objKey] = mergeObjects(
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-                    ...objs.map((obj) => obj[objKey])
-                );
-        }
-    }
-    return allKeys;
+export default function mergeObjects(...objs: unknown[]): unknown {
+    return objs.reduce((acc, val) => {
+        if (!isObject(acc)) return val;
+        if (!isObject(val)) return acc;
+        if (isArray(val))
+            return val.reduce<Array<unknown>>((arr, val, key) => {
+                if (!hasOwnProperty(acc, key)) return [...arr, val];
+                return [...arr, mergeObjects(acc[key], val)];
+            }, []);
+        return ObjectEntries(val).reduce<object>((acc, [key, val]) => {
+            if (!hasOwnProperty(acc, key)) {
+                return { ...acc, [key]: val };
+            }
+            return { ...acc, [key]: mergeObjects(acc[key], val) };
+        }, acc);
+    }, objs[0]);
 }
