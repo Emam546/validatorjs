@@ -58,10 +58,10 @@ describe("test is equal validator", () => {
         ).toBe(false);
     });
     test("regExp", () => {
-        expect(AllRules.regExp.isequal({ regex: /myXp/gi })).toBe(true);
-        expect(AllRules.regExp.isequal({ regex: /myReg/ })).toBe(true);
-        expect(AllRules.regExp.isequal({ regex: "//ig" })).toBe(false);
-        expect(AllRules.regExp.isequal({ regex: "" })).toBe(false);
-        expect(AllRules.regExp.isequal({ " regex": /myXp/gi })).toBe(false);
+        expect(AllRules.regExp.isequal({ regExp: /myXp/gi })).toBe(true);
+        expect(AllRules.regExp.isequal({ regExp: /myReg/ })).toBe(true);
+        expect(AllRules.regExp.isequal({ regExp: "//ig" })).toBe(false);
+        expect(AllRules.regExp.isequal({ regExp: "" })).toBe(false);
+        expect(AllRules.regExp.isequal({ " regExp": /myXp/gi })).toBe(false);
     });
 });

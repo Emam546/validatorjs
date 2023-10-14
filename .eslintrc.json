@@ -24,7 +24,7 @@
                 ]
             }
         ],
-        "node/no-missing-import": 1,
+        "node/no-missing-import": 0,
         "node/no-unpublished-import": 1
     },
     "settings": {

@@ -6,7 +6,7 @@ function isObject<T>(
 ): value is Record<string | number, T> | Array<T> {
     return typeof value === "object" && value !== null;
 }
-export default function mergeObjects(...objs: unknown[]): unknown {
+export default function mergeObjects<T>(...objs: unknown[]): T {
     return objs.reduce((acc, val) => {
         if (!isObject(acc)) return val;
         if (!isObject(val)) return acc;
@@ -21,5 +21,5 @@ export default function mergeObjects(...objs: unknown[]): unknown {
             }
             return { ...acc, [key]: mergeObjects(acc[key], val) };
         }, acc);
-    }, objs[0]);
+    }, objs[0]) as T;
 }

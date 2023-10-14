@@ -1,3 +1,4 @@
+import { objectValues } from ".";
 import { isArray, isString } from "./types";
 import Validator from "@/main";
 export type ValidArray<T = unknown> =
@@ -29,12 +30,12 @@ export type RulesNames = {
 export type RulesGetter = Array<RulesNames> | null;
 
 export function is_Rule(val: unknown): val is RulesGetter {
-    if (Validator.Rules.length == 0)
-        throw new Error("there is no rules defined");
     return (
         (isArray(val) &&
             val.every((g) => {
-                return Validator.Rules.some((rule) => rule.isequal(g));
+                return objectValues(Validator.Rules).some((rule) =>
+                    rule.isequal(g)
+                );
             })) ||
         val == null
     );
