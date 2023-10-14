@@ -1,7 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-types */
 import { isArray, isObject, isPromise, isString } from "@/utils/types";
+import {
+    isValidInput,
+    InputRules,
+    PathRules,
+    RulesNames,
+    ValidTypes,
+    is_Rule,
+    RulesGetter,
+} from "@/type";
 import type {
     InitSubmitFun,
     RuleFun,
@@ -14,21 +21,11 @@ import LangTypes from "@/types/lang";
 import { getValue, getAllValues } from "@/utils/getValue";
 import validAttr from "@/utils/validAttr";
 import compare, { hasOwnProperty } from "@/utils/compare";
-import handelMessage from "@/utils/handelMessage";
 import { InvalidPath, UnMatchedType } from "@/utils/inValidAttr";
-export { InvalidPath, UnMatchedType } from "@/utils/inValidAttr";
-import {
-    isValidInput,
-    InputRules,
-    PathRules,
-    RulesNames,
-    ValidTypes,
-    is_Rule,
-    RulesGetter,
-} from "@/type";
+import handelMessage from "@/utils/handelMessage";
 import { checkRules, extractRulesPaths } from "@/parseRules";
 import { ObjectEntries, objectKeys, objectValues } from "@/utils";
-import { AllRules } from "./Rules";
+import { AllRules } from "@/Rules";
 
 export type ValidatorOptions = {
     lang?: LangTypes;
@@ -97,7 +94,7 @@ export default class ValidatorClass<T extends InputRules> {
                 return acc;
             }, {});
         return ObjectEntries(
-            this._get_errors(inputs, this.rules, inputs)
+            this._get_errors(inputs, this.rules, inputs, "")
         ).reduce((acc, [key, errors]) => {
             const arr = errors.filter(
                 (val): val is ErrorMessage =>
@@ -124,7 +121,7 @@ export default class ValidatorClass<T extends InputRules> {
             return acc;
         }, {});
 
-        const r = this._get_errors(inputs, this.rules, inputs);
+        const r = this._get_errors(inputs, this.rules, inputs, "");
         const farr: [string, Promise<ErrorMessage | undefined>[]][] = [];
 
         objectKeys(r).forEach((key) => {
@@ -161,6 +158,7 @@ export default class ValidatorClass<T extends InputRules> {
             >
         >((acc, rule) => {
             const res = rule.initSubmit(
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 (this as any).CPaths as Record<string, RulesGetter>,
                 inputs,
                 rule.errors,
@@ -173,14 +171,16 @@ export default class ValidatorClass<T extends InputRules> {
         input: unknown,
         rules: InputRules,
         allInput: unknown,
-        addedPath = ""
+        addedPath: string
     ): Record<string, Array<Promise<ErrorMessage | undefined> | ErrorMessage>> {
         const curPath = addedPath || ".";
         if (isString(rules)) rules = rules.split("|") as RulesNames[];
         if (is_Rule(rules)) {
             if (!rules) return {};
             const res = rules
-                .map((rule) => this.validate(input, rule, allInput, curPath))
+                .map((rule) =>
+                    this._validateInput(input, rule, allInput, curPath)
+                )
                 .filter(
                     (
                         rule
@@ -217,7 +217,10 @@ export default class ValidatorClass<T extends InputRules> {
                         ],
                     };
                 return ObjectEntries(input).reduce((acc, [path, val]) => {
-                    const cPath = addedPath ? `${addedPath}.${path}` : path;
+                    const cPath =
+                        addedPath && addedPath != "."
+                            ? `${addedPath}.${path}`
+                            : path;
                     if (rule2 && state && hasOwnProperty(rule2, path)) {
                         return {
                             ...acc,
@@ -262,17 +265,20 @@ export default class ValidatorClass<T extends InputRules> {
                     Array<Promise<ErrorMessage | undefined> | ErrorMessage>
                 >
             >((acc, val, i) => {
-                const cPath = addedPath ? `${addedPath}.*${i}` : `*${i}`;
+                const cPath =
+                    addedPath && addedPath != "."
+                        ? `${addedPath}.*${i}`
+                        : `*${i}`;
 
                 if (rule2 && state && hasOwnProperty(rule2, i)) {
                     return {
                         ...acc,
-                        ...this._get_errors(val, rule2[i], cPath),
+                        ...this._get_errors(val, rule2[i], allInput, cPath),
                     };
                 }
                 return {
                     ...acc,
-                    ...this._get_errors(val, rule1, cPath),
+                    ...this._get_errors(val, rule1, allInput, cPath),
                 };
             }, {});
         }
@@ -294,7 +300,8 @@ export default class ValidatorClass<T extends InputRules> {
             };
         return ObjectEntries(input)
             .map(([key, val]) => {
-                const fPath = addedPath ? `${addedPath}.${key}` : key;
+                const fPath =
+                    addedPath && addedPath != "." ? `${addedPath}.${key}` : key;
                 if (!hasOwnProperty(rules, key))
                     return {
                         [fPath]: [
@@ -313,10 +320,15 @@ export default class ValidatorClass<T extends InputRules> {
                     };
                 if (key == ".") {
                     if (!rules["."]) return {};
-                    return this._get_errors(val, rules["."], addedPath);
+                    return this._get_errors(
+                        val,
+                        rules["."],
+                        allInput,
+                        addedPath
+                    );
                 }
 
-                return this._get_errors(val, rules[key], fPath);
+                return this._get_errors(val, rules[key], allInput, fPath);
             })
             .reduce((acc, val) => ({ ...acc, ...val }), {});
     }
@@ -338,22 +350,22 @@ export default class ValidatorClass<T extends InputRules> {
         return compare(this.validAttr(inputs), inputs);
     }
 
-    validate(
+    private _validateInput(
         value: unknown,
-        rule: RulesNames,
+        data: RulesNames,
         allInput: unknown,
         path: string
     ): Promise<ErrorMessage | undefined> | ErrorMessage | undefined {
         for (let i = 0; i < ValidatorClass.Rules.length; i++) {
             const rule = ValidatorClass.Rules[i];
-            if (rule.isequal(rule)) {
+            if (rule.isequal(data)) {
                 const message = rule.validate(
                     value,
-                    rule,
+                    data,
                     path,
                     allInput,
-                    rule.errors,
-                    this.lang
+                    this.lang,
+                    rule.errors
                 );
                 if (message instanceof Promise) {
                     return new Promise<ErrorMessage | undefined>((res, rej) => {
@@ -373,7 +385,13 @@ export default class ValidatorClass<T extends InputRules> {
             }
         }
 
-        throw new Error(`THE RULE ${JSON.stringify(rule)} IS NOT EXIST`);
+        throw new Error(`THE RULE ${JSON.stringify(data)} IS NOT EXIST`);
+    }
+    validate(
+        value: unknown,
+        rule: RulesNames
+    ): Promise<ErrorMessage | undefined> | ErrorMessage | undefined {
+        return this._validateInput(value, rule, value, ".");
     }
     static extractRulesPaths = extractRulesPaths;
     static register<Data, Errors extends ErrorsType<Data>>(
@@ -383,7 +401,7 @@ export default class ValidatorClass<T extends InputRules> {
         initSubmit?: InitSubmitFun<Data, Errors>
     ) {
         const rule = new Rule(name, fun, errors, initSubmit);
-        ValidatorClass.Rules.push(rule as any);
+        ValidatorClass.Rules.push(rule);
         return rule;
     }
 }
