@@ -59,7 +59,7 @@ type FromPaths<T extends { path: string; type: RulesGetter }> = {
     [P in T["path"]]: Extract<T, { path: P }>["type"];
 };
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+type UnionToIntersection<U> = (U extends unknown ? (k: U) => void : never) extends (
     k: infer I
 ) => void
     ? I

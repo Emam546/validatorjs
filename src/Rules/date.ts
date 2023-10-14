@@ -1,4 +1,4 @@
-import Rule, { MessagesStore, RuleFun } from "@/Rule";
+import Rule, { MessagesStore } from "@/Rule";
 import { hasOwnProperty } from "@/utils/compare";
 import handelMessage from "@/utils/handelMessage";
 import isEmpty from "@/utils/isEmpty";

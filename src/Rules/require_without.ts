@@ -1,4 +1,4 @@
-import Rule, { ErrorMessage } from "@/Rule";
+import Rule from "@/Rule";
 import { getAllValues, getValue } from "@/utils/getValue";
 import { ValueNotExist as Messages } from "./required";
 export { ValueNotExist as Messages } from "./required";

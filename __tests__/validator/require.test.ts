@@ -1,5 +1,5 @@
 import Validator from "@/index";
-import { InvalidPath, UnMatchedType } from "@/main";
+import { InvalidPath, UnMatchedType } from "@/utils/inValidAttr";
 import { ValueNotExist } from "@/Rules/required";
 import { Messages } from "@/Rules/require_if";
 import { Messages as RequireWithoutMessages } from "@/Rules/require_without";

@@ -26,7 +26,9 @@ export function getAllValues(
                             getAllValues(
                                 val,
                                 restPath,
-                                addedPath ? `${addedPath}.${i}` : key
+                                addedPath && addedPath != "."
+                                    ? `${addedPath}.${i}`
+                                    : key
                             )
                         ).reduce<Record<string, unknown>>(
                             (acc, [key, val]) => ({ ...acc, [key]: val }),
@@ -44,7 +46,9 @@ export function getAllValues(
                         getAllValues(
                             val,
                             restPath,
-                            addedPath ? `${addedPath}.*${i}` : key
+                            addedPath && addedPath != "."
+                                ? `${addedPath}.*${i}`
+                                : key
                         )
                     ).reduce<Record<string, unknown>>(
                         (acc, [key, val]) => ({ ...acc, [key]: val }),
@@ -53,7 +57,7 @@ export function getAllValues(
                 };
             }, {});
     }
-    const newAdd = addedPath ? `${addedPath}.${key}` : key;
+    const newAdd = addedPath && addedPath != "." ? `${addedPath}.${key}` : key;
 
     return hasOwnProperty(inputs, key)
         ? getAllValues(inputs[key], restPath, newAdd)

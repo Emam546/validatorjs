@@ -30,5 +30,5 @@ export const notIn = new Rule<{ not_in: (string | number)[] }>(
         !contains(value, data.not_in)
             ? undefined
             : handelMessage(errors[lang], value, data, path, input, lang),
-    MessagesIn
+    MessagesNotIn
 );

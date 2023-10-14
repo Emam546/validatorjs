@@ -117,8 +117,10 @@ test("IF THE RULE EXIST", () => {
         name: "ali",
     };
     const validator = new Validator(Rules);
-    expect(validator.validate("name", "string", "")).toStrictEqual(undefined);
-    expect(validator.validate(1234, "string", "")).toStrictEqual({
+    expect(validator.validate("name", "string")).toStrictEqual(
+        undefined
+    );
+    expect(validator.validate(1234, "string")).toStrictEqual({
         message: Messages[validator.lang],
         value: 1234,
     });

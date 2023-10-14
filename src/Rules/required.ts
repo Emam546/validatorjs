@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import Rule from "@/Rule";
 import { getAllValues, getValue } from "@/utils/getValue";
 import handelMessage from "@/utils/handelMessage";

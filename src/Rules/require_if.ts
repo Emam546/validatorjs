@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Rule, { MessagesStore } from "@/Rule";
 import compare, { hasOwnProperty } from "@/utils/compare";
 import { getAllValues, getValue } from "@/utils/getValue";
