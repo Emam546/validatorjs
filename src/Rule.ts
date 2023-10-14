@@ -1,4 +1,3 @@
-import { RulesGetter } from "./type";
 import type LangType from "./types/lang";
 import { objectKeys } from "./utils";
 import { isPromise, isString } from "./utils/types";
@@ -48,7 +47,8 @@ function isNoPromises(
 
 export default class Rule<
     Data,
-    Errors extends ErrorsType<Data> = MessagesStore<Data>
+    Errors extends ErrorsType<Data> = MessagesStore<Data>,
+    G = never
 > {
     readonly errors: Errors;
     private readonly eq: Data extends string ? Data : EqualFun<Data>;
@@ -73,7 +73,7 @@ export default class Rule<
         return this.fn(...arr);
     }
     initSubmit(
-        rules: Record<string, RulesGetter>,
+        rules: Record<string, unknown[]>,
         input: unknown,
         errors: Errors,
         lang: LangType
@@ -104,9 +104,9 @@ export default class Rule<
                 });
                 return acc;
             }, {});
-        return new Promise<Record<string, ErrorMessage>>((res,rej) => {
-            Promise.all(messages.map(async (val) => await val)).then(
-                (messages) =>
+        return new Promise<Record<string, ErrorMessage>>((res, rej) => {
+            Promise.all(messages.map(async (val) => await val))
+                .then((messages) =>
                     res(
                         messages.reduce<Record<string, ErrorMessage>>(
                             (acc, cur) => {
@@ -118,7 +118,8 @@ export default class Rule<
                             {}
                         )
                     )
-            ).catch(rej);
+                )
+                .catch(rej);
         });
     }
 }

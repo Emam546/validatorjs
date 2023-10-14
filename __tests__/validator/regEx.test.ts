@@ -4,8 +4,29 @@ describe("test regEx", () => {
     test("simple string", () => {
         const validator = new Validator({ val: [{ regExp: /^(myWord)$/gi }] });
         expect(validator.getErrors({ val: "myWord" })).toStrictEqual({});
-        expect(validator.getErrors({ val: "string" })).toBe(false);
-        expect(validator.getErrors({ val: " myWord" })).toBe(false);
-        expect(validator.getErrors({ val: "myWord " })).toBe(false);
+        expect(validator.getErrors({ val: "string" })).toStrictEqual({
+            val: [
+                {
+                    message: Messages[validator.lang],
+                    value: "string",
+                },
+            ],
+        });
+        expect(validator.getErrors({ val: " myWord" })).toStrictEqual({
+            val: [
+                {
+                    message: Messages[validator.lang],
+                    value: " myWord",
+                },
+            ],
+        });
+        expect(validator.getErrors({ val: "myWord " })).toStrictEqual({
+            val: [
+                {
+                    message: Messages[validator.lang],
+                    value: "myWord ",
+                },
+            ],
+        });
     });
 });

@@ -4,7 +4,7 @@ import handelMessage from "@/utils/handelMessage";
 import { isString } from "@/utils/types";
 export const Messages: MessagesStore<unknown> = { en: "THE URL IS NOT VALID" };
 
-export default new Rule(
+export default new Rule<"url", typeof Messages, string>(
     "url",
     (value, data, path, input, lang, errors) => {
         return isString(value) &&

@@ -5,7 +5,7 @@ import { isString } from "@/utils/types";
 export const Messages: MessagesStore<unknown> = {
     en: "THIS IS NOT A VALID EMAIL",
 };
-export default new Rule(
+export default new Rule<"email", typeof Messages, string>(
     "email",
     (value, data, path, input, lang, errors) => {
         if (!isString(value))

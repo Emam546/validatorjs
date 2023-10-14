@@ -59,9 +59,9 @@ type FromPaths<T extends { path: string; type: RulesGetter }> = {
     [P in T["path"]]: Extract<T, { path: P }>["type"];
 };
 
-type UnionToIntersection<U> = (U extends unknown ? (k: U) => void : never) extends (
-    k: infer I
-) => void
+type UnionToIntersection<U> = (
+    U extends unknown ? (k: U) => void : never
+) extends (k: infer I) => void
     ? I
     : never;
 type ValidG = Validator.AvailableRules[keyof Validator.AvailableRules];

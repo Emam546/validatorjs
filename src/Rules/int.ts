@@ -5,7 +5,7 @@ export const Messages: MessagesStore<unknown> = {
     en: "the input value is not a number",
 };
 
-export default new Rule(
+export default new Rule<"integer", typeof Messages, number>(
     "integer",
     (value, data, path, input, lang, errors) => {
         return isNumber(value)

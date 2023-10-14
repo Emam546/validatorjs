@@ -1,14 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isArray, isObject, isPromise, isString } from "@/utils/types";
-import {
-    isValidInput,
-    InputRules,
-    PathRules,
-    RulesNames,
-    ValidTypes,
-    is_Rule,
-    RulesGetter,
-} from "@/type";
+import { isValidInput, InputRules, PathRules, RulesNames, ValidTypes, is_Rule } from "@/type";
 import type {
     InitSubmitFun,
     RuleFun,
@@ -160,7 +152,7 @@ export default class ValidatorClass<T extends InputRules> {
         >((acc, rule) => {
             const res = rule.initSubmit(
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                (this as any).CPaths as Record<string, RulesGetter>,
+                (this as any).CPaths as Record<string, unknown[]>,
                 inputs,
                 rule.errors,
                 this.lang

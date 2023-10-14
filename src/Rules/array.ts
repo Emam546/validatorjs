@@ -4,7 +4,7 @@ import { isArray } from "@/utils/types";
 export const Messages: MessagesStore<unknown> = {
     en: "ARRAY REQUIREMENTS HAVEN'T BEEN APPLIED ",
 };
-export default new Rule(
+export default new Rule<"array", typeof Messages, Array<unknown>>(
     "array",
     (value, data, path, input, lang, errors) => {
         return isArray(value)

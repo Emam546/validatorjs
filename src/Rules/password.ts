@@ -5,7 +5,7 @@ export const Messages: MessagesStore<unknown> = {
     en: "THE PASSWORD IS NOT VALID",
 };
 
-export default new Rule(
+export default new Rule<"password", typeof Messages, string>(
     "password",
     (value, data, path, input, lang, errors) => {
         return isString(value) &&

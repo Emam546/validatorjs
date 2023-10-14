@@ -141,9 +141,9 @@ describe("Test PathRules", () => {
         type TestType = Expect<
             Equal<
                 PathRules<{
-                    name: [{ require_if: { path: string; value: string } }];
+                    name: [{ required_if: { path: string; value: string } }];
                 }>,
-                { name: [{ require_if: { path: string; value: string } }] }
+                { name: [{ required_if: { path: string; value: string } }] }
             >
         >;
     });
@@ -280,7 +280,7 @@ describe("Test ValidTypes", () => {
                 ValidTypes<{
                     name: [{ after: Date }];
                 }>,
-                { name: Date & string & number }
+                { name: unknown }
             >
         >;
         type G = ValidTypes<{

@@ -7,9 +7,7 @@ import { hasOwnProperty } from "@/utils/compare";
 import { objectKeys } from "@/utils";
 import handelMessage from "@/utils/handelMessage";
 
-export const require_without = new Rule<
-    Validator.AvailableRules["required_without"]["path"]
->(
+export const require_without = new Rule<{ required_without: Array<string> }>(
     (val: unknown): val is { required_without: Array<string> } => {
         return (
             hasOwnProperty(val, "required_without") &&
@@ -52,9 +50,9 @@ export const require_without = new Rule<
         }, {});
     }
 );
-export const require_withoutAll = new Rule<
-    Validator.AvailableRules["required_withoutAll"]["path"]
->(
+export const require_withoutAll = new Rule<{
+    required_withoutAll: Array<string>;
+}>(
     (val: unknown): val is { required_withoutAll: Array<string> } => {
         return (
             hasOwnProperty(val, "required_withoutAll") &&

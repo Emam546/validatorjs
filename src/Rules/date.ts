@@ -82,7 +82,8 @@ export const after = new Rule<
     {
         errors: MessagesStore<{ after: Date }>;
         notValidate: MessagesStore<{ after: Date }>;
-    }
+    },
+    string & Date & number
 >(
     (val): val is { after: Date } => {
         return hasOwnProperty(val, "after") && val["after"] instanceof Date;

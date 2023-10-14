@@ -5,7 +5,7 @@ export const Messages: MessagesStore<unknown> = {
     en: "THE TYPE OF INPUT IS NOT STRING",
 };
 
-export default new Rule(
+export default new Rule<"string", typeof Messages, string>(
     "string",
     (value, data, path, input, lang, errors) => {
         return isString(value)

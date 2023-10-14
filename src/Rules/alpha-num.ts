@@ -4,7 +4,7 @@ import { isString } from "@/utils/types";
 const Messages: MessagesStore<unknown> = {
     en: "The input value must contains only characters or numeric values",
 };
-export default new Rule(
+export default new Rule<"alpha_num", typeof Messages, string>(
     "alpha_num",
     (value, data, path, input, lang, errors) => {
         return isString(value) && /^[a-zA-Z0-9]+$/.test(value)

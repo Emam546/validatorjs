@@ -1,5 +1,5 @@
 import Rule, { StoredMessage } from "@/Rule";
-import LangTypes from "../types/lang";
+import LangTypes from "@/types/lang";
 import handelUnError from "@/utils/handelUnError";
 import { isArray, isNumber, isObject, isString } from "@/utils/types";
 import UnKnownInputValue from "./Messages/unKnownValue";
