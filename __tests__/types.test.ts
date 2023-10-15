@@ -1,4 +1,4 @@
-import { PathRules, ValidTypes } from "@/type";
+import Validator, { InputRules, PathRules, ValidTypes } from "@/index";
 type Expect<T extends true> = T;
 type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y
     ? 1
@@ -171,6 +171,14 @@ describe("Test ValidTypes", () => {
                 { name: string & number }
             >
         >;
+        type TestTypeWithOneInputString = Expect<
+            Equal<
+                ValidTypes<{
+                    name: "string";
+                }>,
+                { name: string & number }
+            >
+        >;
         type TestType3 = Expect<
             Equal<ValidTypes<["string", "integer"]>, string & number>
         >;
@@ -294,5 +302,16 @@ describe("Test ValidTypes", () => {
                 { name: string }
             >
         >;
+    });
+});
+describe("test passes method type", () => {
+    test("test with normal object", () => {
+        type G = { val: ["string"] };
+        type ValidG = ValidTypes<G>;
+        const validator = new Validator({ val: "string" });
+        const res = validator.passes({ val: "string" });
+        if (res.state) {
+            type G = Expect<Equal<typeof res.data, ValidG>>;
+        }
     });
 });
