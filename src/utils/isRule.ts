@@ -8,9 +8,9 @@ export type ValidArray<T = unknown> =
           T,
           "object" | "array",
           (
-              | {
-                    [name: string]: T;
-                }
+              | ({
+                    [name: string | number]: T;
+                } & { "."?: RulesGetter })
               | RulesGetter
           )
       ];

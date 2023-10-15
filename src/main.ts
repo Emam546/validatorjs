@@ -46,11 +46,12 @@ export default class ValidatorClass<T extends InputRules> {
     constructor(rules: T, options?: Partial<ValidatorOptions>) {
         if (!checkRules(rules))
             throw new Error(
-                "The rules is not extended from the INput Rules type"
+                "The rules is not extended from the Input Rules type"
             );
         this.rules = rules;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         this.CPaths = (extractRulesPaths as any)(rules);
+
         this.defaultoptions = mergeObjects(
             {
                 lang: "en",

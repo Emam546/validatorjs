@@ -5,17 +5,27 @@ export type InputRules =
     | RulesGetter
     | string
     | ({
-          [name: string]: InputRules;
+          [name: string | number]: InputRules;
       } & { "."?: RulesGetter })
     | [InputRules]
     | [InputRules, "object" | "array"]
     | [
           InputRules,
-          "object" | "array",
+          "object",
           (
-              | {
+              | ({
                     [name: string]: InputRules;
-                }
+                } & { "."?: RulesGetter })
+              | RulesGetter
+          )
+      ]
+    | [
+          InputRules,
+          "array",
+          (
+              | ({
+                    [name: number]: InputRules;
+                } & { "."?: RulesGetter })
               | RulesGetter
           )
       ];

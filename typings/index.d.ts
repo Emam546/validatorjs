@@ -15,11 +15,8 @@ type G = {
         : never;
 };
 type _Errors = {
-    [K in keyof _Rules]: _Rules[K] extends Rule<
-        unknown,
-        infer ErrorsType,
-        unknown
-    >
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [K in keyof _Rules]: _Rules[K] extends Rule<any, infer ErrorsType, any>
         ? ErrorsType
         : never;
 };
