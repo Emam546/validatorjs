@@ -1,4 +1,5 @@
 import Validator, { InputRules, PathRules, ValidTypes } from "@/index";
+
 type Expect<T extends true> = T;
 type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y
     ? 1
@@ -147,6 +148,17 @@ describe("Test PathRules", () => {
             >
         >;
     });
+    test("string types", () => {
+        type G = Expect<
+            Equal<
+                PathRules<{
+                    val: string;
+                    correct: "string";
+                }>,
+                { correct: ["string"] }
+            >
+        >;
+    });
 });
 describe("Test ValidTypes", () => {
     test("empty rule", () => {
@@ -176,7 +188,7 @@ describe("Test ValidTypes", () => {
                 ValidTypes<{
                     name: "string";
                 }>,
-                { name: string & number }
+                { name: string }
             >
         >;
         type TestType3 = Expect<
@@ -303,12 +315,34 @@ describe("Test ValidTypes", () => {
             >
         >;
     });
+    describe("test same cases", () => {
+        test("test if the string equals the array", () => {
+            type G = Expect<
+                Equal<
+                    ValidTypes<{
+                        val: ["string"];
+                    }>,
+                    ValidTypes<{ val: "string" }>
+                >
+            >;
+        });
+    });
+    test("test string type", () => {
+        type G = Expect<
+            Equal<
+                ValidTypes<{
+                    val: string;
+                }>,
+                { val: unknown }
+            >
+        >;
+    });
 });
 describe("test passes method type", () => {
     test("test with normal object", () => {
         type G = { val: ["string"] };
         type ValidG = ValidTypes<G>;
-        const validator = new Validator({ val: "string" });
+        const validator = new Validator({ val: ["string"] });
         const res = validator.passes({ val: "string" });
         if (res.state) {
             type G = Expect<Equal<typeof res.data, ValidG>>;

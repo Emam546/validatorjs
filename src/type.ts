@@ -93,7 +93,8 @@ export type ValidTypes<T> = T extends Record<string | number, InputRules>
         ? Record<string, ValidTypes<T[0]>> & ValidTypes<T[2]>
         : Array<ValidTypes<T[0]>> & ValidTypes<T[2]>
     : T extends string
-    ? ValidTypes<SplitString<T, "|">>
+    ? SplitString<T, "|"> extends RulesGetter
+        ? ValidTypes<SplitString<T, "|">>
+        : unknown
     : unknown;
-
 export type PathRules<T, P extends string = ""> = FromPaths<ToPaths<T, P>>;
