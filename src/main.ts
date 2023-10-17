@@ -78,7 +78,7 @@ export default class ValidatorClass<T extends InputRules> {
             errors,
         };
     }
-    static setDefaultLang(lang: LangTypes) {
+    static useLang(lang: LangTypes) {
         ValidatorClass.lang = lang;
     }
     static getDefaultLang(lang: LangTypes) {

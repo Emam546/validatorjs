@@ -510,7 +510,22 @@ validator
 
 ### Language Support
 
-Error messages are in English by default. To include another language in the browser
+Error messages are in English by default. To include another language in the browser, reference the language file in a script tag and call `Validator.useLang('lang_code')`.
+
+```html
+<script src="dist/validator.js"></script>
+<script src="dist/lang/ru.js"></script>
+<script>
+  Validator.useLang('es');
+</script>
+```
+
+In Node, it will automatically pickup on the language source files.
+
+```js
+let Validator = require('validatorjs');
+Validator.useLang('ru');
+```
 
 You can add your own custom language in initialization by add your custom errors in the options:
 
@@ -534,7 +549,12 @@ validator.errors.required;
 Switch the default language used by the validator:
 
 ```js
-validator.lang = 'fr';
+Validator.useLang('lang_code');
+```
+Get the default language being used:
+
+```js
+Validator.getDefaultLang(); // returns e.g. 'en'
 ```
 
 get specific errors message by adding lang attribute to the passes or getErrors function
@@ -543,10 +563,15 @@ get specific errors message by adding lang attribute to the passes or getErrors 
 validator.getErrors(data, 'lang_code');
 ```
 
-Get the default language being used:
-
+Override default messages for language:
 ```js
-validator.lang / returns e.g. 'en'
+let messages = Validator.Rules.required
+messages.en="my new custom message for required rule"
 ```
 
-Override default messages for language:
+### Credits
+
+validatorjs created by Imam Ashour
+
+E-Mail: [workemam54637@gmail.com](mailto:workemam54637@gmail.com)
+Website: [codedungeon.io](http://emam546.github.io)
