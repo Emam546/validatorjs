@@ -574,4 +574,4 @@ messages.en="my new custom message for required rule"
 validatorjs created by Imam Ashour
 
 E-Mail: [workemam54637@gmail.com](mailto:workemam54637@gmail.com)
-Website: [codedungeon.io](http://emam546.github.io)
+Website: [emam546.github.io](http://emam546.github.io)
