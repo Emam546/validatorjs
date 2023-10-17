@@ -10,7 +10,7 @@ test("test integer method", () => {
     expect(validator.getErrors({ val: NaN })).toStrictEqual({
         val: [
             {
-                message: Messages[validator.lang],
+                message: Messages[Validator.lang],
                 value: NaN,
             },
         ],
@@ -18,7 +18,7 @@ test("test integer method", () => {
     expect(validator.getErrors({ val: "10" })).toStrictEqual({
         val: [
             {
-                message: Messages[validator.lang],
+                message: Messages[Validator.lang],
                 value: "10",
             },
         ],
@@ -26,7 +26,7 @@ test("test integer method", () => {
     expect(validator.getErrors({ val: null })).toStrictEqual({
         val: [
             {
-                message: Messages[validator.lang],
+                message: Messages[Validator.lang],
                 value: null,
             },
         ],

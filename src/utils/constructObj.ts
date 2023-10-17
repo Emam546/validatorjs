@@ -6,7 +6,7 @@ import {
     is_Rule,
 } from "@/type";
 import { ObjectEntries } from "@/utils";
-import { isString } from "./types";
+import { isObject, isString } from "./types";
 export type ExtractedRules<T> = T extends Record<string | number, InputRules>
     ? {
           [K in keyof T]: ExtractedRules<T[K]>;
@@ -26,7 +26,7 @@ type ExtractedInputRules =
     | [ExtractedInputRules]
     | [ExtractedInputRules, "object" | "array"]
     | [ExtractedInputRules, "object" | "array", ExtractedInputRules];
-function constructRule(rules: InputRules): ExtractedInputRules {
+function constructRule(rules: unknown): ExtractedInputRules {
     if (is_Rule(rules) || isString(rules)) return null;
 
     if (isValidInput(rules)) {
@@ -37,7 +37,7 @@ function constructRule(rules: InputRules): ExtractedInputRules {
             rule2 ? constructRule(rule2) : null,
         ];
     }
-
+    if (!isObject(rules)) return null;
     return ObjectEntries(rules).reduce((acc, [key, val]) => {
         if (key == ".") return acc;
         return {
@@ -46,6 +46,6 @@ function constructRule(rules: InputRules): ExtractedInputRules {
         };
     }, {});
 }
-export default function <T extends InputRules>(rules: T): ExtractedRules<T> {
+export default function <T>(rules: T): ExtractedRules<T> {
     return constructRule(rules) as ExtractedRules<T>;
 }

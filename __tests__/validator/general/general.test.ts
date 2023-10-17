@@ -22,7 +22,7 @@ describe("test validate", () => {
         ).toStrictEqual({
             state: false,
             errors: {
-                name: [{ message: StringMessages[validator.lang], value: 123 }],
+                name: [{ message: StringMessages[Validator.lang], value: 123 }],
             },
         });
     });
@@ -121,7 +121,7 @@ test("IF THE RULE EXIST", () => {
     const validator = new Validator(Rules);
     expect(validator.validate("name", "string")).toStrictEqual(undefined);
     expect(validator.validate(1234, "string")).toStrictEqual({
-        message: StringMessages[validator.lang],
+        message: StringMessages[Validator.lang],
         value: 1234,
     });
 });
@@ -133,7 +133,7 @@ describe("test invalid attributes", () => {
         expect(validator.getErrors({ wrongPath: "value" })).toStrictEqual({
             wrongPath: [
                 {
-                    message: InvalidPath[validator.lang],
+                    message: InvalidPath[Validator.lang],
                     value: "value",
                 },
             ],
@@ -151,13 +151,13 @@ describe("test invalid attributes", () => {
         ).toStrictEqual({
             wrongPath: [
                 {
-                    message: InvalidPath[validator.lang],
+                    message: InvalidPath[Validator.lang],
                     value: "value",
                 },
             ],
             "correctPath.*0.wrongPath": [
                 {
-                    message: InvalidPath[validator.lang],
+                    message: InvalidPath[Validator.lang],
                     value: "value",
                 },
             ],
@@ -186,7 +186,7 @@ describe("test self array rules merging", () => {
         ).toStrictEqual({
             "correctPath.*0": [
                 {
-                    message: IntMessages[validator.lang],
+                    message: IntMessages[Validator.lang],
                     value: "string",
                 },
             ],
@@ -213,7 +213,7 @@ describe("test self array rules merging", () => {
         ).toStrictEqual({
             "correctPath.expected": [
                 {
-                    message: IntMessages[validator.lang],
+                    message: IntMessages[Validator.lang],
                     value: "string",
                 },
             ],
@@ -245,7 +245,7 @@ describe("test self array rules merging", () => {
             ).toStrictEqual({
                 "correctPath.*0": [
                     {
-                        message: IntMessages[validator.lang],
+                        message: IntMessages[Validator.lang],
                         value: "string",
                     },
                 ],
@@ -276,7 +276,7 @@ describe("test self array rules merging", () => {
             ).toStrictEqual({
                 "correctPath.expected": [
                     {
-                        message: IntMessages[validator.lang],
+                        message: IntMessages[Validator.lang],
                         value: "string",
                     },
                 ],

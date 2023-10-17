@@ -7,7 +7,7 @@ describe("test regEx", () => {
         expect(validator.getErrors({ val: "string" })).toStrictEqual({
             val: [
                 {
-                    message: Messages[validator.lang],
+                    message: Messages[Validator.lang],
                     value: "string",
                 },
             ],
@@ -15,7 +15,7 @@ describe("test regEx", () => {
         expect(validator.getErrors({ val: " myWord" })).toStrictEqual({
             val: [
                 {
-                    message: Messages[validator.lang],
+                    message: Messages[Validator.lang],
                     value: " myWord",
                 },
             ],
@@ -23,7 +23,7 @@ describe("test regEx", () => {
         expect(validator.getErrors({ val: "myWord " })).toStrictEqual({
             val: [
                 {
-                    message: Messages[validator.lang],
+                    message: Messages[Validator.lang],
                     value: "myWord ",
                 },
             ],

@@ -27,7 +27,6 @@ import { ObjectEntries, objectKeys } from "@/utils";
 import { AllRules } from "@/Rules";
 import mergeObjects from "@/utils/merge";
 export type ValidatorOptions = {
-    lang: LangTypes;
     errors: Partial<Validator.Errors>;
 };
 export type SuccessState<T> =
@@ -40,7 +39,7 @@ export default class ValidatorClass<T extends InputRules> {
     rules: T;
     CPaths: PathRules<T>;
     defaultoptions: ValidatorOptions;
-    public lang: LangTypes = "en";
+    public static lang: LangTypes = "en";
     public static Rules = AllRules;
     public errors: Validator.Errors;
     constructor(rules: T, options?: Partial<ValidatorOptions>) {
@@ -54,7 +53,6 @@ export default class ValidatorClass<T extends InputRules> {
 
         this.defaultoptions = mergeObjects(
             {
-                lang: "en",
                 errors: {
                     unMatchedType: UnMatchedType,
                     invalidPath: InvalidPath,
@@ -62,7 +60,6 @@ export default class ValidatorClass<T extends InputRules> {
             },
             options
         );
-        this.lang = this.defaultoptions.lang;
         this.errors = this.defaultoptions.errors as Validator.Errors;
     }
     async asyncPasses(
@@ -81,7 +78,12 @@ export default class ValidatorClass<T extends InputRules> {
             errors,
         };
     }
-
+    static setDefaultLang(lang: LangTypes) {
+        ValidatorClass.lang = lang;
+    }
+    static getDefaultLang(lang: LangTypes) {
+        return ValidatorClass.lang;
+    }
     passes(inputs: unknown, lang?: LangTypes): SuccessState<T> {
         const errors = this.getErrors(inputs, lang);
         const state = Object.keys(errors).length === 0;
@@ -102,7 +104,7 @@ export default class ValidatorClass<T extends InputRules> {
         //Just object of paths and Errors description
         const Errors: Record<string, ErrorMessage[]> = this._getSubmitErrors(
             inputs,
-            lang || this.lang
+            lang || ValidatorClass.lang
         )
             .filter<Record<string, ErrorMessage>>(
                 (val): val is Record<string, ErrorMessage> => !isPromise(val)
@@ -115,7 +117,13 @@ export default class ValidatorClass<T extends InputRules> {
                 return acc;
             }, {});
         return ObjectEntries(
-            this._get_errors(inputs, this.rules, inputs, "", lang || this.lang)
+            this._get_errors(
+                inputs,
+                this.rules,
+                inputs,
+                "",
+                lang || ValidatorClass.lang
+            )
         ).reduce((acc, [key, errors]) => {
             const arr = errors.filter(
                 (val): val is ErrorMessage =>
@@ -131,7 +139,7 @@ export default class ValidatorClass<T extends InputRules> {
     ): Promise<Record<string, ErrorMessage[]>> {
         const Errors: Record<string, ErrorMessage[]> = (
             await Promise.all(
-                this._getSubmitErrors(inputs, lang || this.lang).map(
+                this._getSubmitErrors(inputs, lang || ValidatorClass.lang).map(
                     async (val) => {
                         return await val;
                     }
@@ -150,7 +158,7 @@ export default class ValidatorClass<T extends InputRules> {
             this.rules,
             inputs,
             "",
-            lang || this.lang
+            lang || ValidatorClass.lang
         );
         const farr: [string, Promise<ErrorMessage | undefined>[]][] = [];
 
@@ -436,7 +444,13 @@ export default class ValidatorClass<T extends InputRules> {
         rule: RulesNames,
         lang?: LangTypes
     ): Promise<ErrorMessage | undefined> | ErrorMessage | undefined {
-        return this._validateInput(value, rule, value, ".", lang || this.lang);
+        return this._validateInput(
+            value,
+            rule,
+            value,
+            ".",
+            lang || ValidatorClass.lang
+        );
     }
     static extractRulesPaths = extractRulesPaths;
     static register<Data, Errors extends ErrorsType<Data>>(

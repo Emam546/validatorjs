@@ -14,7 +14,7 @@ test("test string method", () => {
         val: [
             {
                 value: 1234,
-                message: Messages[validator.lang],
+                message: Messages[Validator.lang],
             },
         ],
     });
@@ -22,7 +22,7 @@ test("test string method", () => {
         val: [
             {
                 value: null,
-                message: Messages[validator.lang],
+                message: Messages[Validator.lang],
             },
         ],
     });

@@ -11,7 +11,7 @@ describe("different method", () => {
         ).toStrictEqual({
             password: [
                 {
-                    message: ValuesNotSame[validator.lang],
+                    message: ValuesNotSame[Validator.lang],
                     value: "1234",
                 },
             ],
@@ -44,7 +44,7 @@ describe("different method", () => {
         ).toStrictEqual({
             "admin.email": [
                 {
-                    message: ValuesNotSame[validator.lang],
+                    message: ValuesNotSame[Validator.lang],
                     value: "sss",
                 },
             ],
@@ -80,10 +80,10 @@ describe("different method", () => {
         ).toStrictEqual({
             "relatives.*0.email": [
                 {
-                    message: ValuesNotSame[validator.lang],
+                    message: ValuesNotSame[Validator.lang],
                     value: "sss",
                 },
-            ]
+            ],
         });
         expect(
             validator.getErrors({

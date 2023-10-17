@@ -23,7 +23,7 @@ describe("required method", () => {
         ).toStrictEqual({
             password: [
                 {
-                    message: ValueNotExist[validator.lang],
+                    message: ValueNotExist[Validator.lang],
                     value: undefined,
                 },
             ],
@@ -110,7 +110,7 @@ describe("required if method", () => {
         expect(validator.getErrors({ name: "admin" })).toStrictEqual({
             password: [
                 {
-                    message: Messages[validator.lang],
+                    message: Messages[Validator.lang],
                     value: undefined,
                 },
             ],
@@ -179,7 +179,7 @@ describe("required if method", () => {
         ).toStrictEqual({
             users: [
                 {
-                    message: UnMatchedType[validator.lang],
+                    message: UnMatchedType[Validator.lang],
                     value: [
                         {
                             name: "admin",
@@ -240,7 +240,7 @@ describe("required without method", () => {
         expect(validator.getErrors({ name: "ali" })).toStrictEqual({
             email: [
                 {
-                    message: RequireWithoutMessages[validator.lang],
+                    message: RequireWithoutMessages[Validator.lang],
                     value: undefined,
                 },
             ],
@@ -248,7 +248,7 @@ describe("required without method", () => {
         expect(validator.getErrors({})).toStrictEqual({
             email: [
                 {
-                    message: RequireWithoutMessages[validator.lang],
+                    message: RequireWithoutMessages[Validator.lang],
                     value: undefined,
                 },
             ],
@@ -296,7 +296,7 @@ describe("required without method", () => {
             {
                 "users.*0.email": [
                     {
-                        message: RequireWithoutMessages[validator.lang],
+                        message: RequireWithoutMessages[Validator.lang],
                         value: undefined,
                     },
                 ],

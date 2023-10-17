@@ -48,10 +48,7 @@ function matchObjs<T>(input: unknown, matchObj: ExtractedRules<T>): unknown {
     }, {});
 }
 
-export default function <T extends InputRules>(
-    input: unknown,
-    rules: T
-): ValidTypes<T> {
+export default function <T>(input: unknown, rules: T): ValidTypes<T> {
     const RulesObj = constructObj(rules);
     return matchObjs(input, RulesObj) as ValidTypes<T>;
 }

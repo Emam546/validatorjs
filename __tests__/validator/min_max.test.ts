@@ -8,7 +8,7 @@ describe("min max", () => {
         expect(validator.getErrors({ val: -1 })).toStrictEqual({
             val: [
                 {
-                    message: MinError[validator.lang],
+                    message: MinError[Validator.lang],
                     value: -1,
                 },
             ],

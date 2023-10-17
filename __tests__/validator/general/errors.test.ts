@@ -50,10 +50,9 @@ describe("Test Errors option validator", () => {
         const newLang: LangTypes = "fr";
         const validator = new Validator("string", {
             errors: { string: { [newLang]: customMessage } },
-            lang: newLang,
         });
         expect(validator.errors.string[newLang]).toBe(customMessage);
-        expect(validator.getErrors(1234)).toStrictEqual({
+        expect(validator.getErrors(1234, newLang)).toStrictEqual({
             ".": [{ message: customMessage, value: 1234 }],
         });
     });

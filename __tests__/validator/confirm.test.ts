@@ -20,7 +20,7 @@ describe("Confirm method", () => {
         ).toStrictEqual({
             password: [
                 {
-                    message: ValuesNotSame[validator.lang],
+                    message: ValuesNotSame[Validator.lang],
                     value: "1234",
                 },
             ],
@@ -33,7 +33,7 @@ describe("Confirm method", () => {
         ).toStrictEqual({
             password: [
                 {
-                    message: ValuesNotSame[validator.lang],
+                    message: ValuesNotSame[Validator.lang],
                     value: "1234",
                 },
             ],
@@ -41,7 +41,7 @@ describe("Confirm method", () => {
         expect(validator.getErrors({ password: "1234" })).toStrictEqual({
             password: [
                 {
-                    message: ValueNotExist[validator.lang],
+                    message: ValueNotExist[Validator.lang],
                     value: "1234",
                 },
             ],
@@ -78,7 +78,7 @@ describe("Confirm method", () => {
         ).toStrictEqual({
             "admin.password": [
                 {
-                    message: ValueNotExist[validator.lang],
+                    message: ValueNotExist[Validator.lang],
                     value: "sss",
                 },
             ],
@@ -137,7 +137,7 @@ describe("Confirm method", () => {
         ).toStrictEqual({
             "relatives.*1.email": [
                 {
-                    message: ValueNotExist[validator.lang],
+                    message: ValueNotExist[Validator.lang],
                     value: "222",
                 },
             ],
@@ -149,7 +149,7 @@ describe("Confirm method", () => {
         ).toStrictEqual({
             "relatives.*0.email": [
                 {
-                    message: ValuesNotSame[validator.lang],
+                    message: ValuesNotSame[Validator.lang],
                     value: "111",
                 },
             ],

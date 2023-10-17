@@ -13,7 +13,7 @@ describe("in && not_in methods", () => {
         expect(validator.getErrors({ name: "noName" })).toStrictEqual({
             name: [
                 {
-                    message: MessagesIn[validator.lang],
+                    message: MessagesIn[Validator.lang],
                     value: "noName",
                 },
             ],
@@ -21,7 +21,7 @@ describe("in && not_in methods", () => {
         expect(validator.getErrors({ name: "" })).toStrictEqual({
             name: [
                 {
-                    message: MessagesIn[validator.lang],
+                    message: MessagesIn[Validator.lang],
                     value: "",
                 },
             ],
@@ -29,7 +29,7 @@ describe("in && not_in methods", () => {
         expect(validator.getErrors({ name: "ahmed," })).toStrictEqual({
             name: [
                 {
-                    message: MessagesIn[validator.lang],
+                    message: MessagesIn[Validator.lang],
                     value: "ahmed,",
                 },
             ],
@@ -42,15 +42,15 @@ describe("in && not_in methods", () => {
         const validator = new Validator(rules);
 
         expect(validator.getErrors({ name: "ahmed" })).toStrictEqual({
-            name: [{ message: MessagesNotIn[validator.lang], value: "ahmed" }],
+            name: [{ message: MessagesNotIn[Validator.lang], value: "ahmed" }],
         });
         expect(validator.getErrors({ name: "ali" })).toStrictEqual({
-            name: [{ message: MessagesNotIn[validator.lang], value: "ali" }],
+            name: [{ message: MessagesNotIn[Validator.lang], value: "ali" }],
         });
 
         expect(validator.getErrors({ name: "mohamed" })).toStrictEqual({
             name: [
-                { message: MessagesNotIn[validator.lang], value: "mohamed" },
+                { message: MessagesNotIn[Validator.lang], value: "mohamed" },
             ],
         });
         expect(validator.getErrors({ name: "noName" })).toStrictEqual({});

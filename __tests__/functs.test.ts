@@ -280,7 +280,7 @@ describe("Test set value methods", () => {
 });
 describe("test construct methods", () => {
     test("main method", () => {
-        const rules: InputRules = {
+        const rules = {
             name: ["string"],
             age: ["integer"],
             location: [["integer"], "array", [{ min: 0 }]],
@@ -295,7 +295,7 @@ describe("test construct methods", () => {
         expect(constructRule(rules)).toStrictEqual(res);
     });
     test("array object method", () => {
-        const rules: InputRules = {
+        const rules = {
             name: ["string"],
             age: ["integer"],
             locations: [{ x: ["integer"], y: ["integer"] }, "array"],
@@ -348,10 +348,7 @@ describe("test construct methods", () => {
     });
     describe("flattened array", () => {
         test("test 1", () => {
-            const rules: InputRules = [
-                { name: "string", password: "string" },
-                "array",
-            ];
+            const rules = [{ name: "string", password: "string" }, "array"];
             const ex = [{ name: null, password: null }, "array", null];
             expect(constructRule(rules)).toStrictEqual(ex);
         });
@@ -371,7 +368,7 @@ describe("test construct methods", () => {
         });
     });
     test("use .", () => {
-        const rules: InputRules = {
+        const rules = {
             ".": ["required"],
             person: {
                 name: ["string"],
@@ -397,8 +394,8 @@ describe("test construct methods", () => {
 });
 describe("Valid attr", () => {
     test("false values", () => {
-        const rules: InputRules = {
-            name: "string",
+        const rules = {
+            name: ["string"],
             age: ["integer"],
             location: [["integer"], "array", [{ min: 0 }, { max: 2 }]],
         };
@@ -423,7 +420,7 @@ describe("Valid attr", () => {
         expect(validAttr(f3, rules)).toStrictEqual(f3);
     });
     test("main task", () => {
-        const rules: InputRules = {
+        const rules = {
             name: "string",
             age: ["integer"],
             location: [["integer"], "array", [{ min: 0 }, { max: 2 }]],
@@ -449,7 +446,7 @@ describe("Valid attr", () => {
         expect(validAttr(f3, rules)).toStrictEqual(f3);
     });
     test("array of objects", () => {
-        const rules: InputRules = {
+        const rules = {
             friends: [{ name: "string", age: "integer" }],
         };
         const f1 = {
@@ -472,7 +469,7 @@ describe("Valid attr", () => {
         expect(validAttr(f2, rules)).toStrictEqual(f1);
     });
     test("object map", () => {
-        const rules: InputRules = {
+        const rules = {
             friends: [
                 {
                     age: "integer",
