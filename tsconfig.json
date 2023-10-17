@@ -3,6 +3,7 @@
     "module": "commonjs",
     "resolveJsonModule": true,
     "skipLibCheck": false,
+    "declaration": true,
     "outDir": "dist",
     "sourceMap": true,
     "strict": true,
