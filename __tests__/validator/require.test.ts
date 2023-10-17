@@ -78,6 +78,15 @@ describe("required method", () => {
             ],
         });
     });
+    test("using null objects", () => {
+        const validator = new Validator({
+            email: ["required"],
+            password: ["required"],
+        });
+        expect(
+            validator.getErrors({ email: null, password: null })
+        ).toStrictEqual({});
+    });
 });
 describe("required if method", () => {
     test("regular Test", () => {
