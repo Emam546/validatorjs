@@ -13,10 +13,10 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "lint": "npx eslint --ext .ts src/",
     "publish": "npm publish",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "tsc --build --clean &&npm run build"
   },
   "author": "Imam",
   "license": "ISC",
@@ -29,6 +29,7 @@
     "eslint-plugin-node": "^11.1.0",
     "jest": "^29.1.2",
     "ts-jest": "^29.0.3",
+    "tsc-alias": "^1.8.8",
     "tsconfig-paths-jest": "^0.0.1",
     "typescript": "^5.2.2"
   },

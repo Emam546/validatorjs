@@ -25,7 +25,8 @@
             }
         ],
         "node/no-missing-import": 0,
-        "node/no-unpublished-import": 1
+        "node/no-unpublished-import": 1,
+        "@typescript-eslint/no-namespace": 0
     },
     "settings": {
         "node": {

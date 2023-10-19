@@ -1,8 +1,17 @@
 {
     "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "./",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ]
+        }
+    },
     "include": [
         "src",
-        "typings",
         "__tests__"
     ]
 }

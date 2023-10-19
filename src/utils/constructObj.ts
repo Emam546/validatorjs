@@ -1,10 +1,5 @@
-import {
-    InputRules,
-    RulesGetter,
-    ValidArray,
-    isValidInput,
-    is_Rule,
-} from "@/type";
+import { InputRules, RulesGetter, ValidArray } from "@/type";
+import { isValidInput, is_Rule } from "@/utils/isRule";
 import { ObjectEntries } from "@/utils";
 import { isObject, isString } from "./types";
 export type ExtractedRules<T> = T extends Record<string | number, InputRules>

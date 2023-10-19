@@ -4,10 +4,12 @@
     "resolveJsonModule": true,
     "skipLibCheck": false,
     "declaration": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "outDir": "dist",
     "sourceMap": true,
     "strict": true,
-    "target": "es2017",
+    "target": "ES2016",
     "baseUrl": "./",
     "paths": {
       "@/*": [
@@ -15,9 +17,7 @@
       ]
     }
   },
-  "compileOnSave": true,
   "include": [
-    "src",
-    "typings"
+    "src"
   ]
 }

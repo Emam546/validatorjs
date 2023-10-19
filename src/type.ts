@@ -1,6 +1,49 @@
-import type { ValidArray, RulesGetter, RulesNames } from "@/utils/isRule";
-export * from "@/utils/isRule";
+import type Rule from "@/Rule";
+import type { MessagesStore } from "@/Rule";
+import type { _Rules } from "@/Rules";
+type G = {
+    [K in keyof _Rules]: _Rules[K] extends Rule<
+        infer Path,
+        infer ErrorsType,
+        infer Type
+    >
+        ? {
+              path: Path;
+              errors: ErrorsType;
+              type: Type;
+          }
+        : never;
+};
+type _Errors = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [K in keyof _Rules]: _Rules[K] extends Rule<any, infer ErrorsType, any>
+        ? ErrorsType
+        : never;
+};
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface AvailableRules extends G {}
+export interface Errors extends _Errors {
+    invalidPath: MessagesStore<{ obj: unknown }>;
+    unMatchedType: MessagesStore<{ obj: unknown }>;
+}
+export type RulesNames = {
+    [K in keyof AvailableRules]: AvailableRules[K]["path"];
+}[keyof AvailableRules];
+export type ValidArray<T = unknown> =
+    | [T]
+    | [T, "object" | "array"]
+    | [
+          T,
+          "object" | "array",
+          (
+              | ({
+                    [name: string | number]: T;
+                } & { "."?: RulesGetter })
+              | RulesGetter
+          )
+      ];
+export type RulesGetter = Array<RulesNames> | null;
 export type InputRules =
     | RulesGetter
     | string
@@ -74,7 +117,7 @@ type UnionToIntersection<U> = (
 ) extends (k: infer I) => void
     ? I
     : never;
-type ValidG = Validator.AvailableRules[keyof Validator.AvailableRules];
+type ValidG = AvailableRules[keyof AvailableRules];
 export type ValidTypes<T> = T extends Record<string | number, InputRules>
     ? {
           [K in keyof T]: ValidTypes<T[K]>;

@@ -3,9 +3,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { InputRules, PathRules } from "@/type";
-import { isValidInput, is_Rule } from "./utils/isRule";
-import { isObject, isString } from "./utils/types";
-import { ObjectEntries, objectValues } from "./utils";
+import { isValidInput, is_Rule } from "@/utils/isRule";
+import { isObject, isString } from "@/utils/types";
+import { ObjectEntries, objectValues } from "@/utils";
 
 export function extractRulesPaths<T, G extends string = "">(
     input: T,

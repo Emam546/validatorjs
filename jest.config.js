@@ -1,6 +1,6 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 const { pathsToModuleNameMapper } = require("ts-jest");
-const tsconfig = require("./tsconfig");
+const tsconfig = require("./tsconfig.test.json");
 const moduleNameMapper = require("tsconfig-paths-jest")(tsconfig);
 module.exports = {
     transform: {
