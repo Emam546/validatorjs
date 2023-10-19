@@ -29,6 +29,7 @@ import mergeObjects from "@/utils/merge";
 import { isValidInput, is_Rule } from "@/utils/isRule";
 
 import * as typesCore from "@/type";
+import type * as RulesCore from "@/Rule";
 declare namespace Validator {
     type ValidatorOptions = {
         errors: Partial<Errors>;
@@ -44,9 +45,29 @@ declare namespace Validator {
     type PathRules<T, G extends string = ""> = typesCore.PathRules<T, G>;
     type RulesNames = typesCore.RulesNames;
     type ValidTypes<T> = typesCore.ValidTypes<T>;
+    type ValidArray<T> = typesCore.ValidArray<T>;
     type Errors = typesCore.Errors;
     type AvailableRules = typesCore.AvailableRules;
     type LangTypes = _LangTypes;
+
+    type InitSubmitFun<
+        Data,
+        Errors extends ErrorsType<Data>
+    > = RulesCore.InitSubmitFun<Data, Errors>;
+    type RuleFun<Data, Errors extends ErrorsType<Data>> = RulesCore.RuleFun<
+        Data,
+        Errors
+    >;
+    type ErrorMessage = RulesCore.ErrorMessage;
+    type EqualFun<Data> = RulesCore.EqualFun<Data>;
+    type ErrorsType<Data> = RulesCore.ErrorsType<Data>;
+    type GetMessageFun<Data> = RulesCore.GetMessageFun<Data>;
+    type StoredMessage<Data> = RulesCore.StoredMessage<Data>;
+    type Rule<
+        Data,
+        Errors extends ErrorsType<Data> = RulesCore.MessagesStore<Data>,
+        G = never
+    > = RulesCore.default<Data, Errors, G>;
 }
 class Validator<T extends InputRules> {
     rules: T;
@@ -404,7 +425,7 @@ class Validator<T extends InputRules> {
             ValidTypes<PathRules<T>[P]>
         >;
     }
-    
+
     validAttr(inputs: unknown) {
         return validAttr(inputs, this.rules);
     }

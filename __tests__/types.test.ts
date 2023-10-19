@@ -1,4 +1,9 @@
-import Validator, { InputRules, PathRules, ValidTypes } from "@/index";
+import Validator, {
+    InputRules,
+    PathRules,
+    ValidTypes,
+    AvailableRules,
+} from "@/index";
 
 type Expect<T extends true> = T;
 type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y
@@ -6,6 +11,7 @@ type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y
     : 2
     ? true
     : false;
+
 describe("Test PathRules", () => {
     test("empty rule", () => {
         type TestType = Expect<Equal<PathRules<{}>, {}>>;
