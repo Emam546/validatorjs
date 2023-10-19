@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { objectValues } from ".";
 import { ValidArray, RulesGetter } from "@/type";
 import { isArray, isString } from "./types";
-import * as Validator from "@/index";
-
+import type Rule from "@/Rule";
 export function isValidInput<T>(array: unknown): array is ValidArray<T> {
     return (
         isArray(array) &&
@@ -14,6 +14,9 @@ export function isValidInput<T>(array: unknown): array is ValidArray<T> {
 }
 
 export function is_Rule(val: unknown): val is RulesGetter {
+    const Validator = require("../index") as {
+        Rules: Record<string, Rule<unknown>>;
+    };
     return (
         (isArray(val) &&
             val.every((g) => {

@@ -27,6 +27,7 @@ import { ObjectEntries, objectKeys } from "@/utils";
 import { AllRules } from "@/Rules";
 import mergeObjects from "@/utils/merge";
 import { isValidInput, is_Rule } from "@/utils/isRule";
+
 import * as typesCore from "@/type";
 declare namespace Validator {
     type ValidatorOptions = {
@@ -403,7 +404,7 @@ class Validator<T extends InputRules> {
             ValidTypes<PathRules<T>[P]>
         >;
     }
-
+    
     validAttr(inputs: unknown) {
         return validAttr(inputs, this.rules);
     }
