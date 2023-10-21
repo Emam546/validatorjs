@@ -11,7 +11,7 @@ declare module "@/type" {
         };
     }
 }
-Validator.register<{ role: string }, MessagesStore<{ role: string }>>(
+Validator.register<"role">(
     "role",
     (value): value is { role: string } => {
         return hasOwnProperty(value, "role") && isString(value.role);
