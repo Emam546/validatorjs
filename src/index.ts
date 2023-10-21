@@ -14,6 +14,7 @@ import type {
     ErrorMessage,
     EqualFun,
     ErrorsType,
+    MessagesStore,
 } from "@/Rule";
 import Rule from "@/Rule";
 import _LangTypes from "@/types/lang";
@@ -59,6 +60,7 @@ declare namespace Validator {
         Errors
     >;
     type ErrorMessage = RulesCore.ErrorMessage;
+    type MessagesStore<Data> = RulesCore.MessagesStore<Data>;
     type EqualFun<Data> = RulesCore.EqualFun<Data>;
     type ErrorsType<Data> = RulesCore.ErrorsType<Data>;
     type GetMessageFun<Data> = RulesCore.GetMessageFun<Data>;
@@ -488,7 +490,10 @@ class Validator<T extends InputRules> {
             lang || Validator.lang
         );
     }
-    static register<Data, Errors extends ErrorsType<Data>>(
+    static register<
+        Data,
+        Errors extends ErrorsType<Data> = MessagesStore<Data>
+    >(
         key: keyof AvailableRules,
         name: Data extends string ? Data : EqualFun<Data>,
         fun: RuleFun<Data, Errors>,
