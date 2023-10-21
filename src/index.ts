@@ -196,25 +196,28 @@ class Validator<T extends InputRules> {
             "",
             lang || Validator.lang
         );
-        const farr: [string, Promise<ErrorMessage | undefined>[]][] = [];
+        const promiseRules: [string, Promise<ErrorMessage | undefined>[]][] =
+            [];
 
         objectKeys(r).forEach((key) => {
-            const narr: Promise<ErrorMessage | undefined>[] = [];
+            const promiseArr: Promise<ErrorMessage | undefined>[] = [];
             const arr = r[key].filter((val) => {
                 if (isPromise(val)) {
-                    narr.push(val);
+                    promiseArr.push(val);
                     return false;
                 }
                 return true;
             }) as ErrorMessage[];
-            if (narr) farr.push([key, narr]);
-            Errors[key] = arr;
+            if (promiseArr) promiseRules.push([key, promiseArr]);
+            if (arr.length) Errors[key] = arr;
         }, {} as Record<string, ErrorMessage[]>);
         await Promise.all(
-            farr.map(async ([key, prom]) => {
+            promiseRules.map(async ([key, prom]) => {
                 const val = await Promise.all(prom);
-                const narr = val.filter((val) => val) as ErrorMessage[];
-                Errors[key] = narr;
+                const errorMessages = val.filter(
+                    (val) => val
+                ) as ErrorMessage[];
+                if (errorMessages.length) Errors[key] = errorMessages;
             })
         );
 
