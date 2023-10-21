@@ -15,8 +15,7 @@
     "test": "jest",
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "lint": "npx eslint --ext .ts src/",
-    "publish": "npm publish",
-    "prepublishOnly": "tsc --build --clean &&npm run build"
+    "prepublish": "tsc --build --clean &&npm run build"
   },
   "author": "Imam",
   "license": "ISC",
