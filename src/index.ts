@@ -491,14 +491,17 @@ class Validator<T extends InputRules> {
         );
     }
     static register<
-        Data,
-        Errors extends ErrorsType<Data> = MessagesStore<Data>
+        T extends keyof AvailableRules,
+        Path = AvailableRules[T]["path"],
+        Errors extends ErrorsType<Path> = AvailableRules[T]["errors"] extends ErrorsType<Path>
+            ? AvailableRules[T]["errors"]
+            : ErrorsType<Path>
     >(
-        key: keyof AvailableRules,
-        name: Data extends string ? Data : EqualFun<Data>,
-        fun: RuleFun<Data, Errors>,
+        key: T,
+        name: Path extends string ? Path : EqualFun<Path>,
+        fun: RuleFun<Path, Errors>,
         errors: Errors,
-        initSubmit?: InitSubmitFun<Data, Errors>
+        initSubmit?: InitSubmitFun<Path, Errors>
     ) {
         const rule = new Rule(name, fun, errors, initSubmit);
 
