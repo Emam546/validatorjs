@@ -14,7 +14,6 @@ import type {
     ErrorMessage,
     EqualFun,
     ErrorsType,
-    MessagesStore,
 } from "@/Rule";
 import Rule from "@/Rule";
 import _LangTypes from "@/types/lang";
@@ -495,7 +494,7 @@ class Validator<T extends InputRules> {
     }
     static register<
         T extends keyof AvailableRules,
-        Path = AvailableRules[T]["path"],
+        Path extends AvailableRules[T]["path"] = AvailableRules[T]["path"],
         Errors extends ErrorsType<Path> = AvailableRules[T]["errors"] extends ErrorsType<Path>
             ? AvailableRules[T]["errors"]
             : ErrorsType<Path>
@@ -508,7 +507,8 @@ class Validator<T extends InputRules> {
     ) {
         const rule = new Rule(name, fun, errors, initSubmit);
 
-        Validator.Rules = { ...Validator.Rules, [key]: rule };
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        Validator.Rules[key] = rule as any;
         return rule;
     }
 }

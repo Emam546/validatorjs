@@ -11,7 +11,7 @@ declare module "@/type" {
         };
     }
 }
-Validator.register<"role">(
+Validator.register(
     "role",
     (value): value is { role: string } => {
         return hasOwnProperty(value, "role") && isString(value.role);
