@@ -76,8 +76,6 @@ class Validator<T extends InputRules> {
   public static Rules = AllRules;
   public errors: Errors;
   constructor(rules: T, options?: Partial<Validator.ValidatorOptions>) {
-    if (!checkRules(rules))
-      throw new Error("The rules is not extended from the Input Rules type");
     this.rules = rules;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     this.CPaths = (extractRulesPaths as any)(rules);
