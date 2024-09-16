@@ -18,7 +18,8 @@ ValidatorClass.register<"asyncRole">(
     return new Promise((res) => {
       setTimeout(() => {
         if (!isString(val)) res("the val is not a string");
-      }, 3000);
+        res(undefined);
+      }, 300);
     });
   },
   {}
