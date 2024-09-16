@@ -4,7 +4,7 @@ import Validator, {
   ValidTypes,
   AvailableRules,
 } from "@/index";
-import { RulesNames, UnionToIntersection } from "@/type";
+import { GetKeys, RulesNames, UnionToIntersection } from "@/type";
 
 type Expect<T extends true> = T;
 type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y
@@ -188,6 +188,7 @@ describe("Test PathRules", () => {
 });
 describe("Test ValidTypes", () => {
   test("empty rule", () => {
+    type G = GetKeys<["required", "string"]>;
     type TestType = Expect<Equal<ValidTypes<{}>, {} | undefined>>;
     type TestType2 = Expect<Equal<ValidTypes<[]>, unknown>>;
   });
@@ -225,35 +226,38 @@ describe("Test ValidTypes", () => {
     type TestType4 = Expect<
       Equal<
         ValidTypes<[{ name: "string"; age: "integer" }]>,
-        Array<{
-          name: string | undefined;
-          age: number | undefined;
-        }>
+        | Array<{
+            name: string | undefined;
+            age: number | undefined;
+          }>
+        | undefined
       >
     >;
     type TestType5 = Expect<
       Equal<
         ValidTypes<[{ name: "string"; age: "integer" }, "object"]>,
-        Record<
-          string,
-          {
-            name: string | undefined;
-            age: number | undefined;
-          }
-        >
+        | Record<
+            string,
+            {
+              name: string | undefined;
+              age: number | undefined;
+            }
+          >
+        | undefined
       >
     >;
     type TestType6 = Expect<
       Equal<
         ValidTypes<[{ name: "string"; age: "integer" }, "object", ["string"]]>,
-        Record<
-          string,
-          {
-            name: string | undefined;
-            age: number | undefined;
-          }
-        > &
-          string
+        | (Record<
+            string,
+            {
+              name: string | undefined;
+              age: number | undefined;
+            }
+          > &
+            string)
+        | undefined
       >
     >;
     // type TestType7 = Expect<
@@ -271,35 +275,38 @@ describe("Test ValidTypes", () => {
     type TestType8 = Expect<
       Equal<
         ValidTypes<[{ name: "string"; age: "integer" }, "object", []]>,
-        Record<
-          string,
-          {
-            name: string | undefined;
-            age: number | undefined;
-          }
-        >
+        | Record<
+            string,
+            {
+              name: string | undefined;
+              age: number | undefined;
+            }
+          >
+        | undefined
       >
     >;
     type TestType9 = Expect<
       Equal<
         ValidTypes<[[{ name: "string"; age: "integer" }]]>,
-        Array<
-          Array<{
-            name: string | undefined;
-            age: number | undefined;
-          }>
-        >
+        | Array<
+            Array<{
+              name: string | undefined;
+              age: number | undefined;
+            }>
+          >
+        | undefined
       >
     >;
     type TestType10 = Expect<
       Equal<
         ValidTypes<[[{ name: [["string"]]; age: "integer" }]]>,
-        Array<
-          Array<{
-            name: string[];
-            age: number | undefined;
-          }>
-        >
+        | Array<
+            Array<{
+              name: string[] | undefined;
+              age: number | undefined;
+            }>
+          >
+        | undefined
       >
     >;
     type G = ValidTypes<{
@@ -323,7 +330,7 @@ describe("Test ValidTypes", () => {
           ];
         }>,
         | {
-            names: string[] & { 0: number | undefined };
+            names: (string[] & { 0: number | undefined }) | undefined;
           }
         | undefined
       >
@@ -404,13 +411,16 @@ describe("Test ValidTypes", () => {
           name: ["boolean"];
           ".": ["string"];
         }>,
-        { name: boolean | undefined } | undefined
+        ({ name: boolean | undefined } & string) | undefined
       >
     >;
-    type G = ValidTypes<{
+    type HasUndefined<T> = undefined extends T ? true : false;
+
+    type T = {
       name: ["boolean"];
       ".": ["required"];
-    }>;
+    };
+    type S = ValidTypes<T["."]>;
     type TestType2 = Expect<
       Equal<
         ValidTypes<{
