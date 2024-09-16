@@ -113,12 +113,14 @@ type ToPaths<G, P extends string = ""> = G extends infer T
 type FromPaths<T extends { path: string; type: RulesGetter }> = {
   [P in T["path"]]: Extract<T, { path: P }>["type"];
 };
-
-type UnionToIntersection<U> = (
+type UnionToIntersectionHelper<U> = (
   U extends unknown ? (k: U) => void : never
 ) extends (k: infer I) => void
   ? I
   : never;
+export type UnionToIntersection<U> = boolean extends U
+  ? UnionToIntersectionHelper<Exclude<U, boolean>> & boolean
+  : UnionToIntersectionHelper<U>;
 type ValidG = AvailableRules[keyof AvailableRules];
 type ConvertUndefined<T, State> = State extends true
   ? T

@@ -4,6 +4,7 @@ import Validator, {
   ValidTypes,
   AvailableRules,
 } from "@/index";
+import { RulesNames, UnionToIntersection } from "@/type";
 
 type Expect<T extends true> = T;
 type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y
@@ -359,6 +360,28 @@ describe("Test ValidTypes", () => {
           val: string;
         }>,
         { val: unknown }
+      >
+    >;
+  });
+  describe("test boolean", () => {
+    type G = ValidTypes<{
+      name: ["boolean"];
+    }>;
+    type State1 = Expect<Equal<AvailableRules["boolean"]["type"], boolean>>;
+    type TestType = Expect<
+      Equal<
+        ValidTypes<{
+          name: ["boolean"];
+        }>,
+        { name: boolean | undefined }
+      >
+    >;
+    type TestType2 = Expect<
+      Equal<
+        ValidTypes<{
+          name: ["boolean", "string"];
+        }>,
+        { name: (boolean & string) | undefined }
       >
     >;
   });
