@@ -14,8 +14,12 @@ declare global {
 ValidatorClass.register<"asyncRole">(
   "asyncRole",
   "asyncRole",
-  async (val, data) => {
-    if (!isString(val)) return "the val is not a string";
+  (val, data) => {
+    return new Promise((res) => {
+      setTimeout(() => {
+        if (!isString(val)) res("the val is not a string");
+      }, 3000);
+    });
   },
   {}
 );
