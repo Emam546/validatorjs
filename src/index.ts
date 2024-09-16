@@ -461,7 +461,7 @@ class Validator<T extends InputRules> {
     const rule = new Rule(name, fun, errors, initSubmit);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    Validator.Rules[key] = rule as any;
+    (Validator.Rules as Record<string, unknown>)[key] = rule;
     return rule;
   }
 }
