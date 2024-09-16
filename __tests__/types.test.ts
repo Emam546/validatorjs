@@ -196,7 +196,7 @@ describe("Test ValidTypes", () => {
         ValidTypes<{
           name: ["string"];
         }>,
-        { name: string }
+        { name: string | undefined }
       >
     >;
 
@@ -205,26 +205,27 @@ describe("Test ValidTypes", () => {
         ValidTypes<{
           name: "string|integer";
         }>,
-        { name: string & number }
+        { name: (string & number) | undefined }
       >
     >;
+
     type TestTypeWithOneInputString = Expect<
       Equal<
         ValidTypes<{
           name: "string";
         }>,
-        { name: string }
+        { name: string | undefined }
       >
     >;
     type TestType3 = Expect<
-      Equal<ValidTypes<["string", "integer"]>, string & number>
+      Equal<ValidTypes<["string", "integer"]>, (string & number) | undefined>
     >;
     type TestType4 = Expect<
       Equal<
         ValidTypes<[{ name: "string"; age: "integer" }]>,
         Array<{
-          name: string;
-          age: number;
+          name: string | undefined;
+          age: number | undefined;
         }>
       >
     >;
@@ -234,8 +235,8 @@ describe("Test ValidTypes", () => {
         Record<
           string,
           {
-            name: string;
-            age: number;
+            name: string | undefined;
+            age: number | undefined;
           }
         >
       >
@@ -246,8 +247,8 @@ describe("Test ValidTypes", () => {
         Record<
           string,
           {
-            name: string;
-            age: number;
+            name: string | undefined;
+            age: number | undefined;
           }
         > &
           string
@@ -271,8 +272,8 @@ describe("Test ValidTypes", () => {
         Record<
           string,
           {
-            name: string;
-            age: number;
+            name: string | undefined;
+            age: number | undefined;
           }
         >
       >
@@ -282,8 +283,8 @@ describe("Test ValidTypes", () => {
         ValidTypes<[[{ name: "string"; age: "integer" }]]>,
         Array<
           Array<{
-            name: string;
-            age: number;
+            name: string | undefined;
+            age: number | undefined;
           }>
         >
       >
@@ -293,8 +294,8 @@ describe("Test ValidTypes", () => {
         ValidTypes<[[{ name: [["string"]]; age: "integer" }]]>,
         Array<
           Array<{
-            name: string[];
-            age: number;
+            name: (string | undefined)[];
+            age: number | undefined;
           }>
         >
       >
@@ -312,18 +313,19 @@ describe("Test ValidTypes", () => {
           ];
         }>,
         {
-          names: string[] & { 0: number };
+          names: (string | undefined)[] & { 0: number | undefined };
         }
       >
     >;
   });
+
   test("complex rules", () => {
     type TestType = Expect<
       Equal<
         ValidTypes<{
           name: [{ after: Date }];
         }>,
-        { name: unknown }
+        { name: unknown | undefined }
       >
     >;
     type G = ValidTypes<{
@@ -334,7 +336,7 @@ describe("Test ValidTypes", () => {
         ValidTypes<{
           name: ["string", { different: string }];
         }>,
-        { name: string }
+        { name: string | undefined }
       >
     >;
   });

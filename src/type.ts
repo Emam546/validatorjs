@@ -120,18 +120,26 @@ type UnionToIntersection<U> = (
   ? I
   : never;
 type ValidG = AvailableRules[keyof AvailableRules];
+type ConvertUndefined<T, State> = State extends true
+  ? T
+  : unknown extends T
+  ? unknown
+  : T | undefined;
 export type ValidTypes<T> = T extends Record<string | number, InputRules>
   ? {
       [K in keyof T]: ValidTypes<T[K]>;
     }
   : T extends RulesNames[]
-  ? UnionToIntersection<
-      {
-        [P in T[number] as T[number] & string]: Extract<
-          ValidG,
-          { path: P }
-        >["type"];
-      }[T[number] & string]
+  ? ConvertUndefined<
+      UnionToIntersection<
+        {
+          [P in T[number] as T[number] & string]: Extract<
+            ValidG,
+            { path: P }
+          >["type"];
+        }[T[number] & string]
+      >,
+      "required" extends T[number] ? true : false
     >
   : T extends ValidArray<InputRules>
   ? T[1] extends "object"
