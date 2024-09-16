@@ -188,7 +188,7 @@ describe("Test PathRules", () => {
 });
 describe("Test ValidTypes", () => {
   test("empty rule", () => {
-    type TestType = Expect<Equal<ValidTypes<{}>, {}>>;
+    type TestType = Expect<Equal<ValidTypes<{}>, {} | undefined>>;
     type TestType2 = Expect<Equal<ValidTypes<[]>, unknown>>;
   });
   test("normal rules", () => {
@@ -197,7 +197,7 @@ describe("Test ValidTypes", () => {
         ValidTypes<{
           name: ["string"];
         }>,
-        { name: string | undefined }
+        { name: string | undefined } | undefined
       >
     >;
 
@@ -206,7 +206,7 @@ describe("Test ValidTypes", () => {
         ValidTypes<{
           name: "string|integer";
         }>,
-        { name: (string & number) | undefined }
+        { name: (string & number) | undefined } | undefined
       >
     >;
 
@@ -215,12 +215,13 @@ describe("Test ValidTypes", () => {
         ValidTypes<{
           name: "string";
         }>,
-        { name: string | undefined }
+        { name: string | undefined } | undefined
       >
     >;
     type TestType3 = Expect<
       Equal<ValidTypes<["string", "integer"]>, (string & number) | undefined>
     >;
+
     type TestType4 = Expect<
       Equal<
         ValidTypes<[{ name: "string"; age: "integer" }]>,
@@ -295,13 +296,21 @@ describe("Test ValidTypes", () => {
         ValidTypes<[[{ name: [["string"]]; age: "integer" }]]>,
         Array<
           Array<{
-            name: (string | undefined)[];
+            name: string[];
             age: number | undefined;
           }>
         >
       >
     >;
-
+    type G = ValidTypes<{
+      names: [
+        ["string"],
+        "array",
+        {
+          0: ["integer"];
+        }
+      ];
+    }>;
     type TestType12 = Expect<
       Equal<
         ValidTypes<{
@@ -313,9 +322,10 @@ describe("Test ValidTypes", () => {
             }
           ];
         }>,
-        {
-          names: (string | undefined)[] & { 0: number | undefined };
-        }
+        | {
+            names: string[] & { 0: number | undefined };
+          }
+        | undefined
       >
     >;
   });
@@ -326,7 +336,7 @@ describe("Test ValidTypes", () => {
         ValidTypes<{
           name: [{ after: Date }];
         }>,
-        { name: unknown | undefined }
+        { name: unknown | undefined } | undefined
       >
     >;
     type G = ValidTypes<{
@@ -337,7 +347,7 @@ describe("Test ValidTypes", () => {
         ValidTypes<{
           name: ["string", { different: string }];
         }>,
-        { name: string | undefined }
+        { name: string | undefined } | undefined
       >
     >;
   });
@@ -359,21 +369,19 @@ describe("Test ValidTypes", () => {
         ValidTypes<{
           val: string;
         }>,
-        { val: unknown }
+        { val: unknown } | undefined
       >
     >;
   });
   describe("test boolean", () => {
-    type G = ValidTypes<{
-      name: ["boolean"];
-    }>;
     type State1 = Expect<Equal<AvailableRules["boolean"]["type"], boolean>>;
+
     type TestType = Expect<
       Equal<
         ValidTypes<{
           name: ["boolean"];
         }>,
-        { name: boolean | undefined }
+        { name: boolean | undefined } | undefined
       >
     >;
     type TestType2 = Expect<
@@ -381,7 +389,35 @@ describe("Test ValidTypes", () => {
         ValidTypes<{
           name: ["boolean", "string"];
         }>,
-        { name: (boolean & string) | undefined }
+        { name: (boolean & string) | undefined } | undefined
+      >
+    >;
+  });
+  type G = ValidTypes<{
+    name: ["boolean"];
+    ".": ["string"];
+  }>;
+  describe("Test .", () => {
+    type TestType = Expect<
+      Equal<
+        ValidTypes<{
+          name: ["boolean"];
+          ".": ["string"];
+        }>,
+        { name: boolean | undefined } | undefined
+      >
+    >;
+    type G = ValidTypes<{
+      name: ["boolean"];
+      ".": ["required"];
+    }>;
+    type TestType2 = Expect<
+      Equal<
+        ValidTypes<{
+          name: ["boolean"];
+          ".": ["required"];
+        }>,
+        { name: boolean | undefined }
       >
     >;
   });

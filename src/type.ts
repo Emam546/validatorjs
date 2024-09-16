@@ -127,10 +127,18 @@ type ConvertUndefined<T, State> = State extends true
   : unknown extends T
   ? unknown
   : T | undefined;
+type ConvertOrigin<T> = T extends Record<string | number, InputRules>
+  ? ConvertUndefined<
+      {
+        [K in keyof T as K extends `.` ? never : K]: ValidTypes<T[K]>;
+      },
+      "required" extends (T["."] extends Array<infer R> ? R : never)
+        ? true
+        : false
+    >
+  : ValidTypes<T>;
 export type ValidTypes<T> = T extends Record<string | number, InputRules>
-  ? {
-      [K in keyof T]: ValidTypes<T[K]>;
-    }
+  ? ConvertOrigin<T>
   : T extends RulesNames[]
   ? ConvertUndefined<
       UnionToIntersection<
@@ -145,8 +153,8 @@ export type ValidTypes<T> = T extends Record<string | number, InputRules>
     >
   : T extends ValidArray<InputRules>
   ? T[1] extends "object"
-    ? Record<string, ValidTypes<T[0]>> & ValidTypes<T[2]>
-    : Array<ValidTypes<T[0]>> & ValidTypes<T[2]>
+    ? Record<string, Exclude<ValidTypes<T[0]>, undefined>> & ConvertOrigin<T[2]>
+    : Array<Exclude<ValidTypes<T[0]>, undefined>> & ConvertOrigin<T[2]>
   : T extends string
   ? SplitString<T, "|"> extends RulesGetter
     ? ValidTypes<SplitString<T, "|">>
