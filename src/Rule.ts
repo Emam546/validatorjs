@@ -48,6 +48,7 @@ function isNoPromises(
 export default class Rule<
     Data,
     Errors extends ErrorsType<Data> = MessagesStore<Data>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     G = never
 > {
     readonly errors: Errors;

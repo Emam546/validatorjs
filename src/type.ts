@@ -132,25 +132,19 @@ export type GetKeys<T> = T extends Record<string | number, InputRules>
   : T extends RulesNames[]
   ? T[number]
   : T extends ValidArray<InputRules>
-  ? T[1] extends "object"
-    ? GetKeys<T[2]>
-    : GetKeys<T[2]>
+  ? GetKeys<T[2]>
   : T extends string
   ? SplitString<T, "|"> extends RulesGetter
     ? ValidTypes<SplitString<T, "|">>
     : never
   : never;
-type ConvertOrigin<T> = T extends Record<string | number, InputRules>
+export type ValidTypes<T> = T extends Record<string | number, InputRules>
   ? ConvertUndefined<
       {
         [K in keyof T as K extends `.` ? never : K]: ValidTypes<T[K]>;
       } & ValidTypes<T["."]>,
       "required" extends GetKeys<T["."]> ? true : false
     >
-  : ValidTypes<T>;
-
-export type ValidTypes<T> = T extends Record<string | number, InputRules>
-  ? ConvertOrigin<T>
   : T extends RulesNames[]
   ? ConvertUndefined<
       UnionToIntersection<
@@ -166,12 +160,11 @@ export type ValidTypes<T> = T extends Record<string | number, InputRules>
   : T extends ValidArray<InputRules>
   ? T[1] extends "object"
     ? ConvertUndefined<
-        Record<string, Exclude<ValidTypes<T[0]>, undefined>> &
-          ConvertOrigin<T[2]>,
+        Record<string, Exclude<ValidTypes<T[0]>, undefined>> & ValidTypes<T[2]>,
         "required" extends GetKeys<T[2]> ? true : false
       >
     : ConvertUndefined<
-        Array<Exclude<ValidTypes<T[0]>, undefined>> & ConvertOrigin<T[2]>,
+        Array<Exclude<ValidTypes<T[0]>, undefined>> & ValidTypes<T[2]>,
         "required" extends GetKeys<T[2]> ? true : false
       >
   : T extends string

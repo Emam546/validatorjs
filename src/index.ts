@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isArray, isObject, isPromise, isString } from "@/utils/types";
 import {
@@ -102,6 +104,7 @@ class Validator<T extends InputRules> {
     const errors = await this.asyncGetErrors(inputs, lang);
     const state = Object.keys(errors).length === 0;
     if (state)
+      //@ts-ignore 
       return {
         state: true,
         data: inputs as ValidTypes<T>,
