@@ -393,12 +393,13 @@ describe("Valid attr", () => {
       age: 0,
       location: [1, 2, { anotheri: 1234 }],
     };
+
     expect(validAttr(f1, rules)).toStrictEqual(f1);
     expect(validAttr(f2, rules)).toStrictEqual(f1);
     expect(validAttr(f3, rules)).toStrictEqual(f3);
   });
   test("main task", () => {
-    const rules = {
+    const rules: unknown = {
       name: "string",
       age: ["integer"],
       location: [["integer"], "array", [{ min: 0 }, { max: 2 }]],
@@ -424,7 +425,9 @@ describe("Valid attr", () => {
     expect(validAttr(f3, rules)).toStrictEqual(f3);
   });
   test("array of objects", () => {
-    const rules = {
+    const rules: {
+      friends: [{ name: "string"; age: "integer" }];
+    } = {
       friends: [{ name: "string", age: "integer" }],
     };
     const f1 = {
@@ -447,7 +450,17 @@ describe("Valid attr", () => {
     expect(validAttr(f2, rules)).toStrictEqual(f1);
   });
   test("object map", () => {
-    const rules = {
+    const rules: {
+      friends: [
+        {
+          age: "integer";
+          email: "string";
+          location: [["integer"]];
+          friends: [{ age: ["integer"] }, "object"];
+        },
+        "object"
+      ];
+    } = {
       friends: [
         {
           age: "integer",

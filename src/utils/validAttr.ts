@@ -1,4 +1,4 @@
-import { ValidTypes } from "@/type";
+import { InputRules, ValidTypes } from "@/type";
 import constructObj, { ExtractedRules } from "./constructObj";
 import { isArray, isObject } from "./types";
 import { ObjectEntries } from ".";

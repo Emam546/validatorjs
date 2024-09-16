@@ -6,10 +6,10 @@ import Validator, {
 } from "@/index";
 import { GetKeys, RulesNames, UnionToIntersection } from "@/type";
 
-type Expect<T extends true> = T;
-type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y
-  ? 1
-  : 2
+export type Expect<T extends true> = T;
+export type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <
+  T
+>() => T extends Y ? 1 : 2
   ? true
   : false;
 

@@ -2,14 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isArray, isObject, isPromise, isString } from "@/utils/types";
-import {
-  InputRules,
-  PathRules,
-  RulesNames,
-  ValidTypes,
-  Errors,
-  AvailableRules,
-} from "@/type";
+import { InputRules, PathRules, RulesNames, ValidTypes, Errors } from "@/type";
 import type {
   InitSubmitFun,
   RuleFun,
@@ -49,7 +42,7 @@ declare namespace Validator {
   type ValidTypes<T> = typesCore.ValidTypes<T>;
   type ValidArray<T> = typesCore.ValidArray<T>;
   type Errors = typesCore.Errors;
-  type AvailableRules = typesCore.AvailableRules;
+
   type LangTypes = _LangTypes;
 
   type InitSubmitFun<
@@ -71,6 +64,9 @@ declare namespace Validator {
     Errors extends ErrorsType<Data> = RulesCore.MessagesStore<Data>,
     G = never
   > = RulesCore.default<Data, Errors, G>;
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface AvailableRules
+    extends globalThis.globalThis.Validator.AvailableRules {}
 }
 class Validator<T extends InputRules> {
   rules: T;
@@ -104,7 +100,7 @@ class Validator<T extends InputRules> {
     const errors = await this.asyncGetErrors(inputs, lang);
     const state = Object.keys(errors).length === 0;
     if (state)
-      //@ts-ignore 
+      //@ts-ignore
       return {
         state: true,
         data: inputs as ValidTypes<T>,
@@ -395,10 +391,10 @@ class Validator<T extends InputRules> {
     >;
   }
 
-  validAttr(inputs: unknown) {
+  validAttr(inputs: unknown): ValidTypes<T> {
     return validAttr(inputs, this.rules);
   }
-  inside(inputs: unknown) {
+  inside(inputs: unknown): inputs is ValidTypes<T> {
     return compare(this.validAttr(inputs), inputs);
   }
 
@@ -452,10 +448,10 @@ class Validator<T extends InputRules> {
     return this._validateInput(value, rule, value, ".", lang || Validator.lang);
   }
   static register<
-    T extends keyof AvailableRules,
-    Path extends AvailableRules[T]["path"] = AvailableRules[T]["path"],
-    Errors extends ErrorsType<Path> = AvailableRules[T]["errors"] extends ErrorsType<Path>
-      ? AvailableRules[T]["errors"]
+    T extends keyof globalThis.Validator.AvailableRules,
+    Path extends globalThis.Validator.AvailableRules[T]["path"] = globalThis.Validator.AvailableRules[T]["path"],
+    Errors extends ErrorsType<Path> = globalThis.Validator.AvailableRules[T]["errors"] extends ErrorsType<Path>
+      ? globalThis.Validator.AvailableRules[T]["errors"]
       : ErrorsType<Path>
   >(
     key: T,

@@ -1,4 +1,4 @@
-import Validator from "@/index";
+import ValidatorClass from "@/index";
 import { InvalidPath, UnMatchedType } from "@/utils/inValidAttr";
 import { ValueNotExist } from "@/Rules/required";
 import { Messages } from "@/Rules/require_if";
@@ -6,7 +6,7 @@ import { Messages as RequireWithoutMessages } from "@/Rules/require_without";
 
 describe("required method", () => {
   test("regular Test", () => {
-    const validator = new Validator({
+    const validator = new ValidatorClass({
       email: ["required"],
       password: ["required"],
     });
@@ -17,7 +17,7 @@ describe("required method", () => {
     ).toStrictEqual({
       password: [
         {
-          message: ValueNotExist[Validator.lang],
+          message: ValueNotExist[ValidatorClass.lang],
           value: undefined,
         },
       ],
@@ -30,7 +30,7 @@ describe("required method", () => {
     ).toStrictEqual({});
   });
   test("array objects", () => {
-    const validator = new Validator({
+    const validator = new ValidatorClass({
       users: [{ email: ["required"], password: ["required"] }],
     });
     expect(
@@ -79,7 +79,7 @@ describe("required method", () => {
     });
   });
   test("using null objects", () => {
-    const validator = new Validator({
+    const validator = new ValidatorClass({
       email: ["required"],
       password: ["required"],
     });
@@ -88,7 +88,7 @@ describe("required method", () => {
     );
   });
   test("test if the object its self is undefined", () => {
-    const validator = new Validator({
+    const validator = new ValidatorClass({
       email: ["required"],
       password: ["required"],
     });
@@ -97,7 +97,7 @@ describe("required method", () => {
 });
 describe("required if method", () => {
   test("regular Test", () => {
-    const validator = new Validator({
+    const validator = new ValidatorClass({
       password: [
         {
           required_if: {
@@ -117,7 +117,7 @@ describe("required if method", () => {
     expect(validator.getErrors({ name: "admin" })).toStrictEqual({
       password: [
         {
-          message: Messages[Validator.lang],
+          message: Messages[ValidatorClass.lang],
           value: undefined,
         },
       ],
@@ -126,7 +126,7 @@ describe("required if method", () => {
     expect(validator.getErrors({})).toStrictEqual({});
   });
   test("array objects", () => {
-    const validator = new Validator({
+    const validator = new ValidatorClass({
       users: [
         {
           password: [{ required_if: { path: "name", value: "admin" } }],
@@ -160,7 +160,7 @@ describe("required if method", () => {
     ).toStrictEqual({});
   });
   test("objects", () => {
-    const validator = new Validator({
+    const validator = new ValidatorClass({
       users: [
         {
           password: [{ required_if: { path: "name", value: "admin" } }],
@@ -174,7 +174,7 @@ describe("required if method", () => {
     ).toStrictEqual({
       users: [
         {
-          message: UnMatchedType[Validator.lang],
+          message: UnMatchedType[ValidatorClass.lang],
           value: [
             {
               name: "admin",
@@ -219,7 +219,7 @@ describe("required if method", () => {
 });
 describe("required without method", () => {
   test("regular method", () => {
-    const validator = new Validator({
+    const validator = new ValidatorClass({
       email: [
         {
           required_without: ["name", "phone"],
@@ -235,7 +235,7 @@ describe("required without method", () => {
     expect(validator.getErrors({ name: "ali" })).toStrictEqual({
       email: [
         {
-          message: RequireWithoutMessages[Validator.lang],
+          message: RequireWithoutMessages[ValidatorClass.lang],
           value: undefined,
         },
       ],
@@ -243,7 +243,7 @@ describe("required without method", () => {
     expect(validator.getErrors({})).toStrictEqual({
       email: [
         {
-          message: RequireWithoutMessages[Validator.lang],
+          message: RequireWithoutMessages[ValidatorClass.lang],
           value: undefined,
         },
       ],
@@ -253,7 +253,7 @@ describe("required without method", () => {
     );
   });
   test("array object", () => {
-    const validator = new Validator({
+    const validator = new ValidatorClass({
       users: [
         {
           name: null,
@@ -290,7 +290,7 @@ describe("required without method", () => {
     expect(validator.getErrors({ users: [{ name: "ali" }] })).toStrictEqual({
       "users.*0.email": [
         {
-          message: RequireWithoutMessages[Validator.lang],
+          message: RequireWithoutMessages[ValidatorClass.lang],
           value: undefined,
         },
       ],

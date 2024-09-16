@@ -21,15 +21,19 @@ type _Errors = {
     : never;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface AvailableRules extends G {}
+declare global {
+  namespace Validator {
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    interface AvailableRules extends G {}
+  }
+}
 export interface Errors extends _Errors {
   invalidPath: MessagesStore<{ obj: unknown }>;
   unMatchedType: MessagesStore<{ obj: unknown }>;
 }
 export type RulesNames = {
-  [K in keyof AvailableRules]: AvailableRules[K]["path"];
-}[keyof AvailableRules];
+  [K in keyof Validator.AvailableRules]: Validator.AvailableRules[K]["path"];
+}[keyof Validator.AvailableRules];
 export type ValidArray<T = unknown> =
   | [T]
   | [T, "object" | "array"]
@@ -121,7 +125,7 @@ type UnionToIntersectionHelper<U> = (
 export type UnionToIntersection<U> = boolean extends U
   ? UnionToIntersectionHelper<Exclude<U, boolean>> & boolean
   : UnionToIntersectionHelper<U>;
-type ValidG = AvailableRules[keyof AvailableRules];
+type ValidG = Validator.AvailableRules[keyof Validator.AvailableRules];
 type ConvertUndefined<T, State> = State extends true
   ? T
   : unknown extends T
@@ -138,7 +142,7 @@ export type GetKeys<T> = T extends Record<string | number, InputRules>
     ? ValidTypes<SplitString<T, "|">>
     : never
   : never;
-export type ValidTypes<T> = T extends Record<string | number, InputRules>
+export type ValidTypes<T> = T extends Record<string | number, unknown>
   ? ConvertUndefined<
       {
         [K in keyof T as K extends `.` ? never : K]: ValidTypes<T[K]>;
@@ -157,7 +161,7 @@ export type ValidTypes<T> = T extends Record<string | number, InputRules>
       >,
       "required" extends T[number] ? true : false
     >
-  : T extends ValidArray<InputRules>
+  : T extends ValidArray<unknown>
   ? T[1] extends "object"
     ? ConvertUndefined<
         Record<string, Exclude<ValidTypes<T[0]>, undefined>> & ValidTypes<T[2]>,
